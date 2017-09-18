@@ -1,0 +1,161 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <div><span class="listNum" ng-bind="totalRecords"></span>条策略</div>
+
+    <hr class="hr-solid">
+    <div>
+        <input type="text" placeholder="搜索策略名称" mdc-placeholder ng-keyup="myKeyup($event)" class="form-control leftsearch" ng-model="search">
+        <span ng-click="searchClick()" class="glyphicon glyphicon-search form-search"></span>
+        <span ng-click="cleanSearch()" ng-show="search" class="curpos cleanSearchBtn">×</span>
+    </div>
+    <hr class="hr-solid">
+
+    <div ng-click="clickGroup()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceGroupShow"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceGroupShow"></span>
+        <span>策略类型</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceGroupShow">
+        <li>
+            <input type="checkbox" ng-model="norm" class="chk_1" id="normalStr" ng-change="strategySelect()">
+            <label for="normalStr" ng-class="{'checkStyle':norm}"></label>
+            <label for="normalStr" class="curpos">通用策略</label>
+        </li>
+        <li>
+            <input type="checkbox" ng-model="style" class="chk_1"  id="styleStr" ng-change="strategySelect()">
+            <label for="styleStr" ng-class="{'checkStyle':style}"></label>
+            <label for="styleStr"  class="curpos">执勤模式</label>
+        </li>
+        <li>
+            <input type="checkbox" ng-model="lose" class="chk_1"  id="loseStr" ng-change="strategySelect()">
+            <label for="loseStr" ng-class="{'checkStyle':lose}"></label>
+            <label for="loseStr"  class="curpos"> 丢失模式</label>
+        </li>
+    </ul>
+</form>
+
+<!--右侧-->
+<div class="admin-list userList" ng-show="tableParams.total() > 0 && totalRecords > 0">
+    <div class="handle-div">
+        <button type="button" class="btn btn-blue" ng-click="addCommonStrategy()">新建通用策略</button>
+        <button type="button" class="btn btn-blue" ng-click="addModelStrategy()">新建模式策略</button>
+    </div>
+    <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+
+        <!--自定义表头-->
+        <colgroup>
+            <col width="80px" style="padding-left: 15px;"/>
+            <col width="250px"/>
+            <col width="100px"/>
+            <col width="100px"/>
+            <col/>
+        </colgroup>
+
+        <tr ng-repeat="item in $data track by $index" ng-click="clickTr(item)" ng-class="{visited:item.visited}">
+            <td data-title="'序号'" style="width: 5%;min-width: 80px">
+                <div class="td default left-border">
+                    <span  ng-bind="$index+1"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'策略名称'" style="width: 20%;min-width: 250px">
+                <div class="td default">
+                    <span ng-bind="item.name"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'部署设备'" style="width: 10%;min-width: 100px">
+                <div class="td default">
+                    <span ng-bind="item.terminalTotoal"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'策略类型'" style="width: 15%;min-width: 100px">
+                <div class="td default">
+                    <span ng-if="item.model==1">通用策略</span>
+                    <span ng-if="item.model==2">执勤模式</span>
+                    <span ng-if="item.model==3">丢失模式</span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'最后更新时间'" style="width: 20%;min-width: 160px">
+                <div class="td default">
+                    <span>{{item.updateTime|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'操作'" style="width: 35%;min-width: 300px">
+                <div class="td right-border default">
+                    <span class="desc-text mr10" ng-if="item.model==1" ng-click="editStrategy(item.id,item.name)">编辑策略</span>
+                    <span class="desc-text mr10" ng-if="item.model==2" ng-click="editModel(item.id,item.model,item.name)">编辑策略</span>
+                    <span class="desc-text mr10" ng-if="item.model==3" ng-click="editModelLose(item.id,item.model,item.name)">编辑策略</span>
+                    <span class="desc-text mr10" ng-click="deviceStrategy(item.id, item.terminalTotoal,item.name)">变更部署设备</span>
+                    <a class="curpos showMore mr10" ng-mouseover="moreShow(item)" ng-mouseleave="morehide(item)">
+						<span>更多
+                            <span class="caret"></span>
+                        </span>
+
+                        <ul class="moreSys" ng-show="item.showMore">
+                            <li class="sysList" ng-click="konwInfo(item.id)">
+                                <span>查看部署详情</span>
+                            </li>
+                            <li class="sysList" ng-click="delStrategy(item.id)">
+                                <span>删除</span>
+                            </li>
+                        </ul>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]" ng-bind="'当前'+totalRecords+'条'"></p>
+</div>
+
+<div class="admin-list userList noResultContent" ng-show="noResultContent">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img ng-src="{{'${base}/themes/default/images/' + faceImg +'.png'}}" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm" ng-bind="noContent"></p>
+            <ul>
+                <li ng-repeat="chooseCheck in chooseList" class="listLi">
+                    <p class="fs14">
+                        <img src="${base}/themes/default/images/circleRight.png" />
+                        <span ng-bind="chooseCheck.prevLink"></span>
+                        <span ng-bind="chooseCheck.content" ng-click="addStrategy(chooseCheck.textLink,chooseCheck.commonStr)" ng-class="{'desc-text':chooseCheck.textLink}"></span>
+                        <span ng-bind="chooseCheck.nextLink"></span>
+                    </p>
+                </li>
+            </ul>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>
+
+<div class="foot" ng-show="tableParams.total() > 0 && totalRecords > 0">
+    <div class="infoImg">
+        <img src="${base}/themes/default/images/policy.png" />
+    </div>
+    <p class="personName mbt20">
+        {{prevItem.name}}
+    </p>
+    <!--<p class="fcb" style="padding-bottom:10px">已启用</p>-->
+    <p class="deviceInfo"><span class="deviceInfoName">部署设备:</span><span ng-bind="prevItem.terminalTotoal"></span><span>台设备</span></p>
+    <p class="deviceInfo"><span class="deviceInfoName">策略类型:</span>
+        <span ng-if="prevItem.model==1">通用策略</span>
+        <span ng-if="prevItem.model==2">执勤模式</span>
+        <span ng-if="prevItem.model==3">丢失模式</span>
+    </p>
+    <p class="deviceInfo"><span class="deviceInfoName">更新时间:</span><span ng-bind="prevItem.updateTime|date:'yyyy-MM-dd HH:mm:ss'"></span></p>
+</div>
+<section ng-show="alert.msg" class="col-md-4 alertMsg">
+    <div class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), alert.closeable ? 'alert-dismissable' : null]" role="alert">
+        <button ng-show="alert.closeable" type="button" class="close" ng-click="alertInf.close(0)" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div>
+            <span class="ng-scope ng-binding" ng-bind="alert.msg"></span></div>
+    </div>
+</section>

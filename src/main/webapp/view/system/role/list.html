@@ -1,0 +1,128 @@
+<!--左侧搜索表单-->
+<form class="role-frm" ng-submit="clickSearch()">
+    <div><span ng-bind="totalRecords" class="listNum"></span>个角色</div>
+
+    <hr class="hr-solid">
+    <div>
+        <input type="text" placeholder="搜索名称、创建人、描述…" ng-model="search" mdc-placeholder ng-keyup="myKeyup($event)" class="form-control leftsearch">
+        <span ng-click="clickSearch()" class="glyphicon glyphicon-search form-search"></span>
+        <span ng-click="cleanSearch()" ng-show="search" class="curpos cleanSearchBtn">×</span>
+    </div>
+</form>
+
+<!--右侧-->
+<div class="admin-list userList" ng-show="tableParams.total() > 0 && totalRecords > 0">
+    <div class="handle-div">
+        <button type="button" class="btn btn-blue" ng-click="openRoleModalDialog()">添加</button>
+        <button type="button" class="btn btn-red" ng-click="deleteConfirm()" >删除</button>
+    </div>
+    <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+
+        <!--自定义表头-->
+        <colgroup>
+            <col width="50px"/>
+            <col width="80px"/>
+            <col width="180px"/>
+            <col width="100px"/>
+            <col width="130px"/>
+            <col width="200px"/>
+            <col/>
+        </colgroup>
+        <tr ng-repeat="it in $data track by $index" ng-click="clickTr(it)" ng-class="{visited:it.visited}">
+            <td style="width: 6%;min-width: 60px;">
+                <div class="td left-border default">
+                    <div class="checkbox-valign">
+                        <input type="radio" name="chk" id="{{it.id}}" class="rdo_1 table_rdo" ng-checked="it.checked" ng-value="it.id" >
+                        <label for="{{it.id}}"></label>
+                    </div>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+
+            <td data-title="'序号'" style="width: 5%;min-width: 80px;">
+                <div class="td default">
+                    <span ng-bind="tableParams.count() * (tableParams.page()- 1) + $index + 1" ></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'角色名称'" style="width: 15%;min-width: 180px;">
+                <div class="td default">
+                    <span ng-bind="it.name"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'创建人'" style="width: 10%;min-width: 100px;">
+                <div class="td default">
+                    <span ng-bind="it.userName"></span>
+
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'创建时间'" style="width: 13%;min-width: 160px;">
+                <div class="td default">
+                    <span ng-bind="it.createTime|date:'yyyy-MM-dd HH:mm:ss'"></span>
+
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'角色描述'" style="width: 25%;max-width: 200px;">
+                <div class="td default table-whitespace">
+                    <span title="{{it.note}}" ng-bind="it.note"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'操作'" style="width: 13%;min-width: 100px;">
+                <div class="td default right-border">
+                    <span class="desc-text" ng-click="openRoleModalDialog(it)">编辑角色</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]" ng-bind="'当前'+tableParams.total()+'条'"></p>
+</div>
+
+<div class="admin-list userList noResultContent" ng-show="noResultContent">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img ng-src="{{'${base}/themes/default/images/' + faceImg +'.png'}}" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm" ng-bind="noContent"></p>
+            <ul>
+            	<li ng-repeat="chooseCheck in chooseList" style="list-style:none;">
+            		<p class="fs14">
+	                	<img src="${base}/themes/default/images/circleRight.png" />
+	                	<span ng-bind="chooseCheck.prevLink"></span>
+		               	<span ng-bind="chooseCheck.content" ng-click="addRole(chooseCheck.textLink)" ng-class="{'desc-text':chooseCheck.textLink}"></span>
+		               	<span ng-bind="chooseCheck.nextLink"></span>
+		            </p>
+            	</li>
+            </ul>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>
+
+<div class="foot" ng-show="tableParams.total() > 0 && totalRecords > 0">
+	<div class="infoImg">
+		<img src="${base}/themes/default/images/role.png" />
+	</div>
+	<p class="personName" ng-bind="prevItem.name">
+	</p>
+	<p class="fcb" style="padding-bottom:10px" ng-bind="prevItem.userName"></p>
+	<p class="deviceInfo">
+		<span class="deviceInfoName">角色描述:</span>
+        <span class="fcb" style="padding-bottom:10px" ng-bind="prevItem.note"></span>
+	</p>
+</div>
+
+
+<section ng-show="alert.msg" class="col-md-4" style="position: absolute; top: 20px; left: 500px; z-index: 9999;">
+    <div class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), alert.closeable ? 'alert-dismissable' : null]" role="alert">
+        <button ng-show="alert.closeable" type="button" class="close" ng-click="alertInf.close(0)" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div>
+            <span class="ng-scope ng-binding" ng-bind="alert.msg"></span></div>
+    </div>
+</section>

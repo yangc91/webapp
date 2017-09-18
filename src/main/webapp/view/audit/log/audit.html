@@ -1,0 +1,37 @@
+<div class="modal-body" style="padding-top: 0px;margin-top: -20px;">
+    <form name="addFrm" method="post" novalidate="novalidate">
+        <table class="dialogNormal" style="font-size: 14px;line-height: 34px;">
+            <tr class="addTableTr">
+                <td class="fc9" style="width: 100px;"> 设备所有人：</td>
+                <td style="width: 150px">
+                    <span ng-bind="selectItem.personName"></span>
+                </td>
+                <td class="fc9" style="width: 100px">警号：</td>
+                <td style="width: 150px">
+                    <span ng-bind="selectItem.personCode"></span>
+                </td>
+            </tr>
+            <tr class="addTableTr">
+                <td class="fc9">违规事件：</td>
+                <td><span ng-bind="selectItem.violationName"></span></td>
+                <td class="fc9">违规等级：</td>
+                <td><span ng-bind="selectItem.violationGrade"></span></td>
+            </tr>
+            <tr class="addTableTr">
+                <td class="fc9">违规处理：</td>
+                <td colspan="3"><span ng-bind="selectItem.disposeTypeStr"></span></td>
+            </tr>
+            <tr class="addTableTr">
+                <td class="fc9" style="vertical-align: text-top;">审计意见：</td>
+                <td colspan="3" style="padding-top: 10px;">
+                    <div ng-class="{'has-success':addFrm.modelMsgInput.$valid, 'has-error':addFrm.modelMsgInput.$invalid && addFrm.modelMsgInput.$dirty}">
+                    <textarea style="height: 150px" class="form-control" ng-model="modelMsg"
+                              ng-blur="blurCheck(addFrm.modelMsgInput)" name="modelMsgInput" required tooltip="{{addFrm.modelMsgInput.$invalid?'审批意见不能为空':''}}" tooltip-placement="bottom"
+                    ></textarea>
+                    </div>
+                    <p class="fc9 fs12">提示：审计后，将解除对该违规事件的违规处理。</p>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>

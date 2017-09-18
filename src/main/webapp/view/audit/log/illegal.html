@@ -1,0 +1,138 @@
+<div style="height:460px">
+	<div class="w350 float-left mt25">
+		<div class="phoneBg">
+				<table class="phoneInfo mt20" style="display: <#if device.deviceActualId??>block;<#else>none;</#if>">
+					<tr>
+						<td class="txtr w70">更新时间：</td>
+						<td class="mdc-layer" id="illegalTime">
+							<#if device.actualTimeStr??>${device.actualTimeStr!}<#else>--</#if>
+						</td>
+					</tr>
+					<tr>
+						<td class="txtr ">违规事件：</td>
+						<td>
+							<div id="illegalViolationName" class="w70 mdc-layer" title="${violation.violationName!}">${violation.violationName!}</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="txtr">摄像头：</td>
+						<td class="mdc-layer" id="illegalCameraStatus">
+							<#if device.cameraStatus??><#if device.cameraStatus == 1>开启<#else>关闭</#if><#else>--</#if>
+						</td>
+					</tr>
+					<tr>
+						<td class="txtr">蓝牙：</td>
+						<td class="mdc-layer" id="illegalBluetoothStatus">
+							<#if device.bluetoothStatus??><#if device.bluetoothStatus == 1>开启<#else>关闭</#if><#else>--</#if>
+						</td>
+					</tr>
+					<tr>
+						<td class="txtr">WIFI：</td>
+						<td class="mdc-layer" id="illegalWifiStatus">
+							<#if device.wifiStatus??><#if device.wifiStatus == 1>开启<#else>关闭</#if><#else>--</#if>
+						</td>
+					</tr>
+					<tr>
+						<td class="txtr">密码锁屏：</td>
+						<td class="mdc-layer" id="illegalScreenStatus">
+							<#if device.screenStatus??><#if device.screenStatus == 1>无锁屏<#else>加密锁屏</#if><#else>--</#if>
+						</td>
+					</tr>
+					<!-- <tr>
+						<td class="txtr">GPS：</td>
+						<td class="mdc-layer" id="illegalGpsStatus">
+							<#if device.gpsStatus??><#if device.gpsStatus == 1>开启<#else>关闭</#if><#else>--</#if>
+						</td>
+					</tr> -->
+					<tr>
+						<td class="txtr">设备root：</td>
+						<td class="mdc-layer" id="illegalIsRoot">
+							<#if device.isRoot??><#if device.isRoot == 1>是<#else>否</#if><#else>--</#if>
+						</td>
+					</tr>
+					<tr>
+						<td class="txtr">USB连接：</td>
+						<td class="mdc-layer" id="illegalUsbConnectStatus">
+							<#if device.usbConnectStatus??><#if device.usbConnectStatus == 1>调试<#elseif device.usbConnectStatus == 2>相册<#else>充电</#if><#else>--</#if>
+						</td>
+					</tr>
+				</table>
+				<div class="cantGet" style="display: <#if device.deviceActualId??>none;<#else>block;</#if>">
+					<div class="noMessage">暂时无法获取设备信息</div>
+					<p>可能原因：</p>
+					<p>1、设备网络不通</p>
+					<p>2、设备移动安全助手客户端被卸载</p>
+					<p>3、设备激活授权被设备所有人取消</p>
+					<p>4、设备关机</p>
+					<p>请联系设备所有人，设备重新在线后重试刷新</p>
+				</div>
+			<div class="isLoading" style="display: none;">
+				<img src="${base}/image/loader.gif"/>
+				<p>正在获取，请稍后...</p>
+			</div>
+		</div>
+		<div class="btn-group ml130">
+			<button type="button" class="btn btn-default" onclick="refleshIllegal(${violation.id})">刷新</button>
+		</div>
+	</div>
+	<div class="info-right float-left">
+		<div class="systemTips">
+			<div class="successTip" style="display: none;">
+				<span>&nbsp;&nbsp;恭喜您，管控成功！</span>
+			</div>
+			<div class="waitTip" style="display: none;">
+				<span>&nbsp;&nbsp;指令正在发送中，请稍等<span id="lastResultStatus"></span>秒...</span>
+			</div>
+			<div class="failTip" style="display: none;">
+				<span><img src="${base}/themes/default/images/stop.png" />&nbsp;&nbsp;管控失败，请联系警员确认设备状态正常后重新尝试！</span>
+			</div>
+		</div>
+		<div class="baseInfo" style="line-height:30px;">
+			<div style="width:230px">所有人：<span>${device.personName}</span></div>
+			<div style="width:200px">警号：<span>${device.personCode}</span></div>
+			<div style="width:230px">IMEI号：<span>${device.imei}</span></div>
+			<div style="width:300px;" class="mdc-layer">所属部门：<span title="${device.deptName}">${device.deptName}</span></div>
+		</div>
+		<div class="manageControl">
+			<table>
+				<tr>
+					<td>
+						<img src="${base}/image/baojing.png" /><br/>
+						<button type="button" class="btn btn-default mt10" onclick="operatePC(7, 0)">鸣笛报警</button>
+					</td>
+					<td>
+						<img src="${base}/image/shexiangtou.png" /><br/>
+						<button type="button" class="btn btn-default mt10" onclick="operatePC(3, 1)">开启</button>
+						<button type="button" class="btn btn-default mt10 ml15" onclick="operatePC(3, 2)">关闭</button>
+					</td>
+					<td>
+						<img src="${base}/image/bluetooth.png" /><br/>
+						<button type="button" class="btn btn-default mt10" onclick="operatePC(2, 1)">开启</button>
+						<button type="button" class="btn btn-default mt10 ml15" onclick="operatePC(2, 2)">关闭</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="${base}/image/wifiBig.png" /><br/>
+						<button type="button" class="btn btn-default mt10" onclick="operatePC(1, 1)">开启</button>
+						<button type="button" class="btn btn-default mt10 ml15" onclick="operatePC(1, 2)">关闭</button>
+					</td>
+					<td>
+						<img src="${base}/image/xiaochumima.png" /><br/>
+						<button type="button" class="btn btn-default mt10" onclick="operatePC(8, 0)">消除密码</button>
+					</td>
+					<td>
+						<img src="${base}/image/suoping.png" /><br/>
+						<button type="button" class="btn btn-default mt10" id="lockScreen">密码锁屏</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="${base}/image/cachushuju.png" /><br/>
+						<button type="button" class="btn btn-default mt10" onclick="operatePC(5, 0)">恢复出厂设置</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>

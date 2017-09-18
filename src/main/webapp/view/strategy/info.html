@@ -1,0 +1,150 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+	<a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回列表</a>
+	<div>共<span ng-bind="totalRecords"></span>台设备</div>
+    <hr class="hr-solid">
+
+    <div>
+        <input type="text" placeholder="搜索IMEI、姓名、警号..." mdc-placeholder ng-keyup="myKeyup($event)" class="form-control leftsearch" ng-model="search">
+        <span ng-click="searchClick()" class="glyphicon glyphicon-search form-search"></span>
+        <span ng-click="cleanSearch()" ng-show="search" class="curpos cleanSearchBtn">×</span>
+    </div>
+    <hr class="hr-solid">
+
+	 <div class="ztreeDiv" ng-mouseleave="closeTree()">
+         <div class="input-group icon-search"  ng-click="showDept()">
+             <div class="form-control leftTree">
+                 <input class="searchDept" type="text" placeholder="要筛选的部门..."  mdc-placeholder readonly ng-show="!selectDept.name" ng-model="selectDept.name">
+                 <p ng-bind="selectDept.name" class="whiteSpace" title="{{selectDept.name}}"></p>
+                 <button class="close searchDeptBtn" ng-click="removeSelectDept()" type="button" ng-show="selectDept.name">×</button>
+             </div>
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-triangle-bottom searchDeptLogo"></span>
+            </span>
+         </div>
+         <hr class="hr-solid">
+        <div class=" form-control authChoose flowZtree" ng-show="showTree" when-scrolled="loadMoreDeptList()">
+            <div class="input-group icon-search" ng-click="searchdept()">
+                <input type="text" placeholder="搜索部门..." mdc-placeholder ng-keyup="myKeyupdept($event)" class="form-control" ng-model="d.deptName">
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-search"></span>
+                </span>
+            </div>
+            <div>
+                <ul>
+                    <li ng-repeat="dept in deptList" class="deptListLi">
+                        <img src="${base}/themes/default/images/deptGroup.png">
+                        <span ng-click="onSelectedDept(dept)" title="{{dept.name}}" ng-bind="dept.name | cut:true:10:' ...'"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+	<div ng-click="clickGroup()" class="curpos">
+        <span class="glyphicon glyphicon glyphicon-triangle-bottom" ng-show="deviceGroupShow"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceGroupShow"></span>
+        <span style="margin-left: 5px;">策略执行状态</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceGroupShow">
+        <li>
+            <input type="checkbox" ng-model="excute" id="excuteStr" class="chk_1" ng-change="selectExcute()">
+            <label for="excuteStr"></label>
+            <label for="excuteStr"  class="curpos">已执行</label>
+        </li>
+        <li>
+            <input type="checkbox" ng-model="noExcute" id="noExcuteStr" class="chk_1" ng-change="selectExcute()">
+            <label for="noExcuteStr"></label>
+            <label for="noExcuteStr" class="curpos" >未执行</label>
+        </li>
+    </ul>
+</form>
+
+<!--右侧-->
+<div class="admin-list userList" ng-show="tableParams.total() > 0">
+    <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+
+        <!--自定义表头-->
+        <colgroup>
+            <col width="120px"/>
+            <col width="300px"/>
+            <col width="120px"/>
+            <col width="200px"/>
+            <col />
+        </colgroup>
+
+        <tr ng-repeat="item in $data track by $index" ng-click="clickTr(item)" ng-class="{visited:item.visited}">
+            <td data-title="'姓名'" style="width: 10%;min-width: 120px;">
+                <div class="td left-border default">
+                    <span ng-click="deviceControl(item.id)" ng-bind="item.personName"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'部门'"  style="width: 30%;max-width: 300px;">
+                <div class="td default table-whitespace" title="{{item.deptName}}">
+                    <span ng-bind="item.deptName"></span>
+
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'警号'"  style="width: 10%;min-width: 120px;">
+                <div class="td default">
+                    <span ng-bind="item.policeCode"></span>
+
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'IMEI号'"  style="width: 20%;min-width: 200px;">
+                <div class="td default">
+                    <span ng-bind="item.imei"></span>
+
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'策略执行状态'"  style="width: 10%;min-width: 120px;">
+                <div class="td right-border default">
+                    <span>
+                        <span ng-if="item.resultStatus==1">已执行</span>
+                        <span ng-if="item.resultStatus==0">未执行</span>
+                    </span>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]" ng-bind="'当前'+totalCount+'条'"></p>
+</div>
+
+<div class="admin-list userList noResultContent" ng-show="noResultContent">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img src="${base}/themes/default/images/secondConfirm.png" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm">啊呀，该策略没有部署任何设备…</p>
+            <p class="fs14">
+                <img src="${base}/themes/default/images/circleRight.png" />
+                请<span class="desc-text" ng-click="goBack()">返回列表</span>变更部署设备。
+            </p>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>
+
+<div class="foot" ng-show="tableParams.total() > 0">
+	<div class="infoImg">
+		<img src="${base}/themes/default/images/device.png" />
+	</div>
+    <p class="personName" ng-bind="prevItem.personName">
+		张三
+    </p>
+    <p class="fcb" style="padding-bottom:10px" ng-bind="prevItem.deptName">贵阳市公安局</p>
+    <p class="deviceInfo">
+    	<span class="deviceInfoName">策略状态:</span>
+    	 <span ng-if="prevItem.resultStatus==1">已执行</span>
+         <span ng-if="prevItem.resultStatus==0">未执行</span>
+    </p>
+    <p class="deviceInfo">
+    	<span class="deviceInfoName">IMEI号:&nbsp;&nbsp;&nbsp;</span>
+    	<span ng-bind="prevItem.imei">150381611833816</span>
+   	</p>
+</div>

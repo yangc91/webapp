@@ -1,0 +1,173 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <div><span class="listNum" ng-bind="recordsNumber"></span>件违规事件</div>
+
+    <hr class="hr-solid">
+    <div>
+        <input type="text" placeholder="搜索IMEI、姓名、警号..." mdc-placeholder ng-keyup="myKeyup($event)" class="form-control leftsearch" ng-model="search">
+        <span ng-click="searchClick()" class="glyphicon glyphicon-search form-search"></span>
+        <span ng-click="cleanSearch()" ng-show="search" class="curpos cleanSearchBtn">×</span>
+    </div>
+
+    <hr class="hr-solid">
+    <div class="ztreeDiv" ng-mouseleave="closeTree()">
+        <div class="input-group icon-search" ng-click="showDept()">
+            <div class="form-control leftTree">
+                <input style="border: none;" type="text" placeholder="要筛选的部门..."  mdc-placeholder readonly ng-show="!selectDept.name" ng-model="selectDept.name">
+                <p ng-bind="selectDept.name" class="whiteSpace" title="{{selectDept.name}}"></p>
+                <button class="close" ng-click="removeSelectDept()" type="button" style="position: relative;top: -19px;right: -17px" ng-show="selectDept.name">×</button>
+            </div>
+
+            <span class="input-group-addon" style="background-color: #FFFFFF">
+                <span style="font-size: 12px;" class="glyphicon glyphicon-triangle-bottom"></span>
+            </span>
+        </div>
+        <hr class="hr-solid">
+        <div class=" form-control authChoose flowZtree" ng-show="showTree" when-scrolled="loadMoreDeptList()">
+            <div class="input-group icon-search">
+                <input type="text" placeholder="搜索部门..." mdc-placeholder ng-keyup="myKeyupdept($event)" class="form-control" ng-model="d.deptName">
+                <span class="input-group-addon">
+                <span class="glyphicon glyphicon-search" ng-click="searchdept()"></span>
+                </span>
+            </div>
+            <div>
+                <ul>
+                    <li ng-repeat="dept in deptList" style="margin-top: 8px; list-style: none">
+                        <img src="${base}/themes/default/images/deptGroup.png">
+                        <span ng-click="onSelectedDept(dept)" title="{{dept.name}}" ng-bind="dept.name | cut:true:10:' ...'"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div ng-click="changestate1()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState1"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState1"></span>
+        <span>日志状态</span>
+    </div>
+    <ul class="role-list" ng-show="deviceState1">
+        <li class="curpos">
+            <input type="checkBox" class="chk_1" name="statecheckBox" ng-model="unaudit"  id="waitAudit" ng-change="auditSelect()">
+            <label for="waitAudit" ng-class="{'checkStyle':unaudit}"></label>
+            <label for="waitAudit" class="curpos" >待审计事件</label>
+        </li>
+        <li class="curpos">
+            <input type="checkBox" class="chk_1" name="statecheckBox" ng-model="audit" id="audited" ng-change="auditSelect()">
+            <label for="audited" ng-class="{'checkStyle':audit}"></label>
+            <label for="audited" class="curpos">已审计事件</label>
+        </li>
+    </ul>
+    <hr class="hr-solid">
+    <div ng-click="changestate2()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState2"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState2"></span>
+        <span>违规等级</span>
+    </div>
+
+
+    <ul class="role-list" ng-show="deviceState2">
+        <li ng-repeat="grade in gradeArray track by $index">
+            <input type="checkbox" class="chk_1" ng-model="grade.selected" id="{{'firstIllegal_' + grade.value}}" ng-change="gradeSelect()">
+            <label for="{{'firstIllegal_' + grade.value}}" ng-class="{'checkStyle':grade.selected}"></label>
+            <label style="font-weight: normal;" class="curpos" for="{{'firstIllegal_' + grade.value}}" ng-bind="grade.name"></label>
+        </li>
+    </ul>
+    <hr class="hr-solid">
+    <div ng-click="changestate3()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState3"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState3"></span>
+        <span>违规处理</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceState3" style="margin-bottom: 30px">
+        <li ng-repeat="dispose in disposeTypeArray track by $index">
+            <input type="checkbox" class="chk_1" ng-model="dispose.selected" id="{{'dispose_' + dispose.value}}" ng-change="disposeSelect()">
+            <label for="{{'dispose_' + dispose.value}}" ng-class="{'checkStyle':dispose.selected}"></label>
+            <label style="font-weight: normal;" class="curpos" for="{{'dispose_' + dispose.value}}" ng-bind="dispose.name"></label>
+        </li>
+    </ul>
+</form>
+<div class="admin-list" style="overflow: auto;height: 100%;" ng-show="tableParams.total() > 0">
+    <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+
+        <!--自定义表头-->
+        <colgroup>
+            <col width="160px" style="padding-left: 25px;"/>
+            <col width="255px"/>
+            <col width="160px"/>
+            <col width="160px"/>
+            <col />
+        </colgroup>
+
+        <tr ng-repeat="item in $data track by $index" ng-click="clickNetTr(item)" ng-class="{visited:item.visited}">
+
+            <td data-title="'设备所属人员'">
+                <div class="td left-border default">
+                    <span ng-bind="item.personName"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'违规事件'" >
+                <div class="td default table-whitespace" title="{{item.violationName}}" style="width: 255px">
+                    <span class="gradeSpan" ng-class="{'spanBg1':item.violationGrade=='一级违规','spanBg2':item.violationGrade=='二级违规','spanBg3':item.violationGrade=='三级违规'}"  ng-bind="item.violationGrade"></span>
+                    <span ng-bind="item.violationName"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'违规自动处理'">
+                <div class="td default">
+                    <span ng-bind="item.disposeTypeStr"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'违规时间'">
+                <div class="td default">
+                    <span ng-bind="item.violationTime | date:'yyyy-MM-dd HH:mm' "></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'操作'">
+                <div class="td right-border default" >
+                    <span class="desc-text" ng-click="auditDialog(item)" ng-if="item.auditStatus==0">审计</span>
+                    <span class="" ng-if="item.auditStatus==1">已审计</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]" ng-bind="'当前' + tableParams.total() + '条'"></p>
+</div>
+
+<div class="admin-list userList noResultContent" ng-show="noResultContent">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img src="${base}/themes/default/images/secondConfirm.png" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm">啊呀，没有检索到任何内容……</p>
+            <p class="fs14">
+                <img src="${base}/themes/default/images/circleRight.png" />
+                请更改条件后再次搜索或筛选
+            </p>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>
+
+<section ng-show="alert.msg" style="position: absolute; top: 20px; left: 400px; right: 400px; z-index: 9999;">
+    <div class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), alert.closeable ? 'alert-dismissable' : null]" role="alert">
+        <button ng-show="alert.closeable" type="button" class="close" ng-click="alert=null" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div>
+            <span class="ng-scope ng-binding" ng-bind="alert.msg"></span></div>
+    </div>
+</section>
+<div class="foot" ng-show="tableParams.total() > 0">
+    <div class="infoImg">
+        <img src="${base}/themes/default/images/people.png" />
+    </div>
+    <p class="personName" style="margin-bottom: 6px;" ng-bind="prevItem.personName"></p>
+    <p class="fcb" style="padding-bottom:10px" ng-bind="prevItem.deptName"></p>
+    <p class="deviceInfo"><span class="deviceInfoName">警号:&nbsp;&nbsp;&nbsp;&nbsp;</span><span ng-bind="prevItem.personCode||'&#45;&#45;'"></span></p>
+    <p class="deviceInfo"><span class="deviceInfoName">IMEI号:</span><span ng-bind="prevItem.imei||'--'"></span></p>
+</div>

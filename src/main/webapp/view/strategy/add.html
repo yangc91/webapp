@@ -1,0 +1,648 @@
+<!--左侧搜索表单-->
+<style>
+	.ng-table-pager{
+		width: 500px;
+		padding-right: 0px;
+		margin-top: 20px;
+	}
+</style>
+<form class="role-frm">
+	<a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回列表</a>
+    <div class="deviceTitle">新建策略</div>
+
+    <hr class="hr-solid">
+    <div>
+        <ul class="stgyAddList">
+        	<li ng-repeat="addStep in addStepList" ng-class="'addstep'+addStep.id">
+        		<p>
+	        		<img class="stepLine" src="${base}/themes/default/images/blue-line.png" ng-show="(addStep.active) && (addStep.lineShow)"/>
+	        		<img class="stepLine" src="${base}/themes/default/images/gray-line.png" ng-show="(!addStep.active) && (addStep.lineShow)"/>
+	        	</p>
+        		<img ng-src="{{'${base}/themes/default/images/' + addStep.pic +'.png'}}" width="40px" ng-show="addStep.active"/>
+        		<img ng-src="{{'${base}/themes/default/images/' + addStep.pic2 +'.png'}}" width="40px" ng-show="!addStep.active" />
+        		<span class="ml10" ng-class="{'fc9':!addStep.active}" ng-bind="addStep.name"></span>
+        	</li>
+        </ul>
+    </div>
+</form>
+<!--右侧-->
+<!--第一步-->
+<div ng-show="firstStepShow">
+	<div class="admin-list">
+		<div class="handle-div handleHeight">
+			<div class="groupLogo">
+				<img src="${base}/themes/default/images/policy.png" width="50px" />
+			</div>
+			<p class="editGroupDevice strategyTitle" ng-bind="addStepList[0].name"></p>
+			<p class="fc9">
+				系统提供了“高中低”三个安全等级的策略配置，可根据实际需要选择其一，并调整默认项。
+			</p>
+		</div>
+		<div class="addStrategy">
+			<ul>
+				<li class="strgFirstStep ml0" ng-repeat="gradeChoose in strategyCodeList.STRATEGY_GRADE" ng-click="firstStepClick(gradeChoose.itemCode)" ng-class="{'active':gradeChoose.itemCode == itemCode}" >
+					<span ng-show="gradeChoose.itemCode == itemCode" class="glyphicon glyphicon-ok rightOk"></span>
+					<img class="mbt10" ng-src="{{'${base}/themes/default/images/' + gradePic[gradeChoose.itemCode] +'.png'}}" />
+					<span class="editGroupDevice mbt10 fs14">策略等级：<span ng-bind="gradeChoose.itemName"></span></span>
+					<p class="lh26" ng-bind="gradeChoose.note"></p>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="psdBtns">
+		<button type="button" class="btn btn-gray" ng-click="goBack()">取消</button>
+		<button type="button" class="btn btn-disable rightGryArrow" ng-show = '!nextshow'>
+			下一步
+		</button>
+		<button type="button" class="btn btn-green rightArrow" ng-show="nextshow" ng-click="stepTwo(itemCode)">
+			下一步
+		</button>
+	</div>
+</div>
+<!--第二步-->
+<div ng-show="secondStepShow">
+	<div class="admin-list">
+		<div class="handle-div handleHeight">
+			<div class="groupLogo">
+				<img src="${base}/themes/default/images/policy.png" width="50px" />
+			</div>
+			<p class="editGroupDevice strategyTitle" ng-bind="addStepList[1].name"></p>
+			<p class="fc9">
+				限制使用设备外设功能：如WIFI，GPS，蓝牙等；监测外设状态信息。
+			</p>
+		</div>
+		<form name="addFrm"  novalidate="novalidate">
+			<div class="addStrategy">
+				<p class="editGroupDevice fs14">策略基本信息</p>
+				<p class="secondTitle">策略名称</p>
+				<p ng-class="{'has-success':addFrm.strategyName.$valid, 'has-error':addFrm.strategyName.$invalid && addFrm.strategyName.$dirty}" class="h55">
+					<input type="text" class="form-control w350" ng-model="extendStrategyName" name="strategyName" required maxlength="15" minlength="3"
+						placeholder="如:财务部日常策略" ng-pattern="/^[\u4E00-\u9FA5\uF900-\uFA2D]+$/" ng-keyup="checkDubStrName(extendStrategyName)"
+						tooltip="名称必须是1-15个汉字且不能重复" tooltip-placement="bottom" ng-class="{'borderRed':checkStrategyName}"/>
+					<span class="fs12 password" ng-show="errorShow">{{addFrm.strategyName.$error.required?'策略项必填' : (addFrm.strategyName.$error.maxlength?'策略项最大15位' :( addFrm.strategyName.$error.pattern?'名称必须是中文':(checkStrategyName?'该策略名称已被占用,请重新输入！':'')))}}</span>
+				</p>
+				<p class="secondTitle">备注<span class="fc9 fs12">（选填）</span></p>
+				<p>
+					<input type="text" class="form-control w350" ng-model="extendStrategyNote" maxlength="64" placeholder="如:这是一段关于'财务部日常策略'的备注" mdc-placeholder />
+				</p>
+				<p class="editGroupDevice fs14">设备硬件使用限制</p>
+				<ul>
+					<li ng-repeat="limitUse in strategyCodeList.extendStrategy" class="fc6 listLi lh26" ng-if="limitUse.itemCode!='isConnectUSB'" >
+						<input type="checkbox" ng-change="toggleCheck(limitUse)" id="{{limitUse.itemCode}}" class="chk_1" ng-model="limitUse.selected" ng-checked="limitUse.id==1">
+						<label for="{{limitUse.itemCode}}" ng-class="{'checkStyle':limitUse.selected}"></label>
+						<label class="curpos" ng-bind="limitUse.itemName" for="{{limitUse.itemCode}}"></label>
+						<span class="fc9" ng-bind="limitUse.note"></span>
+					</li>
+				</ul>
+				<p class="editGroupDevice fc6 fs14">设备硬件使用监测</p>
+				<div ng-repeat="limitUse in strategyCodeList.extendStrategy" ng-if="limitUse.itemCode=='isConnectUSB'" >
+					<input type="checkbox" class="chk_1 titleChk" ng-model="limitUse.selected" id="hardWare" ng-change="toggleCheck(limitUse)" ng-checked="limitUse.id==1"/>
+					<label for="hardWare" ng-class="{'checkStyle':limitUse.selected}"></label>
+					<label class="fc6"  ng-if="limitUse.itemCode=='isConnectUSB'" ng-bind="limitUse.itemName" for="hardWare"></label>
+					<span class="fc9" ng-if="limitUse.itemCode=='isConnectUSB'" ng-bind="limitUse.note"></span>
+				</div>
+			</div>
+		</form>
+		
+	</div>
+	<div class="psdBtns">
+		<button type="button" class="btn btn-gray leftArrow" ng-click="upStepFirst()">
+			上一步
+		</button>
+		<button type="button" class="btn btn-disable rightGryArrow" ng-click="disableShow()" ng-show="!addFrm.strategyName.$valid||checkStrategyName">
+			下一步
+		</button>
+		<button type="button" class="btn btn-green rightArrow" ng-click="stepThree()" ng-show="addFrm.strategyName.$valid&&!checkStrategyName">
+			下一步
+		</button>
+
+	</div>
+</div>
+<!--第三步-->
+<div ng-show="thirdStepShow">
+	<div class="admin-list">
+		<div class="handle-div handleHeight">
+			<div class="groupLogo">
+				<img src="${base}/themes/default/images/policy.png" width="50px" />
+			</div>
+			<p class="editGroupDevice strategyTitle" ng-bind="addStepList[2].name"></p>
+			<p class="fc9">
+				您可以监测设备使用流量、访问记录，设定流量阈值，启用APN白名单和安全浏览器域名白名单。
+			</p>
+		</div>
+		<div class="addStrategy fc6 lh30">
+			<form name="addDomainFrm"  novalidate="novalidate">
+				<p class="editGroupDevice fs14">网络策略</p>
+				<input type="checkbox" class="chk_1 strgChk" id="flowModel" ng-model="flowModel" ng-change="toggleCheckNet('FLOW_DATA', flowModel)" ng-click="flowClick(flowModel)"/>
+				<label for="flowModel" ng-class="{'checkStyle':flowModel}"></label>
+				<label  class="fc6 curpos" for="flowModel">允许对设备流量进行监控</label>
+				<p>
+					<input type="checkbox" class="chk_1 strgChk" ng-change="toggleCheckNet('NET_APP',netTraceCheck)" ng-model="netTraceCheck" id="netTraceCheck" />
+					<label for="netTraceCheck" ng-class="{'checkStyle':netTraceCheck}"></label>
+					<label for="netTraceCheck" class="fc6 curpos">允许获取设备的网络访问记录</label>
+					<span class="fc9 fs12">（访问记录数据量较大，将增加流量消耗）</span>
+				</p>
+				<p>
+					<input type="checkbox" class="chk_1 strgChk"  ng-model="apnCheck" ng-change="toggleCheckApn(apnCheck)" id="apnCheck"/>
+					<label for="apnCheck" ng-class="{'checkStyle':apnCheck}"></label>
+					<label for="apnCheck" class="curpos fc6" >允许获取设备的APN列表以及变更信息</label>
+				</p>
+				<p class="pl60" ng-show="showApnCheck">
+					<input type="checkbox" class="chk_1 strgChk" ng-change="toggleEditCheck(addCheck)" ng-model="addCheck" id="addCheck"/>
+					<label for="addCheck" ng-class="{'checkStyle':addCheck}"></label>
+					<label for="addCheck" class="curpos fc6" >启用APN接入点白名单</label>
+					<span class="fc9 fs12">（使用白名单以外的APN接入点，可在违规策略配置为违规项）</span>
+				</p>
+				<table class="thirdStepTable ml70">
+					<tr ng-repeat="externalApn in externalApns track by $index">
+						<td>接入途径：外网</td>
+						<td>APN接入点：{{externalApn}}</td>
+						<td><a class="curpos" ng-click="editApn('extern',externalApn)">编辑</a>&nbsp;&nbsp;<a class="curpos" ng-click="deleteData('extern', externalApn)">删除</a></td>
+					</tr>
+					<tr ng-repeat="internalApn in internalApns track by $index">
+						<td>接入途径：内网</td>
+						<td>APN接入点：{{internalApn}}</td>
+						<td><a class="curpos" ng-click="editApn('intern',internalApn)">编辑</a>&nbsp;&nbsp;<a class="curpos" ng-click="deleteData('intern', internalApn)">删除</a></td>
+					</tr>
+					<tr ng-show="showEdit&&showApnCheck" style="height: 75px">
+						<td style="vertical-align: text-top;">接入途径：
+							<select id="fst" ng-model="selectedIntenetApns">
+								<option ng-selected="selectedIntenetApns=='internetOption'" value="internetOption">选择接入途径</option>
+								<option ng-selected="selectedIntenetApns=='internalApns'" value="internalApns">内网</option>
+								<option ng-selected="selectedIntenetApns=='externalApns'" value="externalApns">外网</option>
+							</select>
+						</td>
+						<td style="vertical-align: text-top;">
+							<p ng-class="{'has-success':addDomainFrm.apnPoint.$valid, 'has-error':addDomainFrm.apnPoint.$invalid && addDomainFrm.apnPoint.$dirty}">
+								<span>APN接入点：</span>
+								<input type="text" placeholder="如:CMCC" name="apnPoint" required ng-model="contentExternalApns" mdc-placeholder maxlength="15"
+									   class="strategyApn" ng-class="{'borderRed':!addDomainFrm.apnPoint.$valid&&thirdErrorShow}"/>
+							</p>
+							<p class="fs12 password" ng-show="thirdErrorShow || showFinish">{{errorNote}}</p>
+						</td>
+						<td style="vertical-align: text-top;">
+							<input type="button" class="btn btn-green" value="添加" ng-click='finishShow()' />&nbsp;&nbsp;
+							<!--<input type="button" class="btn btn-gray" value="取消" ng-click = 'closeFinish()' ng-show='cancelBtn'/>-->
+						</td>
+					</tr>
+				</table>
+				<p>
+					<input type="checkbox" class="chk_1 strgChk" ng-model="nameList" id="nameList" ng-change="toggleCheckNet('BROWSER', nameList)" ng-checked="netStrategy.BROWSER.isAllowed==1" />
+					<label for="nameList" ng-class="{'checkStyle':nameList}"></label>
+					<label for="nameList" class="curpos fc6" >启用安全浏览器域名白名单</label>
+				</p>
+
+				<div class="ml20" ng-show="netStrategy.BROWSER.isAllowed==1">
+					<div class="w500">
+						<input type="button" class="btn-green btn-md" value="添加" ng-click="addDomainDialog()" style="padding: 0px 16px;"/>
+						<input type="text" ng-model="domainSearch" class="form-control float-right leftsearch w180" placeholder="输入域名、网站"/>
+						<span ng-click="searchClick()" class="glyphicon glyphicon-search form-search float-right" style="left: 170px;top: 11px;;"></span>
+					</div>
+					<table class="homeTable domainTable"  ng-table="tableParams" show-filter="true">
+						<thead>
+							<th>序号</th>
+							<th>域名</th>
+							<th>网站名称</th>
+							<th>操作</th>
+						</thead>
+						<tr ng-repeat="domainObj in domainDataList
+						 track by $index">
+							<td class="pl17" ng-bind="$index+1"></td>
+							<td class="pl17" ng-bind="domainObj.domain"></td>
+							<td class="pl17">
+								<span ng-bind="domainObj.name"></span>
+							</td>
+							<td class="pl17">
+								<p>
+									<a class="desc-text" ng-click="addDomainDialog(domainObj)">编辑</a>&nbsp;&nbsp;
+									<a class="desc-text" ng-click="deleteDomain(domainObj)">删除</a>
+								</p>
+							</td>
+						</tr>
+					</table>
+					<p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]" ng-bind="'当前'+totalRecords+'条'"></p>
+					<!--<tr ng-show="netStrategy.BROWSER.isAllowed==1&&domainListShow">
+						<td>
+							<span class="float-left">域名：</span>
+							<p class="float-left w300 table-whitespace" title="{{netWhiteList}}">{{netWhiteList}}</p>
+						</td>
+						<td><a class="curpos" ng-click="editDomain()">编辑</a>&nbsp;&nbsp;<a class="curpos" ng-click='finishDel()'>删除</a></td>
+					</tr>
+					<tr ng-show="netStrategy.BROWSER.isAllowed==1&&inputTextShow">
+						<td>
+							<p ng-class="{'has-success':addDomainFrm.netWhiteName.$valid, 'has-error':addDomainFrm.netWhiteName.$invalid && addDomainFrm.netWhiteName.$dirty}">
+								<span>域名：</span>
+								<input class="w350" type="text" ng-model="netWhiteList" ng-class="{'borderRed':!addDomainFrm.netWhiteName.$valid&&thirdErrorShow}"
+									placeholder="如:baidu.com,xdja.com(英文逗号分隔)" style="height: 34px;line-height: 34px;padding-left: 8px;border: 1px solid #cccccc" required name="netWhiteName" ng-minlength="2"
+									ng-pattern="/^[0-9a-z.,]+$/" tooltip="多个域名之间用逗号隔开" tooltip-placement="bottom"/>
+							</p>
+							<p class="fs12" style="color: red" ng-show="thirdErrorShow">{{addDomainFrm.netWhiteName.$error.required?'域名白名单必填' : (addDomainFrm.netWhiteName.$error.minlength?'域名白名单不合法' :(addDomainFrm.netWhiteName.$error.pattern?'域名不合法,请输入 如:baidu.com,xdja.com(英文逗号分隔)':''))}}</p>
+						</td>
+						<td style="vertical-align: text-top;">
+							<input type="button" class="btn btn-green" value="添加" ng-click="domainAdd(addDomainFrm.netWhiteName.$modelValue)" />&nbsp;&nbsp;
+						</td>
+					</tr>-->
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="psdBtns">
+		<button type="button" class="btn btn-gray leftArrow" ng-click="upTwoStep()">
+			上一步
+		</button>
+		<button type="button" class="btn btn-disable rightGryArrow" ng-click="thirdDisableFun()" ng-show="(thirdDisable&&showEdit)||(netStrategy.BROWSER.isAllowed==1&&!domainListShow)">
+		下一步
+		</button>
+		<button type="button" class="btn btn-green rightArrow" ng-click="stepFour()" ng-show="(!(thirdDisable&&showEdit))&&(netStrategy.BROWSER.isAllowed==2||domainListShow)">
+		下一步
+		</button>
+	</div>
+</div>
+<!--第四步-->
+<div ng-show="fourStepShow">
+	<div class="admin-list">
+		<div class="handle-div handleHeight">
+			<div class="groupLogo">
+				<img src="${base}/themes/default/images/policy.png" width="50px" />
+			</div>
+			<p class="editGroupDevice strategyTitle" ng-bind="addStepList[3].name"></p>
+			<p class="fc9">
+				制定监测应用运行的策略；对应用的访问权限进行管理。
+			</p>
+		</div>
+		<div class="addStrategy fc6 lh30">
+			<p class="editGroupDevice fs14">应用策略</p>
+			<p ng-repeat="app in strategyCodeList.appStrategy">
+				<input ng-if="app.itemCode!='APP_ROLE'" class="chk_1 strgChk" type="checkbox" ng-model="app.selected" id="{{app.itemCode}}" ng-change="toggleCheckApp(app.itemCode)"/>
+				<label for="{{app.itemCode}}" ng-class="{'checkStyle':app.selected}"></label>
+				<label class="curpos fc6" ng-if="app.itemCode!='APP_ROLE'" ng-bind="app.itemName" for="{{app.itemCode}}"></label>
+			</p>
+			<p class="editGroupDevice fs14 mbt0">应用权限管理</p>
+			<ul>
+				<li class="strgFirstStep ml0 mt0" ng-click="limitShow()" ng-class="{'active':appLimitShow}">
+					<span ng-show="appLimitShow" class="glyphicon glyphicon-ok rightOk"></span>
+					<img class="mbt10" src="${base}/themes/default/images/softSort.png" />
+					<span class="editGroupDevice fs14 mbt10">按软件分类</span>
+					<p>为单独的应用设置不同的权限。</p>
+				</li>
+				<li class="strgFirstStep mt0" ng-click="limitDisShow()" ng-class="{'active':appLimitDisShow}">
+					<span ng-show="appLimitDisShow" class="glyphicon glyphicon-ok rightOk"></span>
+					<img class="mbt10" src="${base}/themes/default/images/jurisdiction.png" />
+					<span class="editGroupDevice fs14 mbt10">按权限分类</span>
+					<p>可以设置某一项权限对所有的应用有效。</p>
+				</li>
+			</ul>
+			<div class="clearfloat"></div>
+			<span class="glyphicon glyphicon-triangle-top triangleTop rel135" ng-show="appLimitShow"></span>
+			<span class="glyphicon glyphicon-triangle-top triangleTop rel485" ng-show="appLimitDisShow"></span>
+			<div class="applimit" ng-show="appLimitShow">
+				<div class="leftAppLimit">
+					<p class="editGroupDevice lh22">选择要管理的软件</p>
+					<hr class="hr-solid mt8">
+					<div class="limitAppDiv">
+						<ul>
+							<li class="limitAppList" ng-repeat="limitApp in limitlist" ng-click="clickSoft(limitApp)" ng-class="{'limitListActive':limitApp.visited}">
+								<img class="appLogo" ng-src="{{limitApp.icon}}" />
+								<p class="appName" ng-bind="limitApp.name"></p>
+								<p class="fc9"><span ng-bind="limitApp.limitNum"></span>&nbsp;</p>
+								<span class="glyphicon glyphicon-chevron-right chevronRight"></span>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="rightAppLimit">
+					<p class="editGroupDevice lh22">选择要管理的权限</p>
+					<hr class="hr-solid mt8">
+					<div class="limitAppDiv">
+						<ul>
+							<li class="limitAppList">
+								<img class="appLogo" src="{{prevItem.icon}}" />
+								<span ng-model="prevItem.package_bak" class="appName" style="top: 0px" ng-bind="prevItem.name"></span>
+								<p class="fc9 fs12" ng-bind="prevItem.version"></p>
+							</li>
+						</ul>
+						<ul>
+							<li class="limitlist" ng-repeat="(key,value) in appStrategy.appList[prevItem.package_bak]">
+							<div class="float-left">
+									<div ng-if="key=='WIFI'">
+										<span>通过WIFI连接网络</span>
+										<p class="fc9">用于访问内容</p>
+									</div>
+									<div ng-if="key=='LOCATION'">
+										<span>通过网络或GPS对手机定位</span>
+										<p class="fc9">用于定位</p>
+									</div>
+									<div ng-if="key=='RECORD'">
+										<span>通话录音和本地录音</span>
+										<p class="fc9">用于录音</p>
+									</div>
+									<div ng-if="key=='BLUETOOTH'">
+										<span>访问、开启蓝牙</span>
+										<p class="fc9">用于外部连接</p>
+									</div>
+									<div ng-if="key=='CAMERA'">
+										<span>使用摄像头拍摄</span>
+										<p class="fc9">用于相机</p>
+									</div>
+									<div ng-if="key=='SMS'">
+										<span>访问短信和彩信</span>
+										<p class="fc9">用于查看短信和彩信记录</p>
+									</div>
+									<div ng-if="key=='CONTACTS'">
+										<span>读取、修改联系人</span>
+										<p class="fc9">用于查看联系人</p>
+									</div>
+									<div ng-if="key=='CALL_LOG'">
+										<span>读取、修改通话记录</span>
+										<p class="fc9">用于查看通话情况</p>
+									</div>
+									<!--<span class="fc9" ng-bind="mgeLimit.note"></span>-->
+								</div>
+								<div class="float-right" style="position: relative;top: 10px;">
+									<select ng-model="appStrategy.appList[prevItem.package_bak][key]">
+										<option ng-selected="value==3" value="3">询问</option>
+										<option ng-selected="value==2" value="2">禁止</option>
+										<option ng-selected="value==1" value="1">允许</option>
+										<option ng-selected="value==0" value="0">默认</option>
+									</select>
+								</div>
+								<div class="clearfloat"></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="clearfloat"></div>
+			</div>
+			
+			<div class="applimit" ng-show="appLimitDisShow">
+				<div class="rightAppLimit">
+					<p class="editGroupDevice lh22">选择要管理的权限</p>
+					<hr class="hr-solid mt8">
+					<div class="limitAppDiv">
+						<ul>
+							<li class="limitlist curpos" ng-repeat="mgeLimit in strategyCodeList.appPermission"  ng-click="clickPerssion(mgeLimit)" ng-class="{'limitListActive':mgeLimit.visited}">
+								<div class="float-left" style="width: 100%;">
+									<p ng-bind="mgeLimit.itemName"></p>
+									<span class="fc9" ng-class="{'limitListActive':mgeLimit.visited}" ng-bind="mgeLimit.note"></span>
+									<span class="glyphicon glyphicon-chevron-right limitChevron"></span>
+								</div>
+								<div class="clearfloat"></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="leftAppLimit">
+					<p class="editGroupDevice lh22">选择要管理的软件</p>
+					<hr class="hr-solid mt8">
+					<div class="limitAppDiv">
+						<ul>
+							<div class="limitlist">
+								<p ng-model="prevItemPer.itemCode" ng-bind="prevItemPer.itemName"></p>
+								<p class="fc9 fs12" ng-bind="prevItemPer.note">用于访问内容</p>
+							</div>
+
+							<li class="limitAppList" ng-repeat="limitApp in limitlist">
+								<img class="appLogo" ng-src="{{limitApp.icon}}" />
+								<span class="appName" ng-bind="limitApp.name"></span>
+								<p class="fc9">&nbsp;</p>
+								<div class="float-right" style="position:relative;top: -42px;">
+									<select ng-model="appStrategy.appList[limitApp.package_bak][prevItemPer.itemCode]">
+										<option ng-selected="appStrategy.appList[limitApp.package_bak][prevItemPer.itemCode]==3" value="3">询问</option>
+										<option ng-selected="appStrategy.appList[limitApp.package_bak][prevItemPer.itemCode]==2" value="2">禁止</option>
+										<option ng-selected="appStrategy.appList[limitApp.package_bak][prevItemPer.itemCode]==1" value="1">允许</option>
+										<option ng-selected="appStrategy.appList[limitApp.package_bak][prevItemPer.itemCode]==0" value="0">默认</option>
+									</select>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="clearfloat"></div>
+			</div>
+		</div>
+	</div>
+	<div class="psdBtns">
+		<button type="button" class="btn btn-gray leftArrow" ng-click="upThreeStep()">
+			上一步
+		</button>
+		<button type="button" class="btn btn-green rightArrow" ng-click="stepFive()">
+			下一步
+		</button>
+	</div>
+</div>
+<!--第五步-->
+<div ng-show="fiveStepShow">
+	<div class="admin-list">
+		<div class="handle-div handleHeight">
+			<div class="groupLogo">
+				<img src="${base}/themes/default/images/policy.png" width="50px" />
+			</div>
+			<p class="editGroupDevice strategyTitle" ng-bind="addStepList[4].name"></p>
+			<p class="fc9">
+				定义主要的违规事件、违规等级及管控方式，配置黑名单策略。
+			</p>
+		</div>
+		<div class="addStrategy fc6 lh30">
+			<p class="editGroupDevice fs14 lh30">选择违规策略</p>
+			<ul>
+				<li class="illegalList" ng-repeat="illegalStrg in strategyCodeList.violationStrategy" ng-show="isShowAPNWhite(illegalStrg.itemCode)">
+					<!--ng-show="checkAPNWhite()"-->
+					<input type="checkbox" class="chk_1 strgChk" value="illegalStrg.itemCode" id="{{illegalStrg.id}}"
+						ng-change="illegalSel(illegalStrg.itemCode,illegalStrg.showVal)" ng-model="illegalStrg.showVal" ng-checked="illegalStrg.showVal"/>
+					<label for="{{illegalStrg.id}}" ng-class="{'checkStyle':illegalStrg.showVal}"></label>
+					<label ng-if="illegalStrg.id!='6'" for="{{illegalStrg.id}}"  class="curpos" ng-bind="illegalStrg.itemName"></label>
+					<label ng-if="illegalStrg.id=='6'" for="{{illegalStrg.id}}"  class="curpos">{{illegalStrg.itemName}}{{illegalStrg.note}}</label>
+					<p class="pl60" ng-show="illegalStrg.showVal">
+						设置违规等级：
+						<select ng-change="violationLevelSel(illegalStrg.itemCode)" ng-model="violationStrategy[illegalStrg.itemCode].grade">
+							<option ng-selected="illegalStrg.id=='6'||illegalStrg.id=='8'" value=1>一级违规<span class="fc9">(最轻)</span></option>
+							<option ng-selected="illegalStrg.id=='2'||illegalStrg.id=='3'||illegalStrg.id=='4'||illegalStrg.id=='7'" value=2>二级违规</option>
+							<option ng-selected="illegalStrg.id=='1'||illegalStrg.id=='5'" value=3>三级违规<span class="fc9">(严重)</span></option>
+						</select>
+						<label class="ml20">违规处理:</label>
+						<select ng-model="violationStrategy[illegalStrg.itemCode].type">
+							<option ng-selected="illegalStrg.id=='2'" value="1">禁拨电话</option>
+							<option ng-selected="illegalStrg.id=='3'" value="3">擦除数据</option>
+							<option ng-selected="illegalStrg.id=='1'||illegalStrg.id=='4'||illegalStrg.id=='5'" value="4">锁定屏幕</option>
+							<option ng-selected="illegalStrg.id=='6'||illegalStrg.id=='7'" value="2">禁止上网</option>
+							<option ng-selected="illegalStrg.id=='8'" value="0">违规只记录不管控</option>
+						</select>
+						<label ng-show="illegalStrg.id=='2'||illegalStrg.id=='4'" class="ml20">最长拔出时间不超过:</label>
+						<select ng-show="illegalStrg.id=='2'||illegalStrg.id=='4'" ng-change="violationTimeSel(illegalStrg.itemCode)" ng-model="violationStrategy[illegalStrg.itemCode].overTime">
+							<option ng-selected="true" value="172800">48小时</option>
+							<option value="129600">36小时</option>
+							<option value="86400">24小时</option>
+							<option value="0">自定义</option>
+						</select>
+						<span ng-show="(illegalStrg.id=='2'&&hourMinSec2)||(illegalStrg.id=='4'&&hourMinSec4)">
+							<input type="text" class="input-sm" ng-keyup="checkVioTime(illegalStrg.itemCode)" tooltip="必须是整数且不能为空" tooltip-placement="bottom"
+								ng-model="violationStrategyTime[illegalStrg.itemCode].hour">小时
+							<input type="text" class="input-sm" ng-keyup="checkVioTime(illegalStrg.itemCode)" tooltip="必须是整数且不能为空" tooltip-placement="bottom"
+								ng-model="violationStrategyTime[illegalStrg.itemCode].minites">分钟
+							<input type="text" class="input-sm" ng-keyup="checkVioTime(illegalStrg.itemCode)" tooltip="必须是整数且不能为空" tooltip-placement="bottom"
+								ng-model="violationStrategyTime[illegalStrg.itemCode].seconds">秒
+						</span>
+						<label ng-show="illegalStrg.id=='6'" class="ml20">流量阈值(单位M):</label>
+						<input ng-show="illegalStrg.id=='6'"  type="text" ng-model="violationStrategy.VIOLATION_OUT_FLOW_DATA.limit" name="limitFlow" required ng-class="{'borderRed':addflowFrm.limitFlow.$invalid && addflowFrm.limitFlow.$dirty}"
+						ng-pattern="/^[1-9]\d*$/" ng-keyup="checkFlowLimit()" tooltip="必须是整数" tooltip-placement="bottom" class="limitFlow">
+					</p>
+				</li>
+			</ul>
+			<p class="editGroupDevice fs14">黑名单策略 <span class="fc9 fs12">（当违规事件的等级和次数满足黑名单策略时，会把设备加入到黑名单）</span> </p>
+				<input type="checkbox" class="chk_1 strgChk" ng-model="showBlack" id="showBlack" ng-change="illegalSel('blackList',showBlack)"/>
+				<label for="showBlack" ng-class="{'checkStyle':showBlack}"></label>
+				<label for="showBlack" class="curpos fc6">开启黑名单策略</label>
+				<p class="pl60" ng-show="showBlack">
+					违规累计满足以下条件，将被加入黑名单：
+					<label class="ml20">一级违规<span class="fc9">(最轻)</span>:</label>
+					<select ng-model="violationStrategy.blackList.one" ng-change="blackListCtr()">
+						<option ng-selected="violationStrategy.blackList.one==0" value=0>0次</option>
+						<option ng-selected="violationStrategy.blackList.one==1" value=1>1次</option>
+						<option ng-selected="violationStrategy.blackList.one==2" value=2>2次</option>
+						<option ng-selected="violationStrategy.blackList.one==3" value=3>3次</option>
+					</select>
+					<label class="ml20">二级违规:</label>
+					<select ng-model="violationStrategy.blackList.two" ng-change="blackListCtr()">
+						<option ng-selected="violationStrategy.blackList.two==0" value=0>0次</option>
+						<option ng-selected="violationStrategy.blackList.two==1" value=1>1次</option>
+						<option ng-selected="violationStrategy.blackList.two==2" value=2>2次</option>
+						<option ng-selected="violationStrategy.blackList.two==3" value=3>3次</option>
+					</select>
+					<label class="ml20">三级违规<span class="fc9">(严重)</span>:</label>
+					<select ng-model="violationStrategy.blackList.three" ng-change="blackListCtr()">
+						<option ng-selected="violationStrategy.blackList.three==0" value=0>0次</option>
+						<option ng-selected="violationStrategy.blackList.three==1" value=1>1次</option>
+						<option ng-selected="violationStrategy.blackList.three==2" value=2>2次</option>
+						<option ng-selected="violationStrategy.blackList.three==3" value=3>3次</option>
+					</select>
+				</p>
+		</div>
+	</div>
+	<div class="psdBtns">
+		<button type="button" class="btn btn-gray leftArrow" ng-click="upFourStep()">
+			上一步
+		</button>
+		<button type="button" class="btn btn-disable rightGryArrow" ng-show="!sixNext||!sixNext4">
+			下一步
+		</button>
+		<button type="button" class="btn btn-green rightArrow" ng-click="stepSix()" ng-show="sixNext&&sixNext4">
+			下一步
+		</button>
+	</div>
+</div>
+<!--第六步-->
+<div ng-show="sixStepShow">
+	<div class="admin-list">
+		<div class="handle-div handleHeight">
+			<div class="groupLogo">
+				<img src="${base}/themes/default/images/policy.png" width="50px" />
+			</div>
+			<p class="editGroupDevice strategyTitle" ng-bind="addStepList[5].name"></p>
+			<p class="fc9">
+				将已配置的策略部署到设备或设备组。
+			</p>
+		</div>
+		<div class="addStrategy">
+			<p class="editGroupDevice fs14" >选择部署设备的方式</p>
+			<ul>
+				<li class="strgFirstStep ml0" ng-repeat="mapWay in mapList" ng-click="mapWapFn(mapWay.device)" ng-class="{'active':mapWay.device == device}" >
+					<span ng-show="mapWay.device == device" class="glyphicon glyphicon-ok rightOk"></span>
+					<img class="mbt10" ng-src="{{'${base}/themes/default/images/'+mapWay.pic+'.png'}}" />
+					<span class="editGroupDevice fs14 mbt10"><span ng-bind="mapWay.deviceTitle"></span></span>
+					<p ng-bind="mapWay.content"></p>
+				</li>
+			</ul>
+			<div class="mapDeviceDiv" ng-show="device == 'self'" style="border-bottom: none">
+				<span class="glyphicon glyphicon-triangle-top mapTriangle"></span>
+				<input type="radio" ng-click="groupCheck('group')" class="rdo_1" name="groupChecked" id="deployGroup"/>
+				<label for="deployGroup"></label>
+				<label class="curpos" for="deployGroup">部署到设备组</label>
+				<img  src="${base}/themes/default/images/down.png" class="float-right curpos" ng-click="groupshowMenu()" ng-show="!groupShow" />
+				<img src="${base}/themes/default/images/up.png" class="float-right curpos" ng-click="groupshowMenu()" ng-show="groupShow"/>
+				<div class="mapDeviceGroup" ng-show="groupShow">
+					<p>设备组({{selGroupListSize.length}}/{{groupSize}})</p>
+					<div ng-repeat="group in groupList" class="float-left" title={{group.name}}>
+						<input type="checkbox" ng-model="group.selected" class="chk_1 strgChk" id="{{group.id}}" ng-change="selGroup(group.id)"/>
+						<label for="{{group.id}}" ng-class="{'checkStyle':group.selected}"></label>
+						<label for="{{group.id}}" class="curpos table-whitespace" style="width: 130px;" >
+							<span ng-bind="group.name"></span>
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="mapDeviceDiv" ng-show="device == 'self'">
+				<input type="radio" ng-click="groupCheck('device')" name="groupChecked" class="rdo_1" id="deployDevice"/>
+				<label for="deployDevice"></label>
+				<label class="curpos"  for="deployDevice">部署到设备</label>
+				<img  src="${base}/themes/default/images/down.png" class="float-right curpos mr20" ng-click="groupshowMenu2()" ng-show="!groupShow2"/>
+				<img  src="${base}/themes/default/images/up.png" class="float-right curpos mr20" ng-click="groupshowMenu2()" ng-show="groupShow2"/>
+				<div ng-show="groupShow2" class="modifyPsd mr20">
+					<div class="chooseDevice">
+						<div class="leftChooseDiv">
+				 			<input class="chooseSearchInput" type="text" placeholder="搜索人员" ng-keyup="myKeyup($event)" ng-model="personName"/> 
+				 			<div class="chooseSearch curpos"  ng-click="searchPerson()"></div>
+							<div class="zTreeDemoBackground">
+								<div class="tree-start" style="height:260px;">
+							        <div class="ztree">
+							            <div ivh-treeview="list"
+							                 ivh-treeview-expand-to-depth="0"
+							                 ivh-treeview-id-attribute="'id'"
+							                 ivh-treeview-label-attribute="'name'"
+							                 ivh-treeview-children-attribute="'children'"
+							                 ivh-treeview-use-checkboxes="true"
+							                 ivh-treeview-twistie-collapsed-tpl="'<span class=\'button level0 switch center_close\'></span>'"
+							                 ivh-treeview-twistie-expanded-tpl="'<span class=\'button level0 switch center_open\'></span>'"
+							                 ivh-treeview-twistie-leaf-tpl="'<span class=\'button level1 switch center_docu\'></span>'"
+							                 ivh-treeview-on-cb-change="selectCallback(ivhNode, ivhIsSelected, ivhTree)"
+											 ivh-treeview-on-toggle="toggleCallback(ivhNode, ivhIsExpanded, ivhTree)">
+							            </div>
+							        </div>
+								</div>
+							</div>
+						</div>
+						<div class="rightchooseDiv">
+							<div class="chooseAllLine">
+								<span class="fc9 tableTip">（提示：部署策略到设备时，不能选择已加入设备组中的设备）</span>
+								<input type="checkbox" id="checkAll" class="chk_1 vtb" ng-model="checkboxes.checked" ng-change="checkAll()" name="checkAll" autocomplete="off"/>
+								<label style="display: none" for="checkAll"></label>
+								<label for="checkAll"  class="desc-text chooseAllWord">全选</label>
+							</div>
+							<input type="hidden" name="deptmentId" id="deptmentId" >
+							<div class="chooseTable chooseDeviceDiv dialogNormal" when-scrolled="loadMore()" >
+								<div class="deviceList" ng-repeat="person in personList" title="{{person.imei}}">
+									<label for="{{person.imei}}"  class="curpos phoneBg" ng-class="{'fc9':person.isGroup==1,'curBle':person.isGroup!=1,'active':person.selected}">
+										<span>{{person.name}}</span>
+									</label>
+									<input ng-if="person.isGroup!=1" type="checkbox" class="chk_1 titleChk" id="{{person.imei}}" ng-change="toggleCheckPerson(person)" ng-model="person.selected">
+									<label ng-if="person.isGroup!=1" for="{{person.imei}}" ng-class="{'checkStyle':person.selected}"></label>
+								</div>
+							</div>
+							<div class="clearfloat"></div>
+
+						</div>
+						<div class="bottomChooseDiv">
+							<div class="dialogNormal">
+								<p>
+									<span class="float-left choosenSpan">已选</span>
+									<span id="chooseNum" class="choosenSpan">（{{selectPerson.length}}）</span>
+									<span class="cleanAllBtn desc-text float-right" ng-click="deleteAllPerson(person)">清除</span>
+								</p>
+								<div ng-repeat="person in selectPerson track by $index" title="{{person.imei}}" class="chooseElesDiv float-left">
+									<div style="width: 50px" class="table-whitespace float-left" >{{person.name}}</div>
+									<a class="deleteLabel curpos" ng-click="deletePerson(person)"></a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="psdBtns">
+		<button type="button" class="btn btn-gray leftArrow" ng-click="upFiveStep()">
+			上一步
+		</button>
+		<button type="button" class="btn btn-disable" ng-show = '!finishBtn'>完成</button>
+		<button type="button" class="btn btn-green" ng-show="finishBtn" ng-click="finish()">完成</button>
+	</div>
+</div>

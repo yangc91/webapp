@@ -1,0 +1,480 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<@p.script value=["card","ztree", "ztree.extends", "ztree.combox"] />
+<meta charset="utf-8">
+<div class="pageheader fix">
+	<h2>
+		<img src="${base}/themes/default/images/auditBig.png" />
+		审计日志<span>对违规事件的处理和审计</span>
+	</h2>
+</div>
+<form id="frm" class="content-bianju">
+	<input type="hidden" name="imei" id="imei"></input>
+	<input type="hidden" name="operateType" id="operateType"></input>
+	<input type="hidden" name="operateState" id="operateState"></input>
+	<input type="hidden" id="screenPwd" name="screenPwd"></input>
+	<div class="handle-search">
+		<!-- 操作列开始 -->
+		<div class="handle-div">
+			<div class="btn-toolbar">
+				<div class="btn-group ml0">
+					<button id="refreshBtn" type="button" class="btn btn-default">刷新</button>
+				</div>
+			</div>
+		</div>
+		<div class="search-div">
+			<div class="btn-toolbar">
+				<div class="input-group w220">
+					<input class="form-control xlk" type="text" readOnly="readonly" 
+						name="deptId" id="deptId" placeholder="全部设备" value="" />
+					<span class="input-group-btn">
+						<input class="select-pic" id="selectBtn" type="button" />
+					</span>
+					<div id="menuContent" style="display:none">
+						<ul id="tree" class="ztree"></ul>
+					</div>
+				</div>
+				<!-- 违规事件 -->
+				<div class="input-group">
+					<input name="event" id="event" value="" type="hidden">
+					<select id="eventSelect" class="bindSelect" class="w150">
+						<option value="">全部</option>
+						<option value="1">黑名单事件</option>
+						<option value="2">未审计违规事件</option>
+					</select>
+				</div>
+
+				<!-- 违规等级 -->
+				<div class="input-group">
+					<input name="grade" id="grade" value="" type="hidden">
+					<select id="gradeSelect" class="bindSelect" class="w150">
+						<option value="">全部违规</option>
+						<#list allGrades as grade>
+						<option value="${grade.value!}">${grade.name!}</option>
+						</#list>
+		            </select>
+				</div>
+				<div class="input-group">  
+                     <select id="deviceGroupSel" class="w150">
+                         <option value="">全部</option>
+                         <option value="1">设备组1</option>
+                         <option value="2">设备组2</option>
+                         <option value="3">设备组3</option>
+                     </select>
+                 </div>
+				<div class="btn-group search-text">
+					<input id="searchKey" name="searchKey" type="text" placeholder="使用人" class="form-control border-radius4" />
+				</div>
+				<div class="btn-group">
+					<button id="searchButton" title="搜索" type="button" class="btn btn-default">搜索</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="show-table">
+		<table class="pageTable" id="ajaxListData">
+			<thead>
+				<tr>
+					<th style="width: 3%; min-width: 30px;"><span>序号</span></th>
+					<th style="width: 9%; min-width: 93px;"><span>操作</span></th>
+					<th style="width: 5%; min-width: 45px;"><span>使用人</span></th>
+					<th style="width: 15%; min-width: 180px;"><span>部门</span></th>
+					<!-- <th style="width: 7%; min-width: 80px;"><span>策略名称</span></th> -->
+					<th style="width: 11%; min-width: 120px;"><span>触发黑名单</span></th>
+					<th style="width: 10%; min-width: 85px;"><span>违规事件</span></th>
+					<th style="width: 8%; min-width: 50px;"><span>违规等级</span></th>
+					<th style="width: 15%; min-width: 110px;"><span>违规时间</span></th>
+					<th style="width: 15%; min-width: 100px;"><span>审计意见</span></th>
+				</tr>
+			</thead>
+			<tbody>
+
+			</tbody>
+		</table>
+	</div>
+</form>
+<script type="text/javascript">
+	var setting,deptTree ;
+	var table;
+	var secondTime = ${MdmDuration};
+	var timer1,timer2;
+	$(function(){
+		$("#deviceGroupSel").select2({
+			placeholder: "选择设备组",
+		  	minimumResultsForSearch: "Infinity"
+		});
+		$(".search-text").keypress(function(event) {
+            var keyCode = event.keyCode?event.keyCode:event.which?event.which:event.charCode;
+            if(keyCode == 13) {
+                $("#searchButton").trigger('click');
+            }
+		})
+		
+		//部门树
+		//初始化部门树
+		setting = {
+			basePath: "${base}",
+			combox : {
+				target:"#deptId",
+				trigger:"#selectBtn",
+				search:true,
+				width:210
+			},
+			data : {
+				simpleData : {
+					enable : true,
+					idKey : "id",
+					pIdKey : "parentId"
+					
+				}
+			},
+			view: {
+				dblClickExpand: false,
+				showIcon: false
+			},
+			callback: {
+				afterSelectNode: function(event, treeId, node) {
+					reloadTable();
+				},
+				afterClear: function() {
+					reloadTable();
+				},
+				afterDropdown: function() {
+				 	$("#selectBtn").addClass("open");
+				},
+				afterDropup: function() {
+					$("#selectBtn").removeClass("open");
+				}
+			}
+		};
+ 		deptTree = $.fn.zTree.combox($("#tree"), setting, ${deptJson});
+ 		
+ 		var gradeValue = '${grade!""}';
+ 		if(gradeValue != ""){
+ 			$("#gradeSelect").val(gradeValue);
+ 			$("[name='grade']").val(gradeValue);
+ 		}
+ 		
+ 		//数据表格
+		table = dataTablesWrap({
+			basePath:'${base}',
+			url:'${base}/audit/log/list.do',
+			data: function(req){
+				$("#frm [name]").each(function(i,n){
+					req[$(n).attr("name")] = n.value;
+				});
+			},
+			displayLength: 10,
+			sort:false,
+			seq:{show:true,index:0},
+			columns:[
+		            {data:'id', render:function (data, type, full, meta) {
+		            	var str = '';
+		            	if(full.auditStatus==1){
+			            	str = "<span onclick='violationManage("+data+", \"" + full.imei +"\")'>违规处理</span>";
+		            	} else {
+		            		str = "<span onclick='violationManage("+data+", \"" + full.imei +"\")'>违规处理</span>"
+			            	+"<span onclick='audit("+data+")'>审计</span>";
+		            	}
+		            	return str;
+		            }},
+		            {data:'personName'},
+		            {data:'deptName', render:function (data, type, full, meta){
+		            	data = data||'';
+		            	return "<div class='mdc-layer' style='width:15%;min-width:180px;' title='" + data +"'>" + data + "</div>";
+		            }},
+		           /*  {data:'strategyName'}, */
+		            {data:'blacklistName', render:function(data, type, full, meta){
+		            	
+		            	if(data == null || data == "") {
+		            		return "--";
+		            	}
+		            	return data;
+		            }},
+		            {data:'violationName'},
+		            {data:'gradeName', render:function (data, type, full, meta){
+		            	var result;
+		            	if(data == "一级违规"){
+		            		result = "<div class='pl16' title="+data+"><img src='${base}/themes/default/images/gradeOne.png' /></div>";
+		            	} else if(data == "二级违规"){
+		            		result = "<div class='pl16' title="+data+"><img src='${base}/themes/default/images/gradeTwo.png' /></div>";
+		            	}else if(data == "三级违规"){
+		            		result = "<div class='pl16' title="+data+"><img src='${base}/themes/default/images/gradeThree.png' /></div>";
+		            	}
+		            	return result;
+		            }},
+		            {data:'violationTime', render:function (data, type, full, meta) {
+//		            	return new Date(data).format("yyyy-MM-dd hh:mm:ss");
+		            	return new Date(data).format("yyyy-MM-dd hh:mm");
+		            }},
+		            {data:'audit', render:function (data, type, full, meta){
+		            	data = data||'';
+		            	return "<div class='mdc-layer' style='width:130px;' title='" + data +"'>" + data + "</div>";
+		            }}
+		    ]
+		});
+ 		
+		//下拉列表
+		$(".bindSelect").select2({
+		  	minimumResultsForSearch: "Infinity"
+		});
+		
+		$("#gradeSelect").on("change", function (e) { 
+			$("#grade").val($("#gradeSelect").select2("val"));
+			reloadTable();
+		});
+		
+		$("#eventSelect").on("change", function (e) { 
+			$("#event").val($("#eventSelect").select2("val"));
+			reloadTable();
+		});
+		
+		$("#searchButton").click(function() {
+            if($("[name='searchKey']").val()){
+                reloadTable();
+            }
+		});
+		
+		$("#refreshBtn").click(function(){
+			$("#deptId").val("");
+			deptTree.clear();
+			$("#event").val("");
+			$("#eventSelect").select2("val", "");
+			$("#grade").val("");
+			$("#gradeSelect").select2("val", "");
+			$("#searchKey").val("");
+			reloadTable();
+		})
+	})
+
+	function reloadTable() {
+		if(validateForm($("#frm"))) {
+			table.fnDraw();
+		}
+	}
+	
+	
+	function violationManage(id, imei){
+		$("#imei").val(imei);
+		var dialog = openDialog({
+			title:"违规处理",
+			width:900,
+			height:460,
+			padding:"0px",
+			ajaxUrl:"${base}/audit/log/toViolationManage.do?id="+id,
+			okVal:"关闭",
+			cancel:null,
+			ajaxSuccess:function(){
+				$("#lockScreen").click(function(){
+					openDialog({
+						title:"锁屏密码",
+						width:300,
+						height:200,
+						padding:"20px",
+						ajaxUrl:"${base}/audit/log/toLockScreen.do",
+						ajaxSuccess:function(){
+							$('input[placeholder]').placeholder();
+						},
+						ok:function(){
+							if (!validateForm($("#screenForm")))return false;
+	        				$("#screenPwd").val($("#screenPassword").val());
+	        				operatePC(4, 0);
+						},
+						okVal:"确定"
+					})
+				})
+			},
+			ok:function(){
+				clearInterval(timer1);
+        		clearInterval(timer2);
+			}
+		})
+	}
+	
+	function audit(violationId){
+		var dialog = openDialog({
+			title:"事件审计",
+			subtitle:"对违规事件进行审计",
+			width:770,
+			height:320,
+			padding:"30px",
+			ajaxUrl:"${base}/audit/log/toAudit.do?violationId="+violationId,
+			ok:function(){
+				var content = $('#auditContent').val();
+				if(content=='') {
+					$alert('请填写审核意见');
+					return false;
+				}
+				var waitting = $waiting('操作进行中...');
+				$.ajax({
+					url: "${base}/audit/log/audit.do",
+					async: false,
+					method:"post",
+					data: {violationId:violationId,content:content},
+					cache:false,
+					dataType:"json",
+					success: function(ret) {
+						waitting.close();
+						if(ret.success && ret.success == "true") {
+							$notice("操作成功!");
+							table.fnDraw();
+							dialog.close();
+						} else {
+							$alert('操作失败!');
+							return false;
+						}
+					}
+				});
+			},
+			okVal:"保存"
+		})
+	}
+	function fresh(instructionSeq) {
+		$("#lastResultStatus").text(secondTime);
+		secondTime--;
+		if(secondTime == -1){
+			clearInterval(timer1);
+			clearInterval(timer2);
+			getMCResult(instructionSeq, true);
+		}
+	}
+	
+	function operatePC(operateType, operateState) {
+		var confirmContent;
+		var confirmType;
+		switch(operateType)
+		{
+			case 1:
+				if(operateState==1){
+					confirmType="开启";
+				}else{
+					confirmType="关闭";
+				}
+				confirmContent = "让目标设备的WIFI开启或关闭。确认"+confirmType+"WIFI吗？";
+				break;
+			
+			case 2:
+				if(operateState==1){
+					confirmType="开启";
+				}else{
+					confirmType="关闭";
+				}
+				confirmContent = "让目标设备的蓝牙开启或关闭。确认"+confirmType+"蓝牙吗？";
+				break;
+			
+			case 3:
+				if(operateState==1){
+					confirmType="开启";
+				}else{
+					confirmType="关闭";
+				}
+				confirmContent = "让目标设备的摄像头开启或关闭。确认"+confirmType+"摄像头吗？";
+				break;
+			
+			case 4:
+				confirmContent = "让处于无密码锁屏状态的目标设备强制加上密码锁屏，同时设置好锁屏密码。确认锁屏吗？";
+				break;
+			
+			case 5:
+				confirmContent = "让目标设备擦除所有文字、图片、视频等数据资料以及设置，恢复到出厂时的初始状态。确认恢复出厂设置吗？";
+				break;
+			
+			case 7:
+				confirmContent = "让目标设备发出警告性质的鸣笛，鸣笛时长5秒。确认鸣笛告警吗？";
+				break;
+			
+			case 8:
+				confirmContent = "让处于密码锁屏状态的目标设备锁屏密码消除。确认消除密码吗？";
+				$("#screenPwd").val($("#screenPassword").val());
+				break;
+		}
+		$confirm(confirmContent,function(){
+			if(timer1!=undefined){
+				clearInterval(timer1);
+				clearInterval(timer2);
+			}
+			
+			secondTime = ${MdmDuration};
+			$(".waitTip").hide();
+			$(".failTip").hide();
+			$(".successTip").hide();
+			
+			$("#operateType").val(operateType);
+			$("#operateState").val(operateState);
+			
+			var waitting = $waiting('操作进行中...');
+			$.post("${base}/audit/log/operateMC.do", $("#frm").serialize(), function(ret) {
+				waitting.close();
+				if(ret.result && ret.result == "success") {
+					$("#lastResultStatus").text(secondTime);
+					$(".waitTip").show();
+					
+					timer1 = setInterval(function(){
+						fresh(ret.instructionSeq);
+					}, 1000);
+	    			timer2 = setInterval(function(){
+	    				getMCResult(ret.instructionSeq, false);
+	    			}, ${MdmInterval} * 1000);
+					
+				} else {
+					$alert("管控失败");
+					return false;
+				}
+			});
+		})
+	}
+	
+	function getMCResult(instructionSeq, flag){
+		$.post("${base}/audit/log/operateMCResult.do", {instructionSeq:instructionSeq}, function(ret) {
+			if(ret.result && ret.result == "success") {
+				var resultStatus = ret.device.resultStatus;
+				
+				if(flag && resultStatus != 3){//超时后,最后一次请求将结果置为失败
+					$(".waitTip").hide();
+					$(".successTip").hide();
+					$(".failTip").show();
+				}
+
+				if (resultStatus == 3){
+					$(".waitTip").hide();
+					$(".failTip").hide();
+					$(".successTip").show();
+					
+            		clearInterval(timer1);
+            		clearInterval(timer2);
+            	}
+			} else {
+				return false;
+			}
+		});
+	}
+	
+	function refleshIllegal(id){
+		$.post("${base}/audit/log/refreshIllegal.do", {id:id}, function(ret) {
+			if(ret.result && ret.result == "success") {
+				if(ret.device.deviceActualId == null){
+					$(".cantGet").show();
+					$(".phoneInfo").hide();
+				}else{
+					$(".cantGet").hide();
+					$(".phoneInfo").show();
+
+					$("#illegalTime").html(ret.device.actualTimeStr != "" && ret.device.actualTimeStr != null  ? ret.device.actualTimeStr : "--");
+					$("#illegalViolationName").html(ret.violation.violationName);
+					$("#illegalViolationName").attr('title',ret.violation.violationName);
+					$("#illegalCameraStatus").html(ret.device.cameraStatus == 1 ? "开启" : ret.device.cameraStatus == 2 ? "关闭" : "--");
+					$("#illegalBluetoothStatus").html(ret.device.bluetoothStatus == 1 ? "开启" : ret.device.bluetoothStatus == 2 ? "关闭" : "--");
+					$("#illegalWifiStatus").html(ret.device.wifiStatus == 1 ? "开启" : ret.device.wifiStatus == 2 ? "关闭" : "--");
+					$("#illegalScreenStatus").html(ret.device.screenStatus == 1 ? "无锁屏" : ret.device.screenStatus == 2 ? "加密锁屏" : "--");
+					$("#illegalGpsStatus").html(ret.device.gpsStatus == 1 ? "开启" : ret.device.gpsStatus == 2 ? "关闭" : "--");
+					$("#illegalIsRoot").html(ret.device.isRoot == 1 ? "是" : ret.device.isRoot == 2 ? "否" : "--");
+					$("#illegalUsbConnectStatus").html(ret.device.usbConnectStatus == 1 ? "调试" : ret.device.usbConnectStatus == 2 ? "相册"
+							 : ret.device.usbConnectStatus == 3 ? "充电" : "--");
+				}
+			} else {
+				$alert("操作失败,请重试!");
+				return false;
+			}
+		});
+	}
+</script>

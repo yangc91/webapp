@@ -23,11 +23,11 @@
 	</appender>
 	
 	<logger name="org.apache.shiro" level="ERROR" />
-	<logger name="org.springframework" level="INFO"/>
+	<logger name="org.springframework" level="DEBUG"/>
 	<logger name="org.directwebremoting" level="DEBUG"/>
 	<logger name="org.apache" level="ERROR"/>
-	<logger name="com.yc" level="INFO"/>
-	
+	<logger name="com.yc" level="DEBUG"/>
+
 	<root level="DEBUG">
 		<appender-ref ref="stdout"/>
 		<appender-ref ref="logfile"/>

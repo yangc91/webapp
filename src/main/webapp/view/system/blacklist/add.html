@@ -1,0 +1,349 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<@p.script value=["css_ecss","validator", "smartSelect","select2", "dialog"]/>
+<title>设备策略</title>
+<style>
+	.displayNone {
+	 	display: none;
+	}
+	.lh-34 strong{
+		display:inline-block;
+		width: 200px !important;
+	}
+	
+	.ipsTr{
+		height: 40px;
+	}
+	
+	.addMenu {
+		cursor: pointer;
+	}
+	
+	#ipListData, #appList{
+		margin-top: 10px;
+	}
+	
+	.widthIn5{
+		width: 50%;
+		margin: auto -1px auto auto;
+	}
+	
+	.btn-check{
+		cursor:pointer;
+		position:absolute;
+		width:20px;
+		height:20px;
+		z-index:99;
+		margin-top:2px;
+		background: url(${base}/themes/default/images/check-off.png) no-repeat;
+	}
+	.btn-check.active{
+		width:20px;
+		height:20px;
+		background: url(${base}/themes/default/images/check-on.PNG) no-repeat;
+	}
+	.btnCheck,
+	.btnCheck:hover{
+		position:absolute;
+		z-index:1;
+		width:300px !important;
+		border: none !important;
+		box-shadow: none;
+		padding-top: 0px;
+		background: none;
+	}
+	.forSelect-panel-content ul li:hover,
+	.toSelect-panel-content ul li:hover{
+		background:#1caf9a;
+		color:#fff;
+	}
+	.step-ul li{
+		cursor:pointer;
+	}
+	.select2-selection{
+		font-size:12px;
+		height:27px !important;
+		padding-top:3px !important;
+	}
+	.select2-container--default .select2-selection--single .select2-selection__arrow{
+		height:26px !important;
+	}
+	.select2-results__option{
+		padding:3px !important;
+	}
+	.select2-dropdown{
+		top:0px !important;
+	}
+</style>
+
+</head>
+<body>
+	<div class="pageheader fix">
+		<h2>
+			<img src="${base}/themes/default/images/xtgl.png" />
+			黑名单管理
+		</h2>
+	</div>
+	
+	<div class="hasMargin content-bianju bg-border displayNone firstContent">
+		<div>
+			<ul class="step-ul">
+				<li class="firstLi widthIn5"><b>1.</b>输入黑名单名称</li>
+			  	<li class="secondLi widthIn5"><b>2.</b>选择触发机制</li>
+			</ul>
+		</div>
+	
+		<!--切换tab开始-->	  			
+		<div class="paddingLr">
+			<!-- 策略名称tab开始 --> 
+			<div class="first">
+				<div class="border-bottom2 lh-34">
+					<strong>新建黑名单策略</strong>
+				</div>
+				<div class="form-group ptb">
+					<form id="frm" >
+						<label class="control-label w210 textr">黑名单名称</label>
+						<input id="blacklistname" name="name" class="form-control ml10" type="text" maxlength="20" reg="notempty,chinese"/>
+						<span class="fc83">（名称只能使用汉字，且不能超过10个汉字）</span>
+					</form>
+				</div>
+			</div>		 
+			 
+	 		 <!-- 违规判定组合开始--> 					 		 		 
+			<div class="second displayNone">
+			 	<div class="border-bottom2 lh-34">
+					<strong>选择触发机制</strong>
+				</div>
+				<div class="mb15 ptb">
+					<div class="ml230 ponter">
+			   			<input id="blackscreen1" type="checkbox" class="blackName"  name="gradeViolation" value="1" autocomplete="off"/>
+				 		<label for="blackscreen1">一级违规</label>
+			 		</div>
+			 		<div class="btn-check ml225"style="margin-top:-24px;"></div>
+				  	<div class="chooseWay ml260 mt25">
+						<label style="float:left;vertical-align:middle">触发次数：</label>
+						<div style="margin-left:10px; float:left;">	
+							<select id="gradeOne" class="bindSelect" name="gradeOne" disabled="disabled">
+				              	<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>    
+				            </select>
+						</div>
+				  	</div>
+				</div>
+				
+				<div class="mb15 ptb">
+					<div class="ml230 ponter">
+			   			<input id="blackscreen2" type="checkbox" class="blackName"  name="gradeViolation" value="2" autocomplete="off"/>
+				 		<label for="blackscreen2">二级违规</label>
+			 		</div>
+			 		<div class="btn-check ml225"style="margin-top:-24px;"></div>
+				  	<div class="chooseWay ml260 mt25">
+						<label style="float:left;vertical-align:middle">触发次数：</label>
+						<div style="margin-left:10px; float:left;">	
+							<select id="gradeTwo" class="bindSelect" name="gradeTwo" disabled="disabled">
+				              	<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>    
+				            </select>
+						</div>
+				  	</div>
+				</div>
+			 	
+				<div class="mb15 ptb">
+				  	<div class="ml230 ponter">
+				    	<input id="blackscreen3" type="checkbox" class="blackName"  name="gradeViolation" value="3" autocomplete="off"/>
+				 	 	<label for="blackscreen3">三级违规</label>
+  					</div>
+				  	<div class="btn-check ml225"style="margin-top:-24px;"></div>
+				  	<div class="chooseWay ml260 mt25">
+				  		<label style="float:left;vertical-align:middle">触发次数：</label>
+				  		<div style="margin-left:10px; float:left;">	
+							<select id="gradeThree" class="bindSelect" name="gradeThree" disabled="disabled">
+				              	<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+				            </select>
+						</div>
+				  	</div>
+				</div>
+			</div>
+		 </div>
+ 	</div>  
+	<div class="btn-toolbar padding-bottom content-bianju pl241 first">
+		<div class="btn-group ml15">
+			<button type="button" class="btn btnGreen ml72Center" onclick="firstnext()">下一步</button>
+		</div>
+		<div class="btn-group ml15">
+			<button type="button" class="btn cancelButton" id="cancelButton" onclick="javascript:history.go(-1);">取消</button>
+		</div>
+	</div>
+	<div class="btn-toolbar padding-bottom content-bianju padding-left second">
+		<div class="btn-group ml15">
+			<button type="button" class="btn cancelButton" onclick="secondUp()">上一步</button>
+		</div>
+		<div class="btn-group ml15">
+			<button type="button" class="btn btnGreen ml72Center" id="secondNext">完成</button>
+		</div>
+	</div>
+	
+	<script>
+		function secondUp(){
+			$(".first").show();
+			$(".second").hide();
+			
+			$(".secondLi").removeClass("active");
+			$(".firstLi").addClass("active");
+		}
+		//第二步
+		function firstnext(){
+			if(!validateForm($("#frm"))) {
+				return;
+			}
+			$(".first").hide();
+			$(".second").show();
+			
+			$(".firstLi").removeClass("active");
+			$(".secondLi").addClass("active");
+		}
+		
+		$(".bindSelect").select2({
+			  	minimumResultsForSearch: "Infinity"
+		});
+		
+		$(function () {
+			//初次加载
+			$(".first").show();
+			$(".firstContent").show();
+			$(".firstLi").addClass("active");
+			$(".second").hide();
+	
+			//完成
+			$("#secondNext").click(function(){
+				var waiting = $waiting('操作进行中...'); 
+				var levelData = getSelectedBlacklist().toString();
+				var name = $("#blacklistname").val();
+				if(!validateForm($("#frm-balck-list"))||levelData.length<1) {
+					waiting.close(); 
+					 $alert('请先选择违规等级，再选择违规次数');
+					return ;
+				}
+				$.ajax({
+					type: "POST",
+					url: "${base}/system/blacklist/saveBlackStrategy.do",
+					data: {items:levelData,name:name},
+					success: function(ret){
+						if(ret.result == "success"){
+							$notice('操作成功');
+							waiting.close();
+							window.location.href="${base}/system/blacklist/list.do";	
+						}else{
+							$notice(result);
+							waiting.close();
+						}
+					},
+					error : function(data){
+						$notice('操作失败');
+						waiting.close();
+			  		}
+				});
+						
+				
+			})
+			
+			//获取被选中的黑名单列表
+			function getSelectedBlacklist() {
+				var arr = [];
+				var arrChk=$("input[name='gradeViolation']:checkbox");
+			    $(arrChk).each(function(){
+			    	var self = $(this);
+			    	if (self.prop("checked") == true) {
+			    		if(self.val()==1) {
+				    		arr.push(self.val()+"#"+$("#gradeOne").val());
+			    		}else if(self.val()==2) {
+			    			arr.push(self.val()+"#"+$("#gradeTwo").val());
+			    		}else {
+			    			arr.push(self.val()+"#"+$("#gradeThree").val());
+			    		}
+			    	 }
+			    	});
+			   	 return arr;
+			}
+			//黑名单对象 
+			function blackListObj(grade,triggerNum){
+				this.grade = grade;
+				this.triggerNum = triggerNum;
+			}
+			
+			$("#checkAllItem").click(function(){
+				$(".allow").prop("checked",true);
+				$(".btn-check").addClass("active");
+			})
+			
+			$('input[placeholder]').placeholder();
+			$(".bindSelect").select2({
+			  	minimumResultsForSearch: "Infinity"
+			});
+			$(".blackName").change(function() {
+				if ($(this).prop("checked")) {
+					$(".btn-check",$(this).parent().parent()).addClass("active");
+                    $(".bindSelect",$(this).parent().parent()).removeAttr("disabled");
+					$(':hidden', $(this).parent()).val("1");
+					$(this).parent().addClass("active");
+				} else {
+					$(".btn-check",$(this).parent().parent()).removeClass("active");
+                    $(".bindSelect",$(this).parent().parent()).attr("disabled","disabled");
+					$(':hidden', $(this).parent()).val("0");
+					$(this).parent().removeClass("active");
+				}
+			});
+			$(".btn-check").click(function(){
+				if($(this).hasClass("active")){
+					$(this).removeClass("active");
+					$(".blackName",$(this).prev()).prop("checked",false);
+					$(".bindSelect",$(this).next()).attr("disabled","disabled");
+				}else{
+					$(this).addClass("active");
+					$(".blackName",$(this).prev()).prop("checked",true);
+					$(".bindSelect",$(this).next()).removeAttr("disabled");
+				}
+			});
+			$(".allow").change(function() {
+				if ($(this).prop("checked")) {
+					$(".btn-check",$(this).parent().parent()).addClass("active");
+					$(':hidden', $(this).parent()).val("1");
+					$(this).parent().addClass("active");
+				} else {
+					$(".btn-check",$(this).parent().parent()).removeClass("active");
+					$(':hidden', $(this).parent()).val("0");
+					$(this).parent().removeClass("active");
+				}
+			});
+		
+		});
+	</script>
+</body>
+
+</html>

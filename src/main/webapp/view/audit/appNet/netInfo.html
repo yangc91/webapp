@@ -1,0 +1,130 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回列表</a>
+    <div><span class="listNum" ng-bind="appNumber"></span>个应用</div>
+    <hr class="hr-solid">
+    <div>
+        <span class="deviceTitle" style="font-weight: bold" ng-bind="deviceInfo.personName"></span>
+        <span class="fc9">(<span ng-bind="deviceInfo.personCode"></span>)</span>
+    </div>
+    <p class="fc6" style="margin-top: 5px;" ng-bind="deviceInfo.deptName"></p>
+    <hr class="hr-solid">
+    <div style="height: 85px;">
+        <img src="${base}/themes/default/images/device.png" style="float: left; margin-right: 20px; width: 85px;" />
+        <p class="personName" style="font-size:14px; margin-bottom: 10px;padding-top:10px" ng-bind="deviceInfo.model"></p>
+        <p class="fc6"><span ng-bind="deviceInfo.osName + deviceInfo.osVersion"></span></p>
+        <p class="fc6">已激活</p>
+    </div>
+    <hr class="hr-solid">
+    <div ng-click="changestate()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState"></span>
+        <span>时间区间</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceState">
+        <li class="curpos">
+            <input type="radio" class="rdo_1" name="stateRadio" id="today" ng-model="tab_1_time" value="1" ng-change="changeTimeType()" >
+            <label for="today"></label>
+            <label for="today"  class="curpos">今天</label>
+        </li>
+        <li class="curpos">
+            <input type="radio" class="rdo_1" name="stateRadio" id="yesterday" ng-model="tab_1_time" value="2" ng-change="changeTimeType()">
+            <label for="yesterday"></label>
+            <label for="yesterday"  class="curpos">昨天</label>
+        </li>
+        <li class="curpos">
+            <input type="radio" class="rdo_1" name="stateRadio" id="week" ng-model="tab_1_time" value="3" ng-change="changeTimeType()">
+            <label for="week"></label>
+            <label for="week"  class="curpos">近7天</label>
+        </li>
+        <li class="curpos">
+            <input type="radio" class="rdo_1" name="stateRadio" id="month" ng-model="tab_1_time" value="4" ng-change="changeTimeType()">
+            <label for="month"></label>
+            <label for="month"  class="curpos">最近一个月</label>
+        </li>
+    </ul>
+    <hr class="hr-solid">
+    <div ng-click="changestate2()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState2"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState2"></span>
+        <span>访问途径</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceState2">
+        <li  class="curpos" ng-repeat="netType in netTypeArray">
+            <input type="checkbox" class="chk_1" ng-model="netType.selected" id="{{netType.id}}" ng-change="netTypeSelect()">
+            <label for="{{netType.id}}" ng-class="{'checkStyle':netType.selected}"></label>
+            <label for="{{netType.id}}"  class="curpos" ng-bind="netType.name"></label>
+        </li>
+    </ul>
+    <hr class="hr-solid">
+    <div ng-click="changestate3()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState2"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState2"></span>
+        <span>访问应用</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceState3" style="margin-bottom: 30px;">
+        <li  class="curpos">
+            <input type="checkbox" ng-model="browerSelected" class="chk_1" id="brower" ng-change="browerSelect()">
+            <label for="brower" ng-class="{'checkStyle':browerSelected}"></label>
+            <label  class="curpos" for="brower">安全浏览器</label>
+        </li>
+    </ul>
+</form>
+
+<!--右侧-->
+<div class="admin-list" style="overflow: auto;height: 100%;">
+    <div class="tz-right-content">
+        <ul tabset>
+            <!-- 网络监测 -->
+            <li tab class="tz-tab-left" active="true" heading="{{tabNotice[0].heading}}">
+                <table ng-table="tableParamsNet" show-filter="false" class="table vtable-hover">
+
+                    <!--自定义表头-->
+                    <colgroup>
+                        <col width="300px"/>
+                        <col width="160px"/>
+                        <col width="160px"/>
+                        <col/>
+                    </colgroup>
+
+                    <tr ng-repeat="item in $data track by $index" ng-click="clickTr(item)" ng-class="{visited:item.visited}">
+                        <td data-title="'目标地址'" style="width: 30%;max-width: 300px;">
+                            <div class="td left-border default table-whitespace">
+                                <span ng-bind="item.note | formatNetTarget" title="{{item.note | formatNetTarget}}"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'应用名称'" style="width: 15%;max-width: 160px;">
+                            <div class="td default">
+                                <span ng-bind="item.appName"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'访问途径'" style="width: 15%;min-width: 160px;">
+                            <div class="td default">
+                                <span ng-bind="item.netTypeStr"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'访问时间'" style="width: 15%;min-width: 160px;">
+                            <div class="td default">
+                                <span ng-bind="item.visitTime | date : 'yyyy-MM-dd HH:mm:ss'"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParamsNet.total() > tableParamsNet.count()]" ng-bind="'当前' + tableParamsNet.total() + '条'"></p>
+            </li>
+            <!-- 网络监测结束 -->
+
+            <!-- 流量监测 -->
+            <li tab class="tz-tab" active="tabNotice[1].active" ng-click="goFlowInd()" disable="true"  heading="{{tabNotice[1].heading}}">
+            </li>
+            <!-- 网络监测结束 -->
+        </ul>
+    </div>
+</div>

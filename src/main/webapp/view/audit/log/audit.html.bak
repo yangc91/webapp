@@ -1,0 +1,27 @@
+<table style="height: 260px;overflow:auto">
+	<tr class="textop">
+		<td class="ptb w150 textr fc83"><span>使用人：</span></td>
+		<td class="w150"><span class="pl10">${reportViolation.personName!'--'}</span></td>
+		<td class="ptb w130 textr fc83"><span>分支机构：</span></td>
+		<td class="w150"><span class="pl10">${reportViolation.deptName!'--'}</span></td>
+	</tr>
+	<tr class="textop">
+		<td class="ptb w150 textr fc83"><span>触发违规策略：</span></td>
+		<td class="w150"><span class="pl10">${reportViolation.strategyName!'--'}</span></td>
+		<td class="ptb w130 textr fc83"><span>触发黑名单策略：</span></td>
+		<td class="w150"><span class="pl10">${reportViolation.blacklistName!'--'}</span></td>
+	</tr>
+	<tr class="textop">
+		<td class="ptb w150 textr fc83"><span>违规事件：</span></td>
+		<td class="w150"><div class="pl10">${reportViolation.violationName!'--'}</div></td>
+		<td class="ptb w130 textr fc83"><span>违规时间：</span></td>
+		<td class="w150"><span class="pl10">${reportViolation.violationTime?number_to_date}</span></td>
+	</tr>
+	<tr class="vtop">
+		<td class="ptb w150 textr fc83"><span>审计意见：</span></td>
+		<td colspan="3" class="ptb">
+			<textarea rows=10 style="width: 385px;height:125px;" id="auditContent" reg="notempty" maxLength="20" message="{notempty:'审计意见不允许为空，且首尾不能有空格'}"></textarea>
+			（最多输入20个字）
+		</td>
+	</tr>
+</table>

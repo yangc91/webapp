@@ -1,0 +1,200 @@
+<style>
+    label[class="curpos"] {
+        margin-left: 0;
+    }
+    .chk_1~label{
+        position: relative;
+        left: -17px !important;
+    }
+</style>
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <h4>通知管理</h4>
+
+    <hr class="hr-solid">
+
+    <div>
+        <span class="font-666"><img src="${base}/images/green-bingo.png"/>&nbsp;&nbsp;你可以发送通知至设备，并查看已发送的通知详情。</span>
+    </div>
+</form>
+
+<!--右侧-->
+<div class="admin-list overflowDiv">
+    <div class="tz-right-content" ng-class="{'absoluteDiv':tabNotice[0].active}">
+        <ul tabset>
+            <!-- 发送新通知 -->
+            <li tab active="tabNotice[0].active" onselect="return false;" disable="tabNotice[0].disabled" heading="{{tabNotice[0].heading}}" class="tz-tab-left">
+                <form name="sendFrm" method="post" novalidate="novalidate">
+                <div class="tz-content-left">
+                    <div class="mbt30">
+                            <div class="float-left">接收人</div>
+                            <div title="如果需要选择所有人，在部门中勾选根目录即可" class="tip"></div>
+                        <div class="tz-reciver-content" ng-class="{'has-success':sendFrm.selectedMap.$valid, 'has-error':sendFrm.selectedMap.$invalid}">
+                            <input type="hidden" ng-model="selectedMap" name="selectedMap" required />
+                            <div class="tz-reciver-person" ng-repeat = "item in selectedMap.values() track by $index">
+                                <div class="float-left"><img ng-init="imageType = {1:'tab-people.png',3:'tab-group.png',2:'tab-department.png'}" src="{{'${base}/images/' + imageType[item.type]}}"/></div>
+                                <div class="p-name" ng-bind="item.name" title="{{item.name}}"></div>
+                                <div class="float-right"><button class="close" ng-click="removePeople(item)" type="button">×</button></div>
+                            </div>
+                        </div>
+                        <p class="fs12 chooseUser" ng-show="chooseperson">请您选择接收人</p>
+                    </div>
+
+                    <div>内容</div>
+                    <div class="form-group" ng-class="{'has-success':sendFrm.title.$valid && sendFrm.content.$valid, 'has-error':(sendFrm.title.$invalid && sendFrm.content.$dirty) || (sendFrm.content.$invalid && sendFrm.title.$dirty)}">
+                        <div class="tz-msg-content form-control" >
+                            <input type="hidden" ng-model="msg.id"/>
+                            <input type="text" class="tz-title" placeholder="标题" name="title" ng-blur="sendFrm.title.$dirty = true" required ng-model="msg.title"  maxlength="15" tooltip="{{sendFrm.title.$invalid?'标题不能大于15个字':''}}" tooltip-placement="bottom"/>
+                            <hr class="hr-solid"/>
+                            <textarea class="form-control" rows="9" name="content" ng-model="msg.content" required maxlength="500" ng-blur="sendFrm.content.$dirty = true" tooltip="{{sendFrm.content.$invalid?'不能大于500字':''}}" tooltip-placement="bottom"></textarea>
+                        </div>
+                        <!--<p class="fs12" style="color: red" ng-show="contentShow">标题和内容不能为空</p>-->
+                    </div>
+                </div>
+                </form>
+
+                <!-- 选择人员，部门，设备组 -->
+                <div class="tz-content-right" ng-include="'checkboxToAdd'">
+                </div>
+
+                <!-- 底部发送通知 -->
+                <div class="tz-foot-bar borTop">
+                    <button id="sendMore" class="btn btn-green" ng-click="sendMsg(sendFrm)">发送通知</button>
+                </div>
+            </li>
+            <!-- 发送新通知结束 -->
+
+            <!-- 已发送通知 -->
+            <li tab active="tabNotice[1].active" disable="tabNotice[1].disabled" heading="{{tabNotice[1].heading}}" class="tz-tab">
+                <div class="tz-msg-history" when-scrolled="loadMoreMsg()">
+                    <ul>
+                        <li ng-repeat = "notice in noticeList track by $index">
+                            <div class="li-content">
+                                <div class="date-left mbt5">
+                                    <img src="${base}/images/bell.png"/>
+                                    <span class="fs12 fc9 lh32">{{notice.createTime|date:'yyyy-MM-dd'}}</span>
+                                </div>
+                                <div class="msg-right pt0">
+                                    <p class="personName noticeTitle">{{notice.title}}</p>
+                                    <div class="float-left table-whitespace fc6" title="{{notice.content}}" style="width:auto;max-width: 400px;">{{notice.content}}</div>
+                                    <a href="javascript:" ng-click="sendMoreDevice(notice)">发布到更多设备</a>
+                                    <div class="lh15">
+                                        <p class="fc9 table-whitespace float-left w300">接收人：<span ng-bind="notice.receiveName" title="{{notice.receiveName}}"></span></p>
+                                        <p class="fc9 float-left">{{notice.personNum == null ? 0 : notice.personNum}}人;{{notice.deptNum == null ? 0 : notice.deptNum}}个部门;{{notice.deviceGroupNum == null ? 0 : notice.deviceGroupNum}}个设备组</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="li-content">
+                                <img class="ml37" src="${base}/images/line.png"/>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <!-- 已发送通知结束 -->
+        </ul>
+    </div>
+</div>
+
+<div class="admin-list userList noResultContent top80" ng-show="tabNotice[1].active&&noResultContent">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img src="${base}/themes/default/images/secondConfirm.png" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm">啊呀，没有检索到任何内容……</p>
+            <p class="fs14">
+                <img src="${base}/themes/default/images/circleRight.png" />
+                请点击<span class="desc-text" ng-click="sendNewMsg()">发送新通知</span>来发送通知。
+            </p>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>
+
+<section ng-show="alert.msg" class="col-md-4 alertMsg">
+    <div class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), alert.closeable ? 'alert-dismissable' : null]" role="alert">
+        <button ng-show="alert.closeable" type="button" class="close" ng-click="alertInf.close(0)" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div>
+            <span class="ng-scope ng-binding" ng-bind="alert.msg"></span></div>
+    </div>
+</section>
+
+
+<!-- 选择人员，部门，设备组列表模板 -->
+<script type="text/ng-template" id="checkboxToAdd">
+    <ul tabset>
+        <li tab active="addTab.active" disable="addTab.disabled" heading="人员" class="tz-tab-left">
+            <div class="tz-add-person">
+                <div class="input-group icon-search">
+                    <input type="text" placeholder="搜索人员..." mdc-placeholder ng-keyup="myKeyupPerson($event)" class="form-control" ng-model="p.personName">
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-search" ng-click="searchPerson()"></span>
+                    </span>
+                </div>
+                <div class="tz-add-person-list" when-scrolled="loadMore()">
+                    <ul>
+                        <li ng-repeat="person in personList track by $index">
+                            <input type="checkbox" ng-click="person.chk = !person.chk" id="{{person.code}}" class="chk_1" ng-change="onSelectedPerson(person)" ng-model="person.selected"/>
+                            <label for="{{person.code}}" ng-class="{'checkStyle':person.selected}"></label>
+                            <label for="{{person.code}}"  class="curpos">
+                                <img  src="{{'${base}/images/' + (person.chk?'active-people.png' : 'custom-people.png')}}">
+                                <span>{{person.name}}</span><span class="tz-person-code">({{person.code}})</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+
+        <li tab heading="部门" class="tz-tab">
+            <div class="tz-add-person" >
+                <div class="input-group icon-search">
+                    <input type="text" placeholder="搜索部门..." mdc-placeholder ng-keyup="myKeyupdept($event)" class="form-control" ng-model="d.deptName">
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-search" ng-click="searchdept()"></span>
+                    </span>
+                </div>
+                <div class="tz-add-person-list" when-scrolled="loadMoreDeptList()">
+                    <ul>
+                        <li ng-repeat="dept in deptList track by $index">
+                            <input type="checkbox" ng-click="dept.chk = !dept.chk" class="chk_1" id="{{dept.id}}" ng-change="onSelectedDept(dept)" ng-model="dept.selected"/>
+                            <label for="{{dept.id}}" ng-class="{'checkStyle':dept.selected}"></label>
+                            <label for="{{dept.id}}" class="curpos" >
+                                <img  src="{{'${base}/images/' + (dept.chk?'active-dept.png' : 'custom-dept.png')}}">
+                                <span title="{{dept.name}}" ng-bind="dept.name | cut:true:13:' ...'"></span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+
+        <li tab heading="设备组" class="tz-tab">
+            <div class="tz-add-person">
+                <div class="input-group icon-search">
+                    <input type="text" placeholder="搜索设备组..." mdc-placeholder ng-keyup="myKeyupGroup($event)" class="form-control" ng-model="g.groupName">
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-search" ng-click="searchGroup()"></span>
+                    </span>
+                </div>
+                <div class="tz-add-person-list">
+                    <ul>
+                        <li ng-repeat="group in groupList">
+                            <input type="checkbox" ng-click="group.chk = !group.chk" class="chk_1" id="{{group.id}}" ng-change="onSelectedGroup(group)" ng-model="group.selected"/>
+                            <label for="{{group.id}}" ng-class="{'checkStyle':group.selected}"></label>
+                            <label for="{{group.id}}" title="{{group.name}}" class="curpos table-whitespace" style="font-weight:normal;width: 250px;">
+                                <img  src="{{'${base}/images/' + (group.chk?'active-group.png' : 'custom-group.png')}}">
+                                <span>{{group.name}}</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+
+    </ul>
+
+</script>

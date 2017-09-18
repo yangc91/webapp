@@ -1,0 +1,618 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v = "urn:schemas-microsoft-com:vml">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+		<@p.script value=["datepicker", "calendar", "ztree", "ztree.combox"]/>
+		
+		<link rel="stylesheet" type="text/css"href="${base}/themes/default/css_ecss/statistics.css" />
+
+	    <title>监测视图-违规事件定位视图</title>
+		<style>
+      		.gisContainer{
+      			width:100%;
+      			height:300px;
+      		}
+			.highcharts-series-group{
+				cursor:pointer;
+			}
+	
+			#appDownloadArea .highcharts-container{
+				cursor:pointer;
+			}
+		</style>
+	</head>
+<body>
+	<div class="pageheader fix">
+		<h2>
+			<img src="${base}/themes/default/images/auditBig.png" />
+			监测视图<span>查看监测项的具体信息</span>
+		</h2>
+	</div>
+	<div class="content-bianju mt25" style="border:1px solid #eee">
+		<ul class="nav nav-tabs" >
+			<li class="firstLi widthIn3"><a >总体视图</a></li>
+            <li class="secondLi widthIn3"><a>周期监测视图</a></li>
+			<li class="thirdLi widthIn3 active"><a href="#third" data-toggle="tab">违规事件统计视图</a></li>
+		</ul>
+		<!--切换tab开始-->
+		<div class="paddingLr tab-content">
+			<div class="third tab-pane active" id="third">
+				<div class="recordAll">
+					<div class="recordDiv">
+						<div class="noActive " style="cursor: pointer;" id="gradeEvent">
+							<p class="recordName">违规事件</p>
+							<p class="recordNum mt10" id="gradeEvent_p">${violationEventNum!0}</p>
+							<span class="timeEnd">截至当前</span>
+						</div>
+					</div>
+					<div class="recordDiv" >
+						<div class="activate" style="cursor: pointer;" id="toBlackList">
+							<p class="recordName">黑名单人员设备</p>
+							<p class="recordNum mt10" id="toBlackList_p">${blacklistDevNum!0}</p>
+							<span class="timeEnd">截至当前</span>
+						</div>
+					</div>
+					<div class="recordDiv">
+						<div class="deviceNum">
+							<p class="recordName">违规策略状态</p>
+							<p class="recordName mt10">已发布<span class="ml10" style="cursor: pointer;" id="toAuditPublish">${strategystatusMap.publish!0}</span></p>
+							<p class="recordName mt10">已终止<span class="ml10" style="cursor: pointer;" id="toAuditStop">${strategystatusMap.stop!0}</span></p>
+							<span class="timeEnd" style="top:15px">截至当前</span>
+						</div>
+					</div>
+				</div>
+				
+				<!-- 共用搜索条件 -->
+				<div class="handle-search" style="width:100%;float:left;padding-bottom:10px;">
+					<div class="handle-div">
+						<div class="btn-toolbar">
+							<div class="btn-group ml0">
+							 	<button id="refreshBtnAll" type="button" class="btn btn-default">刷新</button>
+							</div>			
+						</div>
+					</div>						
+					<div class="search-div">
+					
+						<div class="btn-toolbar">
+							<div class="input-group">
+								<select class="bindSelect" id="grade" class="w150">
+									<option></option>
+					              	<option value="1">一级违规</option>
+					              	<option value="2">二级违规</option>
+					              	<option value="3">三级违规</option>
+					            </select>
+							</div>
+							<div class="input-group w220">
+								<input class="form-control xlk" type="text" readOnly="readonly" name="deptId" id="deptId" placeholder="选择部门" value="" />
+								<span class="input-group-btn">
+									<input class="select-pic" id="selectBtn" type="button" />
+								</span>
+								<div id="menuContent" style="display:none;width:210px;overflow:auto;">
+									<ul id="tree" class="ztree"></ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 共用搜索条件 END-->
+                <div class="meg-menu">
+				<ul class="nav nav-tabs">
+                <li class="sixthLi widthIn3 subtabs"><a>违规事件统计报表</a></li>
+			  	<li class="fifthLi widthIn3 subtabs"><a>时间段违规统计报表</a></li>
+		  		<li class="fourthLi widthIn3 subtabs"><a>违规事件GPS定位</a></li>	
+                </ul>
+				<!-- 1违规事件定位 -->
+				<div id="position" style="width:100%;">
+					<div class="handle-search" >
+						<div class="handle-div">
+							<div class="btn-toolbar">
+								<div class="btn-group ml15">
+								 	<button id="refreshBtn1" type="button" class="btn btn-default">刷新</button>
+								</div>			
+							</div>
+						</div>
+						
+						<!-- 操作列开始 -->
+						<div class="search-div">
+							<div class="btn-toolbar">
+								<div class="form-search right" style="margin-right: 10px;">
+									<!-- 开始时间 -->
+									<div class="input-group" style="width:160px">
+										<input class="form-control" type="text" id="startTime1" name="startTime1" style="float:left;width:72% " placeholder="开始时间"/>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+						
+					</div>
+					<!-- 地图 -->
+					<div id="gisContainer" class="gisContainer" style="margin-top:17px">
+						<iframe id="violationMap" src="" height="350px" width="100%" scrolling="auto" frameborder="0" ></iframe>
+					</div>
+				</div>
+				<!-- 1违规事件定位 end-->
+				
+				<!-- 2时间段违规等级 -->
+				<div id="statistics" style="width:100%;">
+					<div class="handle-search" >
+						<!-- 操作列开始 -->
+						<div class="handle-div">
+							<div class="btn-toolbar">
+								<div class="btn-group ml15">
+								 	<button id="refreshBtn2" type="button" class="btn btn-default">刷新</button>
+								</div>
+							</div>
+						</div>
+						
+						<div class="search-div">
+							<div class="btn-toolbar">
+								<div class="form-search right" style="margin-right: 10px;">
+									<!-- 选择日期 -->
+									<div class="input-group" style="width:160px">
+										<input class="form-control" type="text" id="startTime2" name="startTime2" style="float:left;width:72% " placeholder="选择日期"/>
+									</div>
+								</div>
+							</div>
+						</div>
+                     </div>
+                     <div class="gisContainer">   
+						<div class="audit-violationtime" style="width:100%;margin-top:17px"></div>
+						<table id="audit-violationtime" class="highchart table" data-graph-container=".audit-violationtime" data-graph-type="line" data-graph-legend-disabled="0">
+						  	<!-- <caption>时间段违规统计报表</caption> -->
+						  	<thead>
+						    	<tr>
+							    	<th>时间段</th>
+							      	<th>违规数量</th>
+						    	</tr>
+						  	</thead>
+							<tbody id="violationtime">
+						   		<tr>
+							   		<td>00:00</td>
+							   		<td>0</td>
+						   		</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- 2时间段违规等级 end-->
+				
+				<!-- 3违规事件报表 -->
+				<div id="report" style="width:100%;">
+					<div id="appDownloadArea" style="width:100%;">
+						<div class="handle-search" >
+							<div class="handle-div">
+								<div class="btn-toolbar">
+									<div class="btn-group ml15">
+									 	<button id="refreshBtn3" type="button" class="btn btn-default">刷新</button>
+									</div>
+								</div>
+							</div>
+						
+							<!-- 操作列开始 -->
+							<div class="search-div">
+								<div class="btn-toolbar">
+									<div class="form-search right" style="margin-right: 10px;">
+										<!-- 开始时间 -->
+										<div class="input-group" style="width:160px">
+											<input class="form-control" type="text" id="startTime3" name="startTime3" style="float:left;width:72% " placeholder="开始时间"/>
+										</div>
+										
+										<!-- 结束时间 -->
+										<div class="input-group" style="width:160px">
+											<input class="form-control"  type="text" id="endTime3" name="endTime3" style="float:left;width:72% " placeholder="结束时间"/>
+										</div>
+										<div class="input-group" style="width:80px;">
+											<button id="submitBtn3" type="button" class="btn btn-default" onclick="loadChar()">搜索</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="gisContainer" style="margin-top:10px">
+                            <!-- 3-1违规项统计报表 -->
+                            <div class="audit-violationitems" style="width:48%; float:left;overflow:hidden;margin-top:34px"></div>
+                            <table id="audit-violationitems" class="highchart table" data-graph-container=".audit-violationitems" data-graph-type="column" data-graph-legend-disabled="0">
+                                <caption>违规项统计报表</caption>
+                                <thead>
+                                    <tr>
+                                        <th>违规项名称</th>
+                                        <th>违规数量</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="violationitems">
+                                    <tr>
+                                        <td>0</td>
+                                        <td>0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!-- 3-1违规项统计报表end -->
+                            <div style="width:4%;float:left;overflow:hidden;text-align:center"><img src="${base}/themes/default/images/line2.png"  alt=""/></div>
+                            <!-- 3-2各违规事件违规等级构成 -->
+                            <div class="audit-violationgrade" style="width:48%;float:right;overflow:hidden;margin-top:34px"></div>
+                            <table id="audit-violationgrade" class="highchart table" data-graph-container=".audit-violationgrade" data-graph-type="pie" data-graph-legend-disabled="0"
+                                data-graph-legend-layout="vertical" data-graph-legend-align="right">
+                                <caption>违规等级分布</caption>
+                                <thead>
+                                    <tr>
+                                        <th>违规等级</th>
+                                        <th>违规数量</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="violationgrade">
+						   		
+                                </tbody>
+                            </table>
+                            <!-- 3-2各违规事件违规等级构成end -->
+						</div>
+					</div>
+				</div>
+				<!-- 3违规事件报表 end-->
+                </div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="${base}/script/datepickerdefined.js"></script>
+	<script type="text/javascript">
+		var setting, deptTree, preDay;
+
+		var itemColor = {
+            "一级违规":'#e74b47',
+            "二级违规":'#f07c4e',
+            "三级违规":'#f0ad4e'
+        };//data-graph-item-color
+
+  		$(function(){
+            $("#position").hide();
+            $("#statistics").hide();
+            $(".sixthLi").addClass("active");
+            
+  	  		$('#gradeEvent').click(function(){
+  	  			window.location.href = "${base}/audit/log/index.do?menuid=16";
+  	  		});
+  	  		$('#toBlackList').click(function(){
+  	  			window.location.href = "${base}/system/blacklist/list.do?menuid=11";
+  	  		})
+  	  		$('#toAuditPublish').click(function(){
+  	  			window.location.href = "${base}/audit/log/index.do?menuid=16";
+  	  		})
+  	  		$('#toAuditStop').click(function(){
+  	  			window.location.href = "${base}/audit/log/index.do?menuid=16";
+  	  		})
+            
+  			$(".firstLi").click(function(){
+  				window.location.href="${base}/audit/checkview/index.do";
+  			})
+  			$(".secondLi").click(function(){
+  				window.location.href="${base}/audit/checkview/period.do"
+  			})
+  			
+  		  	$(".fourthLi").click(function(){//定位
+                $("#statistics").hide();
+                $("#report").hide();
+                $("#position").show();
+  				$(".fourthLi").addClass("active");
+                $(".fifthLi").removeClass("active");
+                $(".sixthLi").removeClass("active");
+                
+                //loadChar();
+                loadviolationMap();
+                
+  			})
+            $(".fifthLi").click(function(){//时间段统计
+                $("#position").hide();
+                $("#report").hide();
+                $("#statistics").show();
+                $(".fifthLi").addClass("active");
+  				$(".fourthLi").removeClass("active");
+                $(".sixthLi").removeClass("active");
+                
+                loadChar();
+  			})
+            $(".sixthLi").click(function(){//违规项及违规等级统计
+                $("#position").hide();
+                $("#statistics").hide();
+                $("#report").show();
+                $(".sixthLi").addClass("active");
+  				$(".fourthLi").removeClass("active");
+                $(".fifthLi").removeClass("active");
+                
+                loadChar();
+  			})
+  			
+  			//违规等级下拉框的渲染
+			$(".bindSelect").select2({
+				minimumResultsForSearch: "Infinity"
+			});
+  			
+  	  		$("#grade").select2({
+  	  			placeholder:"选择违规等级",
+  	  			minimumResultsForSearch: "Infinity"
+  	  		})
+  			preDay = '${preDay!""}';
+  			$('#startTime1').val(preDay);
+  			$('#startTime2').val(preDay);
+			
+  			//初始化时间组件
+			selectdatefunc('startTime3', 'endTime3');
+  			
+			var checkstartTime1 = $('#startTime1').datepicker({
+ 	  			onRender: function(date) {
+ 			        var result = '';
+ 			        if(date){
+ 			        	if(date.valueOf() > new Date().getTime()) result = 'disabled';
+ 			        } 
+ 			        return result;
+			    }
+			}).on('changeDate', function(ev) {
+				checkstartTime1.hide();
+			    checkstartTime1.setValue(ev.date.valueOf());
+			    
+			    loadIframeFunc();
+			}).data('datepicker');
+			
+			var checkstartTime2 = $('#startTime2').datepicker({
+ 	  			onRender: function(date) {
+ 			        var result = '';
+ 			        if(date){
+ 			        	if(date.valueOf() > new Date().getTime()) result = 'disabled';
+ 			        } 
+ 			        return result;
+			    }
+			}).on('changeDate', function(ev) {
+				checkstartTime2.hide();
+				checkstartTime2.setValue(ev.date.valueOf());
+			    
+			    loadChar();
+			}).data('datepicker');
+			
+  			//初始化部门树
+  			setting = {
+				basePath: "${base}",
+				combox : {
+					target:"#deptId",
+					trigger:"#selectBtn",
+					search:true,
+					width:210
+				},
+				data : {
+					simpleData : {
+						enable : true,
+						idKey : "id",
+						pIdKey : "parentId"
+						
+					}
+				},
+				view: {
+					dblClickExpand: false,
+					showIcon: false
+				},
+				callback: {
+					afterSelectNode: function(event, treeId, node) {
+						if($(".fourthLi").hasClass("active")){
+			  				loadIframeFunc();
+			  			} else {
+				  			loadChar();
+			  			}
+					},
+					afterClear: function() {
+						if($(".fourthLi").hasClass("active")){
+			  				loadIframeFunc();
+			  			} else {
+				  			loadChar();
+			  			}
+					},
+					afterDropdown: function() {
+					 	$("#selectBtn").addClass("open");
+					},
+					afterDropup: function() {
+						$("#selectBtn").removeClass("open");
+					}
+				}
+			};
+  			deptTree = $.fn.zTree.combox($("#tree"), setting, ${deptJson});
+  			
+			//违规事件item，grade统计
+ 			<#if (itemResultStr != "")>
+ 				var itemResultStr = ${itemResultStr};
+ 				$("#violationitems").empty();
+ 				$.each(itemResultStr, function(i, o) {
+ 					$("#violationitems").append("<tr><td>"+i+"</td><td>"+o+"</td></tr>");
+ 				});
+ 			</#if>
+			
+			//违规等级
+ 			<#if (gradeResultStr != "")>
+ 				var gradeResultStr = ${gradeResultStr};
+ 				$("#violationgrade").empty();
+ 				$.each(gradeResultStr, function(i, o) {
+ 					$("#violationgrade").append("<tr><td>"+i+"</td><td data-graph-item-color='"+itemColor[i]+"'data-graph-name='"+i+"'>"+o+"</td></tr>");
+ 				});
+ 			</#if>
+			$('table.highchart').highchartTable();
+			//初始化报表结束
+
+/**
+  	  		//加载地图==========================================  	  		
+  	  		//step1:初始化地图
+  	  		Map.init({
+	  	  		containerId : "gisContainer",
+				markerPath : "${base}/themes/default/images/police.png"
+  	  		});
+  	  		
+  	  		//step2:解析违规事件数据，循环调用addMarkers(lon, lat, strMsg)方法
+  	  		//step3:点击条件搜索，先清空标记Map.clearMarkers，然后在循环调用addMarkers
+
+  	  		//加载地图 END==========================================
+**/
+  	  		//违规等级change事件
+  	  		$("#grade").on("change", function (e) {
+	  	  		if($(".fourthLi").hasClass("active")){
+	  				loadIframeFunc();
+	  			} else{
+		  			loadChar();
+	  			}
+  		  	});
+  	  		
+			//定位违规事件刷新
+			$('#refreshBtn1').click(function(){
+				$("#startTime1").val(preDay);
+				loadIframeFunc();
+			});
+
+			//时间段统计刷新
+  	  		$('#refreshBtn2').click(function(){
+  	  			$("#startTime2").val(preDay);
+  	  			loadChar();
+  	  		});
+			
+			//违规项及违规等级统计刷新
+  	  		$('#refreshBtn3').click(function(){
+  	  			$("#startTime3").val('');
+  	  			$("#endTime3").val('');
+  	  			loadChar();
+  	  		});
+  	  		
+			//刷新全部
+  	  		$('#refreshBtnAll').click(function(){
+  	  			deptTree.clear();
+  	  			$(".bindSelect").select2("val", "");
+  	  			$("#startTime1").val(preDay);
+  	  			$("#startTime2").val(preDay);
+	  			$('#startTime3').val('');
+	  			$('#endTime3').val('');
+	  			
+	  			if($(".fourthLi").hasClass("active")){
+	  				loadIframeFunc();
+	  			} else{
+		  			loadChar();
+	  			}
+  	  		});
+
+  		})
+  		
+		//共用时间段的搜索change事件
+  		function loadChar(){
+  			var grade = $('#grade').val();
+  			var deptId = $("[name='deptId']").val();
+  			var deptName = $('#deptId').val();
+  			
+  			var startTime1 = $('#startTime1').val();
+  			var startTime2 = $("#startTime2").val();
+  			var startTime3 = $('#startTime3').val();
+  			var endTime3 = $('#endTime3').val();
+  			
+  			var tab = "";
+	  		if($(".fourthLi").hasClass("active")){tab = "position"}
+			else if($(".fifthLi").hasClass("active")){tab = "time"}
+			else if($(".sixthLi").hasClass("active")){tab = "itemAndGrade"}
+  			
+  			//{tab:tab,grade:grade,deptId:deptId,startTime2:startTime2,startTime3:startTime3,endTime3:endTime3};
+  			//alert(tab+','+grade+','+deptId+','+startTime2+','+startTime3+','+endTime3);
+  			$.ajax({
+  				url: "${base}/audit/checkview/violationAjaxTab.do",
+  				type: "post",
+  				data: {tab:tab,grade:grade,deptId:deptId,startTime1:startTime1,startTime2:startTime2,startTime3:startTime3,endTime3:endTime3},
+  				success: function(result) {//alert(JSON.stringify(result));
+  				
+					//处理开始
+					if(tab=='time') {//时间段统计	  					
+						var timeResultStr = result.timeResultStr;
+						$("#violationtime").empty();
+	  					if(timeResultStr) {
+	  						var obj = JSON.parse(timeResultStr);
+	  						$.each(obj, function(i, o) {
+	  							var key = i;//atime1 btime11 ctime21
+	  							var num = key.substr(5);
+	  							var num = num - 1;
+	  							if(num<10){num = '0'+num}
+	  							$("#violationtime").append("<tr><td>"+num+":00"+"</td><td>"+o+"</td></tr>");
+	  						});
+	  					}
+						$('table.highchart').highchartTable();
+						
+					} else if(tab=='itemAndGrade') {//违规项及违规等级统计
+						
+						var itemResultStr = result.itemResultStr;
+	  					var gradeResultStr = result.gradeResultStr;
+	  					$("#violationitems").empty();
+						$("#violationgrade").empty();
+						
+						if(itemResultStr) {
+	  						var obj = JSON.parse(itemResultStr);
+	  						$.each(obj, function(i, o) {
+	  							$("#violationitems").append("<tr><td>"+i+"</td><td>"+o+"</td></tr>");
+	  						});
+	  					}
+	  					if(gradeResultStr) {
+	  						var obj = JSON.parse(gradeResultStr);
+	  						$.each(obj, function(i, o) {
+	  							$("#violationgrade").append("<tr><td>"+i+"</td><td data-graph-item-color='"+itemColor[i]+"'data-graph-name='"+i+"'>"+o+"</td></tr>");
+	  						});
+	  					}
+						$('table.highchart').highchartTable();
+						
+					} else if(tab=='position'){//定位
+						
+/**						
+						//加载地图==========================================
+						Map.clearMarkers();
+						var violationPersonList = result.violationPersonList;
+						$.each(violationPersonList, function(i,item){
+			                var lon = item.lon;
+			  	  			var lat = item.lat;
+			  	  			var strMsg = '警号：'+item.account+'<br>'
+			  	  							+ '姓名：'+item.personName+'<br>'
+			  	  							+ '所属机构：'+item.deptName+'<br>'
+			  	  							+ '违规策略：'+item.strategyName+'<br>'
+			  	  							+ '违规事件：'+item.violationItem+'<br>'
+			  	  							+ '违规等级：'+item.gradeName+'<br>'
+			  	  							+ '违规时间：'+(new Date(item.violationTime).format("yyyy-MM-dd"))+'<br>';
+			  	  			//alert(lon+','+lat+','+strMsg);
+				  	  		Map.addMarker({
+			  	  				lon:lon,
+			  	  				lat:lat,
+			  	  				msg:strMsg
+			  	  			});
+			            });
+						//加载地图==========================================
+**/
+
+					}
+					//处理完毕
+					
+  				}
+  				
+  				
+  			});
+  		}
+        
+        //tab切换到定位
+        function loadviolationMap(){
+        	var obj = $('#violationMap');
+        	var type="violation";
+  			var grade = $('#grade').val();
+  			var deptId = $("[name='deptId']").val();
+  			var deptName = $('#deptId').val();
+  			var startTime = $('#startTime1').val();
+
+  			var url = "${base}/audit/checkview/toPosition.do?type="+type+"&grade="+grade+"&deptId="+deptId+"&startTime="+startTime;
+        	obj.attr('src',url);
+        	
+        }
+        
+        //调用iframe页面的方法
+        function loadIframeFunc(){
+        	var type="violation";
+  			var grade = $('#grade').val();
+  			var deptId = $("[name='deptId']").val();
+  			var startTime = $('#startTime1').val();
+  			
+  			var frames=document.getElementById("violationMap");
+  			frames.contentWindow.loadGisMap(type, grade, deptId, startTime, "");
+  			
+        }
+
+	</script>
+</body>

@@ -1,0 +1,273 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+	<a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回列表</a>
+	<div>
+		<span class="deviceTitle fwb" ng-bind="deviceInfo.personName"></span>
+		<span class="fc9 pl5">（{{deviceInfo.personCode}}）</span></div>
+	<p class="fc6 mt6" ng-bind="deviceInfo.deptName"></p>
+
+	<hr class="hr-solid">
+
+	<div>
+		<img src="${base}/themes/default/images/device.png" class="leftLineImg" />
+		<p class="personName leftLinePerson" ng-bind="deviceInfo.model"></p>
+		<p class="fc6"><span ng-bind="deviceInfo.osName"></span> <span ng-bind="deviceInfo.osVersion"></span></p>
+		<p class="fc6">已激活</p>
+	</div>
+	<hr class="hr-solid">
+	<p class="fc9">IMEI号:</p>
+	<p class="fc6 leftImei" ng-bind="deviceInfo.imei"></p>
+	<p class="fc9">SIM卡:</p>
+	<p class="fc6 table-whitespace leftImei w200" title="{{deviceInfo.sim}}" ng-bind="deviceInfo.sim"></p>
+	<p class="fc9">CPU型号:</p>
+	<p class="fc6 leftImei" ng-bind="deviceInfo.cpu"></p>
+	<p class="fc9">存储空间使用情况:</p>
+	<p class="fc6 mt6" ><span ng-bind="deviceInfo.usedMemory/1024 | number:1"></span>G/<span ng-bind="deviceInfo.memory / 1024 | number:1"></span>G </p>
+	<div class="progress leftProgress">
+		<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow='{{deviceInfo.usedMemory/deviceInfo.memory * 100}}' aria-valuemin='0' aria-valuemax='100' ng-style="memoryProcess">
+		</div>
+	</div>
+</form>
+
+<!--右侧-->
+<div class="admin-list overflowDiv">
+	<div class="tz-right-content">
+		<ul tabset>
+			<!-- 设备管控 -->
+			<li tab class="tz-tab-left" active="tabNotice[0].active" ng-click="tabClickFir()" onselect="return false;" deselect="cancelReflushTimer()" disable="tabNotice[0].disabled" heading="{{tabNotice[0].heading}}">
+				<div class="tz-content">
+					<p class="fc6 aboutDevice" ng-show="deviceInstruction.length > 0 ">设备相关</p>
+					<img src="${base}/themes/default/images/line.png" class="mbt10" />
+					<table class="w600">
+						<tr>
+							<td ng-repeat="insItem in deviceInstruction | orderBy:'orders':false">
+								<div class="conrolImg" ng-click="loadConfirmDiv(insItem)">
+									<img src="${base}/themes/default/images/{{insItem.itemCode}}.png" />
+									<p class="controlTitle" ng-bind="insItem.itemName"></p>
+								</div>
+							</td>
+						</tr>
+					</table>
+					<p class="fc6 aboutDevice" ng-show="dataInstruction.length > 0 ">数据安全</p>
+					<img src="${base}/themes/default/images/line.png" class="mbt10" />
+					<table class="w600">
+						<tr>
+							<td ng-repeat="insItem in dataInstruction | orderBy:'orders':false">
+								<div class="conrolImg" ng-click="loadConfirmDiv(insItem)">
+									<img src="${base}/themes/default/images/{{insItem.itemCode}}.png" />
+									<p class="controlTitle">{{insItem.itemName}}</p>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div class="deviceInfo-right tz-add-person tz-content-right" style="width: 400px">
+					<p>
+						更新时间：
+						<span ng-bind="deviceInfo.actualTime | date : 'yyyy-MM-dd HH:mm' ||'暂无数据'"></span>
+						<button type="button" class="btn-sm btn-green" ng-disabled="showReflushSeconds" ng-class="{'btn-disable':showReflushSeconds}"  ng-click="refulshStatus()">刷新
+							<span ng-bind="'(' + reflushSeconds + 's)' " ng-show="showReflushSeconds"></span>
+						</button>
+						<span ng-show="!showReflushSeconds && reflushFail">(失败，请重试)</span>
+					</p>
+					<p class="stausLine">外设状态<hr class="deviceLine"></p>
+					<table class="deviceInfoTable">
+						<tr ng-repeat="devicestatus in outstatus">
+							<td class="w80" ng-bind="devicestatus.name + ':'"></td>
+							<td>
+								<span ng-show="!showReflushSeconds" ng-bind="devicestatus.value"></span>
+								<img ng-show="showReflushSeconds" src="${base}/themes/default/images/loader.gif" />
+							</td>
+						</tr>
+						<tr>
+							<td class="w80">USB状态：</td>
+							<td style="width: 260px;">
+								<span ng-show="!showReflushSeconds" ng-bind="deviceInfo.usbStatusStr"></span>
+								<img ng-show="showReflushSeconds" src="${base}/themes/default/images/loader.gif" />
+
+								<span style="margin-left: 10px">模式：</span>
+								<span ng-show="!showReflushSeconds" ng-bind="deviceInfo.usbConnectStatusStr"></span>
+								<img ng-show="showReflushSeconds" src="${base}/themes/default/images/loader.gif" />
+
+								<span style="margin-left: 10px" class="desc-text" ng-click="toUsbInfo()">查看历史记录</span>
+
+							</td>
+						</tr>
+						<tr class="h28">
+							<td class="w80">电量：</td>
+							<td class="w150">
+								<div ng-show="!showReflushSeconds" class="progress" style="height: 15px;margin-bottom:0px;width: 180px;">
+									<div class="progress-bar progress-bar-striped lh15" role="progressbar" aria-valuenow='' aria-valuemin='0' aria-valuemax='100' ng-style="electricProcess">
+										<span class="fs10">{{electricProcess.width}}</span>
+									</div>
+								</div>
+								<img ng-show="showReflushSeconds" src="${base}/themes/default/images/loader.gif" />
+							</td>
+						</tr>
+					</table>
+					<p class="stausLine">策略状态<hr class="deviceLine"></p>
+					<p class="deviceInfoTable table-whitespace w300" title="{{deviceStrategy}}">部署策略：
+						<span ng-show="!showReflushSeconds" class="ml10" ng-bind="deviceStrategy"></span>
+						<img ng-show="showReflushSeconds" src="${base}/themes/default/images/loader.gif" />
+					</p>
+					<p class="stausLine">网络状态<hr class="deviceLine"></p>
+					<p class="deviceInfoTable">APN接入点：
+						<span ng-show="!showReflushSeconds" title="{{deviceInfo.apn}}" class="apnRefresh" ng-bind="deviceInfo.apn||'暂无法获取'"></span>
+						<img ng-show="showReflushSeconds" src="${base}/themes/default/images/loader.gif" />
+					</p>
+
+
+					<p class="stausLine">安全状态<hr class="deviceLine"></p>
+					<p class="deviceInfoTable">锁屏：
+						<span ng-show="!showReflushSeconds" class="ml40" ng-bind="screenStatus"></span>
+						<img ng-show="showReflushSeconds" src="${base}/themes/default/images/loader.gif" />
+					</p>
+					<p class="deviceInfoTable">解锁密码：
+						<input class="pwdInput ml10" disabled type="{{pwdType}}" ng-model="screenPassword" ng-show="!showReflushSeconds"/>
+						<span class="eyesCloseDiv" ng-click="closePwd()" ng-show="pwdType=='password'&& !showReflushSeconds && screenPassword != '无解锁密码'"></span>
+						<span class="eyesDiv" ng-click="openPwd()" ng-show="pwdType=='text'&&!showReflushSeconds && screenPassword != '无解锁密码'"></span>
+						<img ng-show="showReflushSeconds" src="${base}/themes/default/images/loader.gif" />
+					</p>
+				</div>
+			</li>
+			<!-- 设备管控结束 -->
+
+			<!-- 设备相关 -->
+			<li tab class="tz-tab" active="tabNotice[1].active" ng-click="tabClickSec()" deselect="cancelAllAppTimer()" disable="tabNotice[1].disabled" heading="{{tabNotice[1].heading}}">
+				<div class="tz-msg-history">
+					<p class="mbt10">
+						<span class="fc6 aboutDevice" >已启用的APP</span>
+						<span class="desc-text ml10" ng-click="loadAppRunInfo()">立即更新</span>
+					</p>
+					<img src="${base}/themes/default/images/line.png" class="mbt10"/>
+					<div>
+						<div class="activeApp" ng-repeat="app in activeApps track by $index">
+							<div class="leftLogoApp">
+								<img  ng-src="{{ supportB64 == true ? app.icon : '${base}/ecss/downloadImg.do?imgId=' + app.appId}}" class="leftLogoImg"/>
+							</div>
+							<p class="personName rightAppName" ng-bind="app.name"></p>
+							<p class="deviceInfo table-whitespace versionWidth"><span class="deviceInfoName fc9">版本号：</span><span class="fc6" ng-bind="app.version"></span></p>
+							<p class="deviceInfo"><span class="deviceInfoName fc9 mr10">安装时间：</span><span class="fc6" ng-bind="app.installTime | date:'yyyy-MM-dd' "></span></p>
+							<p class="mt8">
+								<button type="button" class="btn mr0" disabled ng-class="btn-disable">启用</button>
+								<button type="button" class="btn btn-gray uninstallBtn" ng-disabled="app.waitStartApp || app.waitUninstallApp" ng-click="uninstallApp(app)">卸载</button>
+							</p>
+						</div>
+						<div class="clearfloat"></div>
+					</div>
+
+					<p class="fc6 aboutDevice">未启用的APP</p>
+					<img src="${base}/themes/default/images/line.png"class="mbt10" />
+					<div>
+						<div class="activeApp" ng-repeat="app in unactiveApps track by $index">
+							<div class="leftLogoApp">
+								<img  ng-src="{{ supportB64 == true ? app.icon : '${base}/ecss/downloadImg.do?imgId=' + app.appId}}" class="leftLogoImg"/>
+							</div>
+							<p class="personName rightAppName" ng-bind="app.name"></p>
+							<p class="deviceInfo table-whitespace versionWidth"><span class="deviceInfoName fc9">版本号：</span><span class="fc6" ng-bind="app.version"></span></p>
+							<p class="deviceInfo"><span class="deviceInfoName fc9 mr10">安装时间：</span ><span class="fc6" ng-bind="app.installTime | date:'yyyy-MM-dd'"></span></p>
+							<p class="mt8">
+								<button type="button" class="btn btn-blue mr0"  ng-disabled="app.waitStartApp || app.waitUninstallApp" ng-click="startApp(app)">
+									<span ng-show="!app.waitStartApp">启用</span>
+									<span ng-show="app.waitStartApp">
+										<img src="${base}/themes/default/images/loaderBtn.gif" />
+									</span>
+								</button>
+								<button type="button" class="btn btn-gray uninstallBtn" ng-disabled="app.waitStartApp || app.waitUninstallApp" ng-click="uninstallApp(app)">卸载</button>
+							</p>
+						</div>
+						<div class="clearfloat"></div>
+					</div>
+				</div>
+			</li>
+			<!-- 设备相关结束 -->
+
+			<!-- 操作状态查询 -->
+			<li tab class="tz-tab" active="tabNotice[2].active" ng-click="tabClickThr()" deselect="cancelFirstPageResultTimer()" disable="tabNotice[2].disabled" heading="{{tabNotice[2].heading}}">
+				<div class="tz-msg-history" when-scrolled="loadMoreOperatorResultList()">
+					<ul>
+						<li ng-repeat="operatorResult in operatorResultList track by $index">
+							<div class="li-content">
+								<div class="date-left">
+									<img src="${base}/themes/default/images/{{operatorResult.instructionType}}.png" width="80px"/>
+									<img class="ml37" src="${base}/images/line.png"/>
+									<div ng-if="operatorResult.instructionType == 'CMD_PHOTO' && operatorResult.resultStatus == 3 " class="secondLine linePosition" ></div>
+								</div>
+								<div ng-switch="operatorResult.resultStatus" class="pbt10">
+									<p class="personName mbt10" ng-bind="operatorResult.instructionName"></p>
+									<div ng-switch-when="1">
+										<p ng-class="operatorResult.fontClass" ><span ng-bind="operatorResult.resultMsg"></span><img class="ml5" src="${base}/themes/default/images/stateLoader.gif"/></p>
+										<p class="fc9 fs12 mbt10 mt0" ng-bind="operatorResult.resultMsgInfo"></p>
+									</div>
+									<div ng-switch-when="7">
+										<p ng-class="operatorResult.fontClass" ><span ng-bind="operatorResult.resultMsg"></span><img class="ml5" src="${base}/themes/default/images/stateLoader.gif"/></p>
+										<p class="fc9 fs12 mt0 mbt10" ng-bind="operatorResult.resultMsgInfo"></p>
+									</div>
+									<div ng-switch-when="3">
+										<p ng-class="operatorResult.fontClass" ng-bind="operatorResult.resultMsg"></p>
+										<div class="picDiv mbt20" ng-if="operatorResult.instructionType == 'CMD_PHOTO'">
+											<div class="leftLogoApp" ng-mouseover="picShow(operatorResult)" ng-mouseout="picHide(operatorResult)">
+												<img width="60px" height="60px" src="{{ supportB64 == true ? operatorResult.instructionResult : '${base}/ecss/deviceMC/downloadPhoneImg.do?instructionSeq=' + operatorResult.instructionSeq}}" />
+											</div>
+											<p>
+												<span type="buttton" href="${base}/ecss/deviceMC/downloadPhoneImg.do?instructionSeq={{operatorResult.instructionSeq}}" class="btn btn-blue rightBtn mr0">下载</span>
+											</p>
+											<div class="bigPic" ng-show="operatorResult.bigPicShow">
+												<span class="trglLeft glyphicon glyphicon-triangle-left"></span>
+												<img src="{{ supportB64 == true ? operatorResult.instructionResult : '${base}/ecss/deviceMC/downloadPhoneImg.do?instructionSeq=' + operatorResult.instructionSeq}}"  width="300px" height="400px"/>
+											</div>
+										</div>
+										<div ng-if="operatorResult.instructionType == 'CMD_LOCATE'" >
+											<span ng-click="showMapDialog(operatorResult)" class="desc-text">查看</span>
+										</div>
+									</div>
+
+									<div ng-switch-default>
+										<p ng-class="operatorResult.fontClass" ng-bind="operatorResult.resultMsg"></p>
+										<p class="fc9 fs12 mt0 mbt10" ng-bind="operatorResult.resultMsgInfo"></p>
+									</div>
+
+									<p class="fc9 fs12 timeStyle" ng-bind="operatorResult.createTime | date : 'yyyy-MM-dd HH:mm:ss' || '暂无'"></p>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</li>
+			<!-- 操作状态查询结束 -->
+		</ul>
+
+	</div>
+</div>
+
+<section ng-show="alert.msg" class="col-md-4 alertMsg">
+	<div class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), alert.closeable ? 'alert-dismissable' : null]" role="alert">
+		<button ng-show="alert.closeable" type="button" class="close" ng-click="alertInf.close(0)" data-dismiss="alert" aria-label="close">
+			<span aria-hidden="true">×</span>
+		</button>
+		<div>
+			<span class="ng-scope ng-binding" ng-bind="alert.msg"></span></div>
+	</div>
+</section>
+
+
+<script type="text/ng-template" id="showMap.html">
+	<div class="modal-header">
+		<h3 class="modal-title">定位信息展示</h3>
+	</div>
+
+	<div class="modal-body">
+		<input type="hidden" id="abc" value="abc">
+		<div id="mapContainer" class="h300">点击加载地图按钮进行地图展示</div>
+	</div>
+
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="ok()">
+			确认
+		</button>
+		<button class="btn btn-warning" ng-click="cancel()">
+			退出
+		</button>
+	</div>
+</script>

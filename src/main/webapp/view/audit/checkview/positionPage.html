@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v = "urn:schemas-microsoft-com:vml">
+	<head>
+		<link rel="stylesheet" type="text/css"href="${base}/script/map/map.css" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	    <title>地图</title>
+	    <style type="text/css">
+	    	v\:* {
+        		BEHAVIOR: url(#default#VML)
+      		}
+	    	.gisContainer{
+	    		width:100%;
+	    		height:285px;
+	    	}
+	    </style>
+	</head>
+<body>
+	<div id="gisContainer" class="gisContainer">
+		加载中...
+	</div>
+
+	<script type="text/javascript" src="${base}/script/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="http://${gisAddress!}/PGIS_S_TileMap/js/EzMapAPI.js" charset="gb2312"></script>
+<!-- 	<script type="text/javascript" src="${base}/script/map/map.mock.js"></script> -->
+	<script type="text/javascript" src="${base}/script/map/map.js"></script>
+	
+	<script type="text/javascript">
+/**
+	Map.init({
+		containerId : "gisContainer",//显示地图的div的id
+		markerPath : "${base}/themes/default/images/police.png"//定位图标
+	});
+		//清空地图上的定位
+		Map.clearMarkers();
+		//循环将后台查询的数据添加到地图上
+	Map.addMarker({
+		lon:106.60,//精度
+		lat:26.70,//纬度
+		msg:"警号：123456<br>警员：周小欠<br>描述：等等"//鼠标点击定位图标后显示的信息
+	});
+**/  			
+
+//日期格式化函数
+Date.prototype.format = function(format) {
+	var o = {
+		"M+" : this.getMonth() + 1, // month
+		"d+" : this.getDate(), // day
+		"h+" : this.getHours(), // hour
+		"m+" : this.getMinutes(), // minute
+		"s+" : this.getSeconds(), // second
+		"q+" : Math.floor((this.getMonth() + 3) / 3), // quarter
+		"S" : this.getMilliseconds()
+	// millisecond
+	}
+	if (/(y+)/.test(format))
+		format = format.replace(RegExp.$1, (this.getFullYear() + "")
+				.substr(4 - RegExp.$1.length));
+	for ( var k in o)
+		if (new RegExp("(" + k + ")").test(format))
+			format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k]
+					: ("00" + o[k]).substr(("" + o[k]).length));
+	return format;
+}
+
+		//页面加载
+		$(function(){
+			
+			Map.init({
+				containerId : "gisContainer",//显示地图的div的id
+				markerPath : "${base}/themes/default/images/police.png"//定位图标
+			});
+
+			//循环将后台查询的数据添加到地图上
+			var positionType = '${type!""}';
+			if (positionType == "violation") {
+				
+				//违规定位	
+		 		<#if (violationPersonList != "")>
+	 				var violationPersonList = ${violationPersonList};
+	 				$.each(violationPersonList, function(i, item) {
+	 					var lon = item.lon;
+		  	  			var lat = item.lat;
+		  	  			var time = new Date(item.violationTime).format("yyyy-MM-dd");
+		  	  			var strMsg = '警号：'+item.account+'<br>'
+		  	  							+ '姓名：'+item.personName+'<br>'
+		  	  							+ '所属机构：'+item.deptName+'<br>'
+		  	  							+ '违规策略：'+item.strategyName+'<br>'
+		  	  							+ '违规事件：'+item.violationItem+'<br>'
+		  	  							+ '违规等级：'+item.gradeName+'<br>'
+		  	  							+ '违规时间：'+time+'<br>';
+//		  	  			alert(lon+','+lat+','+strMsg);
+			  	  		Map.addMarker({
+		  	  				lon:lon,
+		  	  				lat:lat,
+		  	  				msg:strMsg
+		  	  			});
+	 				});
+	 			</#if>
+				
+			} else if (positionType == 'period') {
+				
+				//周期性定位
+		 		<#if (personPositionList != "")>
+	 				var personPositionList = ${personPositionList};
+	 				$.each(personPositionList, function(i,item){
+//	 					alert(i + "," + item.time+","+item.name+","+item.imei+","+item.lon+","+item.lat);
+		                var lon = item.lon;
+		  	  			var lat = item.lat;
+		  	  			var name = item.name;
+			  	  		Map.addMarker({
+		  	  				lon:lon,
+		  	  				lat:lat,
+		  	  				msg:name
+		  	  			});
+	 				});
+	 			</#if>
+				
+			}
+		})
+		//页面加载END
+	
+  		function loadGisMap(type, grade, deptId, startTime, personName) {
+  			//alert(type + ',' + grade + ',' + deptId + ',' + startTime + ',' + personName );
+  			
+  			//ajax获取定位数据
+  			if(type=='violation'){
+  	  			
+  				$.ajax({
+  	  				url: "${base}/audit/checkview/violationAjaxTab.do",
+  	  				type: "post",
+  	  				data: {tab:"position",grade:grade,deptId:deptId,startTime1:startTime},
+  	  				success: function(result) {//alert(JSON.stringify(result));
+	  	  				//加载地图==========================================
+						Map.clearMarkers();
+						var violationPersonList = result.violationPersonList;
+						$.each(violationPersonList, function(i,item){
+			                var lon = item.lon;
+			  	  			var lat = item.lat;
+			  	  			var time = new Date(item.violationTime).format("yyyy-MM-dd");
+			  	  			var strMsg = '警号：'+item.account+'<br>'
+			  	  							+ '姓名：'+item.personName+'<br>'
+			  	  							+ '所属机构：'+item.deptName+'<br>'
+			  	  							+ '违规策略：'+item.strategyName+'<br>'
+			  	  							+ '违规事件：'+item.violationItem+'<br>'
+			  	  							+ '违规等级：'+item.gradeName+'<br>'
+			  	  							+ '违规时间：'+ time +'<br>';
+//			  	  			alert(lon+','+lat+','+strMsg);
+				  	  		Map.addMarker({
+			  	  				lon:lon,
+			  	  				lat:lat,
+			  	  				msg:strMsg
+			  	  			});
+			            });
+						//加载地图==========================================
+  	  				}
+  	  			});
+  				
+  			} else if (type=='period') {
+  				
+  	  			$.ajax({
+  	  				url: "${base}/audit/checkview/periodAjaxTab.do",
+  	  				type: "post",
+  	  				data: {deptId:deptId,startTime:startTime,personName:personName,tab:"position"},
+  	  				success: function(result) {//alert(JSON.stringify(result));
+						//加载地图==========================================
+ 						Map.clearMarkers();
+						var personPositionList = result.personPositionList;
+						$.each(personPositionList, function(i,item){
+//			                alert(i + "," + item.time+","+item.name+","+item.imei+","+item.lon+","+item.lat);
+			                var lon = item.lon;
+			  	  			var lat = item.lat;
+			  	  			var name = item.name;
+ 				  	  		Map.addMarker({
+ 			  	  				lon:lon,
+ 			  	  				lat:lat,
+ 			  	  				msg:name
+ 			  	  			});
+			            });
+						//加载地图==========================================
+  	  				}
+  	  			});
+  				
+  			}
+  		}
+	</script>
+</body>

@@ -1,0 +1,55 @@
+<!-- 添加开始 -->
+<div class="addtext centerHw" style="font-size: 14px; width: 650px;">
+	<form name="addFrm" method="post" novalidate="novalidate">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tr class="addTableTr">
+				<td class="addTableTd">
+					<p class="inputTitle">角色名称</p>
+					<div class="form-group" ng-class="{'has-success':addFrm.roleName.$valid, 'has-error':addFrm.roleName.$invalid && addFrm.roleName.$dirty}">
+						<input ng-model="input.rolename" ng-blur="blurCheck(addFrm.roleName)" name="roleName" class="form-control form-lg" required type="text" maxLength="10" tooltip="{{addFrm.roleName.$invalid?'角色名称不允许为空':''}}" tooltip-placement="bottom"/>
+					</div>
+				</td>
+				<td class="addTableTd" rowspan="2">
+					<p class="inputTitle">管理权限</p>
+					<div class="form-group" ng-class="{'has-success':addFrm.treectr.$valid, 'has-error':addFrm.treectr.$invalid && addFrm.treectr.$dirty}" style="margin-bottom: 0px;">
+						<input type="hidden" ng-model="treectr" name="treectr" required>
+						<div class="roleChoose form-control" tabindex="-1" ng-blur="blurCheck(addFrm.treectr)" tooltip="{{addFrm.treectr.$valid?'':'请选取管理权限'}}" tooltip-placement="bottom" style="height: 225px;">
+							<div class="ztree">
+								<div ivh-treeview="list"
+									 ivh-treeview-default-selected-state="false"
+									 ivh-treeview-expand-to-depth="-1"
+									 ivh-treeview-id-attribute="'id'"
+									 ivh-treeview-label-attribute="'name'"
+									 ivh-treeview-children-attribute="'children'"
+									 ivh-treeview-use-checkboxes="ture"
+									 ivh-treeview-twistie-collapsed-tpl="'<span class=\'button level0 switch center_close\'></span>'"
+									 ivh-treeview-twistie-expanded-tpl="'<span class=\'button level0 switch center_open\'></span>'"
+									 ivh-treeview-twistie-leaf-tpl="'<span class=\'button level1 switch center_docu\'></span>'"
+									 ivh-treeview-selected-attribute="'checked'"
+									 ivh-treeview-on-cb-change="otherAwesomeCallback(ivhNode, ivhIsSelected, ivhTree)">
+							</div>
+
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr class="addTableTr">
+				<td class="addTableTd">
+					<p class="inputTitle">描述 <span class="fc9">(选填)</span> </p>
+					<textarea name="note"style="height:130px;width:100%;" ng-model="input.note" ></textarea>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<section ng-show="alert.msg" style="position: absolute; top: 20px; left: 100px; right: 100px; z-index: 9999;">
+	<div class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), alert.closeable ? 'alert-dismissable' : null]" role="alert">
+		<button ng-show="alert.closeable" type="button" class="close" ng-click="alert=null" data-dismiss="alert" aria-label="close">
+			<span aria-hidden="true">×</span>
+		</button>
+		<div>
+			<span class="ng-scope ng-binding" ng-bind="alert.msg"></span></div>
+	</div>
+</section>

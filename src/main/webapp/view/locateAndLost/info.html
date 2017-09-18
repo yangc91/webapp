@@ -1,0 +1,74 @@
+<style>
+	.vtable-hover{
+		background: none !important;
+	}
+	.userNum{
+		text-shadow: none !important;
+	}
+	tr.visited .positionDiv{
+		background: #D1E8FF;
+	}
+</style>
+
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回定位列表</a>
+    <div>
+        <span class="deviceTitle" ng-bind="personName" style="margin-right: 5px;font-weight: bold"></span>
+        <span class="fc9">（<span ng-bind="personCode"></span>）</span>
+    </div>
+    <p class="fc6" ng-bind="deptName"></p>
+    <hr class="hr-solid">
+    <div class="locationInfo">
+        <p class="fs12 fc9" ng-bind="devLastTime.address"></p>
+        <p class="fs12 fc9" ng-bind="devLastTime.time|date:'yyyy-MM-dd HH:mm'"></p>
+    </div>
+    <hr class="hr-solid">
+    <div>
+        <img src="${base}/themes/default/images/foot.png">
+        <span class="fc6">足迹查询</span>
+        <div class="input-group" style="margin-top: 20px">
+            <input type="text" placeholder="开始时间" mydatepicker id="startTime" ng-model="startTime" maxDate="{{endTime}}" class="form-control" style="width: 185px;">
+        </div>
+        <div class="input-group endTime">
+            <input type="text" placeholder="结束时间" mydatepicker id="endTime" ng-model="endTime" minDate="{{startTime}}" class="form-control" style="width: 185px;">
+        </div>
+        <p style="margin-top: 10px">
+            <input type="button" class="btn-md btn-green" value="搜索" ng-click="changeTime()">
+<!--             <span class="fc6">共4个小时</span> -->
+        </p>
+    </div>
+    <hr class="hr-solid">
+    <ul style="margin-top: 20px;">
+        <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+        <colgroup>
+           	<col width="150px" style="padding-left: 25px;"/><col/>
+        </colgroup>
+        <tr ng-repeat="dev in $data track by $index" ng-click="clickTr2(dev)" ng-class="{visited:dev.visited}">
+        <td>
+        	<li style="list-style: none">
+         		<div class="positionDiv curpos">
+                  <div class="userNum" ng-bind="$index+1" style="text-shadow:none;background-color: #33A1E6;"></div>
+                  <div class="userInfo" style="margin-left: 25px;">
+                      <p class="fs14 fc6 table-whitespace" title="{{dev.address}}" ng-bind="dev.address" style="width:200px"></p>
+                      <p class="fs12 fc9">
+                      	<span ng-bind="dev.time|date:'yyyy-MM-dd HH:mm'" ></span>
+                      	<span>（{{dev.lon}}</span>&nbsp;
+                      	<span>{{dev.lat}}）</span>
+                      </p>
+                  </div>
+         		</div>
+           		<hr class="hr-solid">
+             </li>
+        </td>
+        </tr>
+        </table>
+        <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]"></p>
+    </ul>    
+</form>
+
+<!--右侧-->
+<div class="locateMap" id="mapContainer" style="width: 80%;height: 650px;">
+
+</div>
+

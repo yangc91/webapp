@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<@p.script value=["ztree","validator","select2"]/>
+<script type="text/javascript" src="${base}/script/jquery.form.js"></script>
+<meta charset="utf-8">
+<div class="pageheader fix">
+	<h2>
+		<img src="${base}/themes/default/images/xtgl.png" />
+		黑名单列表<span>对黑名单策略的增删改查</span>
+	</h2>
+</div>
+<form id="frm" class="content-bianju">
+	<div class="handle-search">
+		<!-- 操作列开始 -->
+		<div class="handle-div">
+			<div class="btn-toolbar">
+				<div class="btn-group ml0">
+					<button class="btn btnGreen" id="addBtn" type="button">新建黑名单策略</button>
+				</div>
+				<div class="btn-group ml15">
+				 	<button id="deleteButton" type="button" class="btn btn-default">删除</button>
+				</div>			
+			</div>
+		</div>
+		<div class="search-div">
+			<div class="btn-toolbar">
+				<div class="btn-group search-text ml15">
+					<input type="text" class="form-control border-radius4" reg="specialchar1" name="search" value="" placeholder="输入黑名单名称搜索"/>
+				</div>
+				<div class="btn-group">
+					<button id="searchButton" title="搜索" type="button"class="btn btn-default">搜索</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="show-table">
+		<table class="pageTable" id="ajaxListData">
+			<thead>
+				<tr>
+					<th style="width:2%;"><span><input type="checkbox" name="all" id="checkAll"/></span></th>
+					<th style="width:5%;"><span>序号</span></th>
+					<th style="width:15%;min-width:60px;"><span>操作</span></th>
+					<th style="width:15%;min-width:80px;"><span>黑名单名称</span></th>
+					<th style="width:15%;min-width:80px;"><span>触发机制</span></th>
+					<th style="width:15%;min-width:80px;"><span>管控方式</span></th>
+					<th style="width:10%;min-width:60px;"><span>创建人</span></th>
+					<th style="width:15%;min-width:80px;"><span>创建时间</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				
+			</tbody>
+		</table>
+	</div>
+</form>
+<script>
+
+var blackTable;
+	var table = dataTablesWrap({
+		basePath:'${base}',
+		url:'${base}/system/blacklist/ajaxList.do',
+		data: function(req){
+			$("#frm [name]").each(function(i,n){
+				req[$(n).attr("name")] = n.value;
+			});
+		},
+		sort:false,
+		seq:{show:true, index:1 },
+		columns:[
+				{data:'id',  render:function (data, type, full, meta) {
+	            	return "<input type='checkbox' name='id' value='" + full.id +"'/>";
+	            }},
+	            {data:'id', render:function (data, type, full, meta) {
+	            	var result = '<span onClick="edit(' + full.id + ')">编辑</span>&nbsp;&nbsp;<span onClick="deleteStr(' + full.id + ')">删除</span><span onClick="manage(' + full.id + ')">黑名单设备</span>&nbsp;&nbsp';
+	            	return result;
+	            }},
+	            {data:'name'},
+	            {data:'trigger', render:function (data, type, full, meta) {
+		            var result = "";
+					if (full.triggers) {
+						$(full.triggers).each(function(i, item){
+							if(item.grade == null || item.grade == '') {
+								result += "--";
+							} else {
+								result += createParam(item.grade, item.triggerNum);
+							}
+							result += "<br/>";
+						});
+					} else {
+						result = "<div>--</div>";
+					}
+	            	return result;	
+	            }},
+	            {data:'violationInstruction', render:function (data, type, full, meta) {
+	            	var result = "";
+	            	if (full.triggers) {
+	            		$(full.triggers).each(function(i, item){
+							if(item.violationInstruction == null || item.violationInstruction == '') {
+								result += "--";
+							} else {
+								var gradeStr;
+								if(item.violationInstruction == "CMD_LOCK_SCREEN") {
+									gradeStr = "锁定屏幕";
+								}else if(item.violationInstruction == "CMD_RESET") {
+									gradeStr = "恢复出厂设置";
+								}
+								result += gradeStr;
+							}
+							result += "<br/>";
+	            		});
+					} else {
+						result = "<div>--</div>";
+					}
+	            	return result;
+	            }},
+	            {data:'userName'},
+	            {data:'createTime', render:function (data, type, full, meta) {
+	            	return new Date(data).format("yyyy-MM-dd hh:mm");
+	            }}
+			],
+			
+			//检测页面变化进行去除复选框
+			onChangePage: function(table) {
+				$("#checkAll").prop("checked", false);
+			}
+	});
+	
+	
+	function createParam(grade, triggerNum){
+		var gradeStr;
+		if(grade == 1){
+			gradeStr = "一";
+		}else if(grade == 2){
+			gradeStr = "二";
+		}else if(grade == 3){
+			gradeStr = "三";
+		}
+		return "触发" + gradeStr + "级违规" + triggerNum + "次";
+	}
+	
+	$("#addBtn").click(function (){
+		window.location.href="${base}/system/blacklist/toAdd.do";
+	})
+		
+	
+	function edit(id) {
+		window.location.href="${base}/system/blacklist/toEdit.do?id="+id;
+	}
+
+	
+	//删除黑名单策略
+	function deleteStr(id) {
+		$confirm("确定要删除该黑名单策略？", function(yes){
+			if(yes) {
+				waiting = $waiting('操作进行中...');
+				$.ajax({
+					type: "POST",
+					url: "${base}/system/blacklist/remove.do",
+					data:{id:id},
+					success: function(result){
+						if(result == "success"){
+							$notice('操作成功');	
+							waiting.close();
+							table.fnDraw();
+						}else{
+							$alert(result);
+							waiting.close();
+						}
+					},
+					error : function(data){
+						$alert('操作失败');
+						waiting.close();
+			  		}
+				});
+			}
+		});
+	}
+	//删除
+	$("#deleteButton").click(function(){
+		 var id = getSelectedIds();
+		 if(id==null||id.length<1){
+			 $alert('请选择要删除的黑名单策略');
+			 return;
+		 }
+		 deleteStr(id);
+	})
+	
+		//选择已经被选中 id
+	 function getSelectedIds() {
+			var arrChk=$("input[name='id']:checkbox");
+			var ids;
+		    $(arrChk).each(function(){
+		    	var self = $(this);
+		    	if (self.prop("checked") == true) {
+		    		if (ids == null || ids == "") {
+		    			ids = self.val();
+		    		} else {
+			    		ids = ids + "," + self.val();
+		    		}
+		    	}
+		    });
+		    return ids;
+	 }
+	
+	//搜索
+	$("#searchButton").click(function(){
+        if($("[name='search']").val()){
+            if(validateForm($("#frm"))) {
+                table.fnDraw();
+            }
+		}
+	})
+	
+	//多选单选列表
+	$("body").on("click","[name='all']:checkbox",function(){
+		if($(this).is(":checked")) {
+			$("[name='id']:checkbox").prop("checked", true);
+		} else {
+			$("[name='id']:checkbox").prop("checked", false);
+		}
+	});
+	
+	$("body").on("click", "[name='id']:checkbox", function(){
+		$("[name='all']").prop("checked", $("[name='id']:checkbox:checked").size() >= $("[name='id']:checkbox").size());
+	});
+	
+	//管理黑名单列表
+	function manage(id) {
+		var waiting = $waiting("操作进行中...");
+		openDialog({
+			title:"管理黑名单列表",
+			ajaxUrl:"${base}/system/blacklist/toManage.do?id="+id,
+			height:400,
+			width:800,
+			padding:"0px 0px",
+			ajaxSuccess:function(){
+				waiting.close();
+				loadBlackList(id);
+				
+				$("#blackListDiv").on("click","[name='checkAll']:checkbox",function(){
+					if($(this).is(":checked")) {
+						$("[name='blackCheck']:checkbox").prop("checked", true);
+					} else {
+						$("[name='blackCheck']:checkbox").prop("checked", false);
+					}
+				});
+				$("#blackListDiv").on("click", "[name='blackCheck']:checkbox", function(){
+					$("[name='checkAll']").prop("checked", $("[name='blackCheck']:checkbox:checked").size() >= $("[name='blackCheck']:checkbox").size());
+				});
+				
+				//移除设备
+				$("#deleteBtn").click(function() {
+					var arrChk=$("input[name='blackCheck']:checkbox");
+					var ids;
+				    $(arrChk).each(function(){
+				    	var self = $(this);
+				    	if (self.prop("checked") == true) {
+				    		if (ids == null || ids == "") {
+				    			ids = self.val();
+				    		} else {
+					    		ids = ids + "," + self.val();
+				    		}
+				    	}
+				    });
+				    
+					if(ids==null||ids.length<1){
+						$alert('请选择要移出的设备');
+						return;
+					}
+					
+					$.ajax({
+						type: "POST",
+						url: "${base}/blacklist/removeDevice.do",
+						data:{id:ids},
+						success: function(result){
+							if(result == "success"){
+								$notice('操作成功');
+								waiting.close();
+								blackTable.fnDraw();
+							}else{
+								$alert(result);
+								waiting.close();
+							}
+						},
+						error : function(data){
+							$notice('操作失败');
+							waiting.close();
+				  		}
+					});
+					
+				});
+				
+			},
+			cancel:null
+		});
+	}
+	
+	function loadBlackList(id) {
+		blackTable = dataTablesWrap({
+			render:'#blackList',
+			basePath:'${base}',
+			url:'${base}/system/blacklist/manageList.do?id='+id,
+			sort:false,
+			seq:{show:true, index:1 },
+			columns:[
+					{data:'id',  render:function (data, type, full, meta) {
+		            	return "<input type='checkbox' name='blackCheck' value='" + full.id +"'/>";
+		            }},
+		            {data:'imei'},
+		            {data:'code'},
+		            {data:'name'},
+		            {data:'deptName'},
+		            {data:'createTime', render:function (data, type, full, meta) {
+		            	return new Date(data).format("yyyy-MM-dd hh:mm");
+		            }}
+				],
+				
+				//检测页面变化进行去除复选框
+				onChangePage: function(blackTable) {
+					$("#checkAll").prop("checked", false);
+				}
+			
+		});
+	}
+	
+	//回车键搜索
+   $("[name='search']").keypress(function(event) {
+		var keyCode = event.keyCode?event.keyCode:event.which?event.which:event.charCode;
+		if(keyCode == 13) {
+			$("#searchButton").trigger('click');
+			return false;
+		}
+	})
+	
+</script>

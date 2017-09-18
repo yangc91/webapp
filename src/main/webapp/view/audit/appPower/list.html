@@ -1,0 +1,209 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+
+    <div ng-show="tabNotice[0].active">
+		<div><span ng-bind="totalRecords" class="listNum"></span>个应用</div>
+        <hr class="hr-solid">
+	    <div>
+            <input type="text" placeholder="搜索应用名称..." ng-model="searchAppName" mdc-placeholder ng-keyup="myKeyupName($event)" class="form-control leftsearch">
+            <span ng-click="clickSearchAppName()" class="glyphicon glyphicon-search form-search"></span>
+        </div>
+	    
+	    <hr class="hr-solid">
+	    
+	    <div ng-click="changestate()" class="curpos liTitle" >
+            <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState"></span>
+            <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState"></span>
+            <span>时间区间</span>
+        </div>
+
+        <ul class="role-list" ng-show="deviceState">
+            <li class="curpos">
+                <input type="radio" name="stateRadio" value="1" id="statusDay" ng-model="status" class="rdo_1" ng-change="changeTime()">
+                <label for="statusDay"></label>
+                <label for="statusDay" class="curpos">近24小时内</label>
+            </li>
+            <li class="curpos">
+                <input type="radio" name="stateRadio" value="2" id="statusWeek" ng-model="status" class="rdo_1" ng-checked="status == 2" ng-change="changeTime()">
+                <label for="statusWeek"></label>
+                <label for="statusWeek"  class="curpos">过去7天内</label>
+            </li>
+        </ul>
+
+        <hr class="hr-solid">
+
+        <div ng-click="changeAppType()" class="curpos liTitle">
+            <span class="glyphicon glyphicon-triangle-bottom" ng-show="appType"></span>
+            <span class="glyphicon glyphicon-triangle-right" ng-show="!appType"></span>
+            <span>应用类型</span>
+        </div>
+
+        <ul class="role-list" ng-show="appType">
+
+            <li ng-repeat="appType in appTypeList">
+                <input type="checkbox" class="chk_1" ng-model="appType.selected" id="{{appType.value}}" ng-change="appTypeSelect()">
+                <label for="{{appType.value}}"></label>
+                <label for="{{appType.value}}"  class="curpos">{{appType.name}}</label>
+            </li>
+        </ul>
+    </div>
+    <div ng-show="tabNotice[1].active">
+		<div><span ng-bind="totalRecords1" class="listNum"></span>个设备</div>
+	
+	    <hr class="hr-solid">
+        <div>
+            <input type="text" placeholder="搜索姓名、警号或IMEI号..." ng-model="searchKey" mdc-placeholder ng-keyup="myKeyup($event)" class="form-control leftsearch">
+            <span ng-click="clickSearch()" class="glyphicon glyphicon-search form-search"></span>
+        </div>
+        <hr class="hr-solid">
+        <div  ng-show="tabNotice[1].active" class="ztreeDiv" ng-mouseleave="closeTree()">
+            <div class="input-group icon-search"  ng-click="showDept()">
+                <div class="form-control leftTree">
+                    <input style="border: none;" type="text" placeholder="要筛选的部门..."  mdc-placeholder readonly ng-show="!selectDept.name" ng-model="selectDept.name">
+                    <p ng-bind="selectDept.name" class="whiteSpace" title="{{selectDept.name}}"></p>
+                    <button class="close" ng-click="removeSelectDept()" type="button" style="position: relative;top: -22px;right: -10px" ng-show="selectDept.name">×</button>
+                </div>
+                <span class="input-group-addon">
+                    <span style="font-size: 12px;" class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+            </div>
+
+            <div class=" form-control authChoose flowZtree" ng-show="showTree" when-scrolled="loadMoreDeptList()">
+                <div class="input-group icon-search">
+                    <input type="text" placeholder="搜索部门..." mdc-placeholder ng-keyup="myKeyupdept($event)" class="form-control" ng-model="d.deptName">
+                <span class="input-group-addon">
+                <span class="glyphicon glyphicon-search" ng-click="searchdept()"></span>
+                </span>
+                </div>
+                <div>
+                    <ul>
+                        <li ng-repeat="dept in deptList" style="margin-top: 8px;list-style: none;">
+                            <img src="${base}/themes/default/images/deptGroup.png">
+                            <span ng-click="onSelectedDept(dept)" title="{{dept.name}}" ng-bind="dept.name | cut:true:10:' ...'"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!--右侧-->
+<div class="admin-list" style="overflow: auto;height: 100%;">
+    <div class="tz-right-content">
+        <ul tabset>
+            <!-- 整体设备应用监测 -->
+            <li tab class="tz-tab-left" active="tabNotice[0].active" ng-click="tabClickFir()" onselect="return false;" disable="tabNotice[0].disabled" heading="{{tabNotice[0].heading}}">
+                <div ng-show="turnPageShow&&successShow">
+                    <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+
+                        <!--自定义表头-->
+                        <colgroup>
+                            <col width="100px" style="padding-left: 25px;"/>
+                            <col width="500px"/>
+                            <col width="255px"/>
+                            <col/>
+                        </colgroup>
+
+                        <tr ng-repeat="deviceElec in $data track by $index" ng-click="clickTr(deviceElec)" ng-class="{visited:deviceElec.visited}">
+                            <td data-title="'排名'">
+                                <div class="td left-border default h100">
+                                    <span>{{(params.page()-1) * (params.count()) + $index + 1}}</span>
+                                    <div class="vline right-vline"></div>
+                                </div>
+                            </td>
+                            <td data-title="'应用名称'" >
+                                <div class="td default h100">
+                                <span>
+                                    <img src="${base}/themes/default/images/system-app.png" ng-show="deviceElec.type==1"/>
+                                    <img style="width: 60px;height: 60px;" ng-show="deviceElec.type!=1" ng-src="{{ supportB64?(deviceElec.icon || '${base}/themes/default/images/thir app.png') : ('${base}/ecss/downloadImg.do?imgId=' + deviceElec.appId || '${base}/themes/default/images/thir app.png')}}"/>
+                                    <span ng-bind="deviceElec.appName||deviceElec.packageName"></span>
+                                </span>
+                                    <div class="vline right-vline"></div>
+                                </div>
+                            </td>
+                            <td data-title="'应用版本号'">
+                                <div class="td default h100">
+                                    <span ng-bind="deviceElec.version||'--'"></span>
+                                    <div class="vline right-vline"></div>
+                                </div>
+                            </td>
+                            <td data-title="'应用类型'">
+                                <div class="td right-border default h100">
+                                    <span ng-bind="deviceElec.type == 1 ? '系统应用' : '第三方应用'"></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]" ng-bind="'当前'+tableParams.total()+'条'"></p>
+                </div>
+                <div ng-show="!successShow">
+                    <img class="animationGif" src="${base}/themes/default/images/animation.gif"/>
+                    <!--<p class="animationWord">数据加载中……</p>-->
+                </div>
+                <div ng-show="!turnPageShow">
+                    <img class="animationGif" src="${base}/themes/default/images/turnPage.gif"/>
+                    <p class="animationWord">数据加载中……</p>
+                </div>
+            </li>
+            <!-- 整体设备应用监测结束 -->
+
+            <!-- 单个设备应用监测 -->
+            <li tab class="tz-tab" active="tabNotice[1].active" ng-click="tabClickSec()" disable="tabNotice[1].disabled" heading="{{tabNotice[1].heading}}">
+                <table ng-table="devicetableParams" show-filter="false" class="table vtable-hover">
+
+                    <!--自定义表头-->
+                    <colgroup>
+                        <col width="160px" style="padding-left: 25px;"/>
+                        <col width="255px"/>
+                        <col width="160px"/>
+                        <col />
+                    </colgroup>
+
+                    <tr ng-repeat="device in $data track by $index" ng-click="clickPowerTr(device)" ng-class="{visited:device.visited}">
+                        <td data-title="'设备所属人员'">
+                            <div class="td left-border default">
+                                <span ng-bind="device.personName"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'警号'" >
+                            <div class="td default">
+                                <span ng-bind="device.personCode"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'设备型号'">
+                            <div class="td default">
+                                <span ng-bind="device.model"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'操作'">
+                            <div class="td right-border default" >
+                                <span class="desc-text" ng-click="deviceControl(device.id)">查看应用耗电监测</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[devicetableParams.total() > devicetableParams.count()]" ng-bind="'当前'+devicetableParams.total()+'条'"></p>
+            </li>
+            <!-- 单个设备应用监测结束 -->
+        </ul>
+    </div>
+</div>
+<div class="admin-list userList noResultContent" style="top: 80px;" ng-show="(tabNotice[0].active&&noResultContent1)||(tabNotice[1].active&&noResultContent2)">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img src="${base}/themes/default/images/secondConfirm.png" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm">啊呀，没有检索到任何内容……</p>
+            <p class="fs14">
+                <img src="${base}/themes/default/images/circleRight.png" />
+                请更改条件后再次搜索或筛选
+            </p>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>

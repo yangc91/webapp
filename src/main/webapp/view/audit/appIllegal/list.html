@@ -1,0 +1,171 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <div><span class="listNum" ng-bind="totalNum"></span><span ng-bind="totalName">件违规事件</span></div>
+
+    <hr class="hr-solid">
+
+    <div class="ztreeDiv" ng-mouseleave="closeTree()">
+        <div class="input-group icon-search"  ng-click="showDept()">
+            <div class="form-control">
+                <input style="border: none;" type="text" placeholder="要筛选的部门..."  mdc-placeholder readonly ng-show="!selectDept.name" ng-model="selectDept.name">
+                <p ng-bind="selectDept.name" class="whiteSpace" title="{{selectDept.name}}"></p>
+                <button class="close" ng-click="removeSelectDept()" type="button" style="position: relative;top: -22px;right: -10px" ng-show="selectDept.name">×</button>
+            </div>
+            <span class="input-group-addon">
+                <span style="font-size: 12px;" class="glyphicon glyphicon-triangle-bottom"></span>
+            </span>
+        </div>
+        <div class=" form-control authChoose flowZtree" style="top: 116px; left: 26px; width: 226px;" ng-show="showTree" when-scrolled="loadMoreDeptList()">
+            <div class="input-group icon-search">
+                <input type="text" placeholder="搜索部门..." mdc-placeholder ng-keyup="myKeyupdept($event)" class="form-control" ng-model="d.deptName">
+                <span class="input-group-addon">
+                <span class="glyphicon glyphicon-search" ng-click="searchdept()"></span>
+                </span>
+            </div>
+            <div>
+                <ul>
+                    <li ng-repeat="dept in deptList" style="margin-top: 8px; list-style: none">
+                        <img src="${base}/themes/default/images/deptGroup.png">
+                        <span ng-click="onSelectedDept(dept)" title="{{dept.name}}" ng-bind="dept.name | cut:true:10:' ...'"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <hr class="hr-solid">
+    
+    <div ng-click="changestate()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState"></span>
+        <span>时间区间</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceState">
+        <li>
+            <input type="radio" name="stateRadio" class="rdo_1" id="today" ng-click="searchfunc('today')">
+            <label for="today"></label>
+            <label for="today" class="curpos" >今天</label>
+        </li>
+        <li>
+            <input type="radio" name="stateRadio" class="rdo_1" id="week" ng-click="searchfunc('pre7Day')">
+            <label for="week"></label>
+            <label for="week" class="curpos" >近7天</label>
+        </li>
+        <li>
+            <input type="radio" name="stateRadio" class="rdo_1" id="month" ng-click="searchfunc('pre30Day')" ng-checked="true">
+            <label for="month"></label>
+            <label for="month" class="curpos" >最近一个月</label>
+        </li>
+    </ul>
+</form>
+
+<!--右侧-->
+<div class="admin-list" style="overflow: auto;height: 100%;">
+    <div class="tz-right-content">
+        <ul tabset>
+            <!-- 违规情况 -->
+            <li tab class="tz-tab-left" active="tabNotice[0].active"  ng-click="tabClickFir()" onselect="return false;" disable="tabNotice[0].disabled" heading="{{tabNotice[0].heading}}">
+                <div style="width: 100%;padding: 20px;height: 470px;">
+                    <div class="tableTitle">违规事件统计</div>
+                    <div style="border: 1px solid #ececec;" >
+                        <highchart style="width: 100%;position: relative" id="chart1" config="chartConfig"></highchart>
+                    </div>
+                </div>
+                <div style="width: 100%;padding: 20px;height: 470px;">
+                    <div class="tableTitle">已发生违规事件等级构成</div>
+                    <div style="border: 1px solid #ececec;">
+                        <highchart style="width: 100%;" id="chart2" config="chartCircleConfig"></highchart>
+                    </div>
+                </div>
+            </li>
+            <!-- 违规情况结束 -->
+
+            <!-- 黑名单设备 -->
+            <li tab class="tz-tab" active="tabNotice[1].active" ng-click="tabClickSec()" disable="tabNotice[1].disabled" heading="{{tabNotice[1].heading}}">
+                <div class="handle-div">
+                    <a class="btn btn-blue" ng-click="exportExcl()">导出黑名单列表</a>
+                </div>
+                
+                <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+                    <!--自定义表头-->
+                    <colgroup>
+                        <col width="160px" style="padding-left: 25px;"/>
+                        <col width="160px"/>
+                        <col width="220px"/>
+                        <col width="220px"/>
+                        <col width="180px"/>
+                        <col />
+                    </colgroup>
+
+                    <tr ng-repeat="dev in $data track by $index" ng-click="clickTr(dev)" ng-class="{visited:dev.visited}">
+                        <td data-title="'设备所属人员'">
+                            <div class="td left-border default">
+                                <span ng-bind="dev.personName"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'警号'" >
+                            <div class="td default">
+                                <span ng-bind="dev.personCode"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'imei号'" >
+                            <div class="td default">
+                                <span ng-bind="dev.imei"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'设备运行策略'">
+                            <div class="td default">
+                                <span ng-bind="dev.strategyName?dev.strategyName:'--'"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'加入黑名单时间'">
+                            <div class="td default">
+                                <span ng-bind="dev.addTime|date:'yyyy-MM-dd HH:mm:ss'"></span>
+                                <div class="vline right-vline"></div>
+                            </div>
+                        </td>
+                        <td data-title="'操作'">
+                            <div class="td right-border default" >
+                                <span class="desc-text" ng-click="deleteBlackList(dev)" >移出黑名单</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]">共{{resultRecords}}条</p>
+                
+            </li>
+            <!-- 流量监测结束 -->
+        </ul>
+    </div>
+</div>
+<div class="admin-list userList noResultContent" style="top: 80px;" ng-show="tabNotice[1].active && noResultContent">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img src="${base}/themes/default/images/secondConfirm.png" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm">啊呀，没有检索到任何内容……</p>
+            <p class="fs14">
+                <img src="${base}/themes/default/images/circleRight.png" />
+                请更改条件后再次搜索或筛选
+            </p>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>
+
+<!--删除成功失败的信息提示-->
+<section ng-show="alert.msg" class="col-md-4" style="position: absolute; top: 20px; left: 500px; z-index: 9999;">
+    <div class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), alert.closeable ? 'alert-dismissable' : null]" role="alert">
+        <button ng-show="alert.closeable" type="button" class="close" ng-click="alertInf.close(0)" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div>
+            <span class="ng-scope ng-binding" ng-bind="alert.msg"></span></div>
+    </div>
+</section>

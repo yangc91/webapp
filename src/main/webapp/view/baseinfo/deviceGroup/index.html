@@ -1,0 +1,141 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <div><span class="listNum" ng-bind="totalRecords"></span>个设备组</div>
+
+    <hr class="hr-solid">
+    <div>
+        <input type="text" placeholder="输入设备组名称、创建人..." mdc-placeholder ng-keyup="myKeyup($event)" class="form-control leftsearch" ng-model="searchKey">
+        <span ng-click="clickSearch()" class="glyphicon glyphicon-search form-search"></span>
+        <span ng-click="cleanSearch()" ng-show="searchKey" class="curpos cleanSearchBtn">×</span>
+    </div>
+</form>
+
+<!--右侧-->
+<div class="admin-list userList" ng-show="tableParams.total() > 0 && totalRecords > 0">
+	<div class="handle-div">
+		<button type="button" class="btn btn-blue" ng-click="openGroupModalDialog()">添加设备组</button>
+	 	<button type="button" ng-class="{ true : 'btn btn-disable', false : 'btn btn-red' }[checkedItem == 0]" ng-click="deleteDeviceGroup()">删除设备组</button>
+	</div>
+    <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+
+        <!--自定义表头-->
+        <colgroup>
+            <col width="60px" style="padding-left: 25px;"/>
+            <col width="255px"/>
+            <col width="16px"/>
+            <col width="160px"/>
+            <col width="160px"/>
+            <col />
+        </colgroup>
+
+        <tr ng-repeat="group in $data track by $index" ng-click="clickTr(group)" ng-class="{visited:group.visited}">
+            <td header="'headerCheckbox.html'" style="width: 5%;min-width: 60px;max-width: 60px;">
+                <div class="td left-border default">
+                    <div class="checkbox-valign">
+                    	<input type="checkbox" ng-change="toggleCheck(group)" class="chk_1 table_chk" id="{{group.id}}" ng-model="group.selected">
+                        <label for="{{group.id}}" ng-class="{'checkStyle':group.selected}"></label>
+                    </div>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            
+            <td data-title="'设备组名称'" style="width: 20%;max-width: 255px">
+                <div class="td default" title="{{group.name}}" >
+                    <p ng-bind="group.name" class="table-whitespace" style="width: 255px"></p>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'组内设备数'" style="width: 15%;min-width: 160px">
+                <div class="td default">
+                    <span ng-bind="group.deviceCount"></span>
+
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'创建人'" style="width: 15%;min-width: 160px">
+                <div class="td default">
+                    <span ng-bind="group.userName"></span>
+
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'创建时间'" style="width: 15%;min-width: 160px">
+                <div class="td default">
+                    <span ng-bind="group.createTime|date:'yyyy-MM-dd HH:mm:ss'"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+
+            </td>
+            <td data-title="'操作'" style="width: 15%;min-width: 160px">
+                <div class="td default right-border">
+                    <span class="desc-text mr10" ng-click="openEditGroupModalDialog(group)">编辑设备组</span>
+                    <span class="desc-text" ng-click="deleteOneDeviceGroup(group)">删除设备组</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]" ng-bind="'当前'+tableParams.total()+'条'"></p>
+</div>
+
+<div class="admin-list userList noResultContent" ng-show="noResultContent">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img ng-src="{{'${base}/themes/default/images/' + faceImg +'.png'}}" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm" ng-bind="noContent"></p>
+            <ul>
+            	<li ng-repeat="chooseCheck in chooseList" class="listLi">
+            		<p class="fs14">
+	                	<img src="${base}/themes/default/images/circleRight.png" />
+	                	<span ng-bind="chooseCheck.prevLink"></span>
+		               	<span ng-bind="chooseCheck.content" ng-click="addGroup(chooseCheck.textLink)" ng-class="{'desc-text':chooseCheck.textLink}"></span>
+		               	<span ng-bind="chooseCheck.nextLink"></span>
+		            </p>
+            	</li>
+            </ul>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>
+
+<div class="foot" ng-show="tableParams.total() > 0 && totalRecords > 0">
+	<div class="infoImg">
+		<img width="100%" src="${base}/themes/default/images/deviceGroup.png" />
+	</div>
+	<p class="personName">
+		{{prevItem.name}}
+	</p>
+	<p class="fcb pbt10">{{prevItem.deviceCount}}台设备</p>
+	<p class="deviceInfo">
+		<span class="deviceInfoName mr45">创建人:</span>
+		{{prevItem.userName}}
+	</p>
+	<!--<p class="deviceInfo">
+		<span class="deviceInfoName">创建时间:</span>
+		{{prevItem.createTime|date:'yyyy-MM-dd'}}
+	</p>-->
+    <p class="deviceInfo">
+        <span class="deviceInfoName">部署的策略:</span>
+        <span ng-bind="prevItem.strategyName||'--'"></span>
+    </p>
+	<p class="deviceInfo">
+		<span class="deviceInfoName">描述:</span>
+    </p>
+    <div class="deviceInfo deviceDesc">
+        <span ng-bind="prevItem.note||'--'"></span>
+    </div>
+</div>
+<script type="text/ng-template" id="headerCheckbox.html">
+        <input style="position: relative;top: 1px;left: 8px;" type="checkbox" id="tableChk" class="chk_1 titleChk" ng-model="checkboxes.checked" ng-change="checkAll()"/>
+        <label style="left: -10px" for="tableChk" ng-class="{'checkStyle':checkboxes.checked}"></label>
+</script>
+<section class="col-md-4 alertTip">
+	<div ng-repeat="alert in alerts" class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), closeable ? 'alert-dismissable' : null]" role="alert">
+   		<button ng-show="closeable" type="button" class="close" ng-click="closeAlert($index)" data-dismiss="alert" aria-label="close">
+	        <span aria-hidden="true">×</span>
+	    </button>
+   		<div>
+   		<span class="ng-scope ng-binding">{{alert.msg}}</span></div>
+	</div>
+</section>

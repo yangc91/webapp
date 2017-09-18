@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<@p.script value=["datepicker", "calendar", "ztree", "ztree.combox"]/>
+		<link rel="stylesheet" type="text/css"href="${base}/themes/default/css_ecss/statistics.css" />
+		<meta charset="UTF-8" />
+	    <title>监测视图-总体视图</title>
+		<style>
+			.highcharts-series-group{
+				cursor:pointer;
+			}
+	
+			#appDownloadArea .highcharts-container{
+				cursor:pointer;
+			}
+			
+		</style>
+	</head>
+<body>
+	<div class="pageheader fix">
+		<h2>
+			<img src="${base}/themes/default/images/auditBig.png" />
+			监测视图<span>查看监测项的具体信息</span>
+		</h2>
+	</div>
+	
+	<div class="content-bianju mt25" style="border:1px solid #eee">
+		
+		<!--切换tab-->
+		<ul class="nav nav-tabs" >
+			<li class="firstLi widthIn3 active"><a href="#" data-toggle="tab">总体视图</a></li>
+ 			<li class="secondLi widthIn3"><a href="#" data-toggle="tab">周期监测视图</a></li>
+			<li class="thirdLi widthIn3"><a href="#" data-toggle="tab">违规事件统计视图</a></li>
+		</ul>
+		
+		<div class="paddingLr tab-content">
+		
+			<div class="first tab-pane active" id="first">
+				<div class="meg-menu"  style="width:100%;">
+					<div id="appDownloadArea">
+						<div class="menu-ul gray-br">
+							<div class="order-execute" >设备激活数量统计表</div>
+						</div>
+						<div class="handle-search" >
+							<!-- 操作列开始 -->
+							<div class="handle-div">
+								<div class="btn-toolbar" >
+									<div class="btn-group ml15" >
+									 	<button id="refreshBtn" type="button" class="btn btn-default">刷新</button>
+									</div>
+								</div>
+							</div>
+							<form id="frm">
+							<div class="search-div">
+								<div class="btn-toolbar" >
+									<div class="form-search right" style="margin-right: 10px;">
+										<!-- 选择年份 -->
+										<div class="input-group" style="width:160px">
+											<input class="form-control" type="text" id="startTime" name="startTime" value="2016" onclick="WdatePicker({isShowToday:false, dateFmt:'yyyy', maxDate:'%y',onpicked:loadChar})" readonly="readonly" placeholder="选择年份"/>
+										</div>
+									</div>
+
+									<div class="input-group w220">
+										<input class="form-control xlk" type="text" readOnly="readonly" name="deptId" id="deptId" placeholder="选择部门" value="" />
+										<span class="input-group-btn">
+											<input class="select-pic" id="selectBtn" type="button" />
+										</span>
+										<div id="menuContent" style="display:none">
+											<ul id="tree" class="ztree"></ul>
+										</div>
+									</div>
+									
+								</div>
+							</div>
+							</form>
+						</div>
+						<div class="audit-online" id="hardware-behavior" style="margin-top:20px; width: 98%;"></div>
+						<table class="highchart table" data-graph-container=".audit-online" data-graph-type="line" data-graph-legend-disabled="0"
+							data-graph-legend-layout="vertical" data-graph-legend-align="center">
+						  	<thead>
+						    	<tr>
+							    	<th>日期</th>
+							      	<th>设备激活数量</th>
+						    	</tr>
+						  	</thead>
+							<tbody id="monthStatistics">
+						   		<tr>
+							   		<td>1月</td>
+							   		<td>0</td>
+						   		</tr>
+						   		<tr>
+							   		<td>2月</td>
+							   		<td>0</td>
+						   		</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+<script type="text/javascript" src="${base}/script/datepickerdefined.js"></script>
+	<script type="text/javascript">
+		var setting,
+			deptTree,
+			devPersonInfoDialog,
+			devPersonInfoTable;
+  		$(function(){
+  			$(".secondLi").click(function(){
+  				window.location.href="${base}/audit/checkview/period.do"
+  			})
+  			$(".thirdLi").click(function(){
+  				window.location.href="${base}/audit/checkview/violation.do"
+  			})
+  			
+  			//初始化部门树
+  			setting = {
+				basePath: "${base}",
+				combox : {
+					target:"#deptId",
+					trigger:"#selectBtn",
+					search:true,
+					width:210
+				},
+				data : {
+					simpleData : {
+						enable : true,
+						idKey : "id",
+						pIdKey : "parentId"
+						
+					}
+				},
+				view: {
+					dblClickExpand: false,
+					showIcon: false
+				},
+				callback: {
+					afterSelectNode: function(event, treeId, node) {
+						loadChar();
+					},
+					afterClear: function() {
+						loadChar();
+					},
+					afterDropdown: function() {
+					 	$("#selectBtn").addClass("open");
+					},
+					afterDropup: function() {
+						$("#selectBtn").removeClass("open");
+					}
+				}
+			};
+  			deptTree = $.fn.zTree.combox($("#tree"), setting, ${deptJson});
+  			
+			//初始化报表
+  			<#if (resultStr != "")>
+				var result = ${resultStr};
+				var htm = "";
+				$("#monthStatistics").empty();
+				$.each(result, function(i, o) {
+					var key = i;//month12
+					var num = key.substr(5);
+					if(num==10 || num==11 || num==12){
+						htm += "<tr><td>"+num+"月"+"</td><td>"+o+"</td></tr>";
+					} else {
+						$("#monthStatistics").append("<tr><td>"+num+"月"+"</td><td>"+o+"</td></tr>");
+					}
+				});
+				$("#monthStatistics").append(htm);
+			</#if>
+  		  	$('table.highchart').highchartTable();
+  			//初始化报表 END
+  		})
+  		
+  		function loadChar(){
+  			var year = $("#startTime").val();
+  			var deptId = $("[name='deptId']").val();
+  			var deptName = $("#deptId").val();
+  			$.ajax({
+  				url: "${base}/audit/checkview/ajaxDeviceNum.do",
+  				type: "post",
+  				data: {year:year,deptId:deptId},
+  				success: function(result) {
+  					if(result=="fail") {
+  						alert("fail");
+  					} else{
+  						$("#monthStatistics").empty();
+  						var str = "";
+  						$.each(result, function(i, o) {
+  							var key = i;//month12
+  							var num = key.substr(5);
+  							if(num==10 || num==11 || num==12){
+  								str += "<tr><td>"+num+"月"+"</td><td>"+o+"</td></tr>";  								
+  							} else {
+  								$("#monthStatistics").append("<tr><td>"+num+"月"+"</td><td>"+o+"</td></tr>");
+  							}
+  						});
+  						$("#monthStatistics").append(str);
+  						$('table.highchart').highchartTable();
+  					}
+  				}
+  			});
+  		}
+  		
+  		$('#refreshBtn').click(function(){
+  			$("#startTime").val('');
+  			deptTree.clear();
+			loadChar();
+  		})
+  		
+  		$('#activateDevNum').click(function(){
+  			//alert($(this).html());
+  			devPersonInfoDialog = openDialog({//art.dialog 4.1.7
+  				id:'devPersonInfoDialog',
+  				title:'<span style="font-size:18px;">人员设备信息表</span>',
+  				ajaxUrl:'${base}/audit/checkview/toDevPersonList.do?r=' + Math.random(),
+  				width :'600px',
+  				height:'400px',
+  				padding:"0px 0px",
+  				init:function(){
+  					$("#iknow").bind("click", function(){
+  						 //window.top.art.dialog({id:'openDialog_PCpmc'}).close();
+  						art.dialog.list['devPersonInfoDialog'].close();
+  					});
+  				},
+	  			ajaxSuccess:function(){
+					initData();//#ajaxListData
+				}
+  			});
+  		})
+  		
+  		function initData(){
+  			devPersonInfoTable = dataTablesWrap({
+  				render:"#ajaxListData",
+  				basePath:'${base}',
+  				displayLength: 5,
+  				url:'devPersonList.do',//全路径也可以访问到
+  				data: function(req){
+//  						$("#frm [name]").each(function(i,n){
+//  							req[$(n).attr("name")] = n.value;
+//  						});
+  				},
+  				seq:{show:true,index:0},//显示序号,并且在第一列显示
+  				sort:false,
+  				columns:[
+  					{data:'name',render:function(data, type, full, meta){
+  						return data;
+  					}},
+  					{data:'code'},
+  					{data:'departName'},
+  					{data:'brand'},
+  					{data:'model'},
+  					{data:'imei'},
+  					{data:'sim'}
+  				]
+  			});
+  		}
+  		
+	</script>
+</body>

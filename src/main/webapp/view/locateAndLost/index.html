@@ -1,0 +1,123 @@
+<!--左侧搜索表单-->
+<style>
+	.nav > li > a{
+		padding:10px 6px !important;
+	}
+	.vtable-hover{
+		background: none !important;
+	}
+	.userNum{
+		text-shadow: none !important;
+	}
+	tr.visited .positionDiv{
+		background: #D1E8FF;
+	}
+</style>
+<form class="role-frm">
+    <div><span class="listNum" ng-bind="actualDeviceNum"></span>个设备定位信息</div>
+
+    <hr class="hr-solid">
+    <div>
+        <input type="text" placeholder="搜索设备..." mdc-placeholder ng-keyup="myKeyup($event)" class="form-control leftsearch" ng-model="searchKey">
+        <span ng-click="searchPerson()" class="glyphicon glyphicon-search form-search"></span>
+        <span ng-click="cleanSearch()" ng-show="searchKey" class="form-search" style="left: 165px;font-size: 20px; line-height: 12px;">×</span>
+    </div>
+    <hr class="hr-solid">
+    <ul tabset>
+        <li tab class="tz-tab-left" ng-click="searchPerson()" style="padding-left: 10px;" active="tabNotice[0].active" onselect="return false;" disable="tabNotice[0].disabled" heading="{{tabNotice[0].heading}}">
+            <ul style="margin-top: 20px;">
+                <table ng-table="tableParamsLost" show-filter="false" class="table vtable-hover">
+	            <colgroup>
+	               	<col width="150px" style="padding-left: 25px;"/><col />
+	            </colgroup>
+	            <tr ng-repeat="dev in $data track by $index" ng-click="clickTr(dev)" ng-class="{visited:dev.visited}">
+	            	<td>
+	            		<li style="list-style: none">
+		            		<div class="positionDiv curpos" style="text-shadow:none;">
+			                    <div class="userNum" ng-bind="$index+1"></div>
+			                    <div class="userInfo" style="margin-left: 25px;">
+			                        <p class="personName" style="margin-bottom: 3px">
+			                            <span ng-bind="dev.personName"></span>
+			                            <input type="button" class="btn-sm btn-warning" value="足迹" ng-click="searchInfo(1,dev)">
+			                        </p>
+			                        <p class="fs12 fc9" ng-bind="dev.personCode" style="margin-bottom: 8px"></p>
+			                        <p class="fs12 fc9" ng-bind="dev.deptName"></p>
+			                        <p class="fs12 fc9" ng-bind="dev.imei"></p>
+<!-- 			                        <p class="fs12 fc9" ng-bind="dev.position"></p> -->
+			                    </div>
+		            		</div>
+			             	<hr class="hr-solid">
+		                </li>
+	            	</td>
+	            </tr>
+                </table>
+                <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParamsLost.total() > tableParamsLost.count()]"></p>
+            </ul>
+        </li>
+        <li tab class="tz-tab-left" ng-click="searchPerson()" style="padding-left: 10px;" active="tabNotice[1].active" onselect="return false;" disable="tabNotice[1].disabled" heading="{{tabNotice[1].heading}}">
+            <ul style="margin-top: 20px;">
+				<div class="ztreeDiv" ng-mouseleave="closeTree()">
+					<div>
+						<div class="form-control leftsearch" ng-click="showDept()">
+							<input style="border: none;margin-top: 3px;" type="text" placeholder="要筛选的设备组..." mdc-placeholder readonly ng-show="!selectDept.name" ng-model="selectDept.name">
+							<p ng-bind="selectDept.name" class="whiteSpace" title="{{selectDept.name}}"></p>
+							<button class="close" ng-click="removeSelectDept()" type="button" style="position: relative;top: -22px;right: 20px" ng-show="selectDept.name">×</button>
+							<span style="font-size: 12px;left: 190px;" class="glyphicon glyphicon-triangle-bottom form-search"></span>
+						</div>
+					</div>
+					<hr class="hr-solid">
+					<div class=" form-control authChoose flowZtree" ng-show="showTree" when-scrolled="loadMoreDeptList()" style="top:258px;">
+						<div class="input-group icon-search">
+							<input type="text" placeholder="搜索设备组..." mdc-placeholder ng-keyup="myKeyupdept($event)" class="form-control" ng-model="d.deptName">
+							<span class="input-group-addon">
+							<span class="glyphicon glyphicon-search" ng-click="searchdept()"></span>
+							</span>
+						</div>
+						<div>
+							<ul>
+								<li ng-repeat="dept in deptList" style="margin-top: 8px; list-style: none">
+									<img  src="${base}/themes/default/images/deptGroup.png">
+									<span ng-click="onSelectedDept(dept)" title="{{dept.name}}" ng-bind="dept.name | cut:true:10:' ...'"></span>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<table ng-table="tableParamsPatrol" show-filter="false" class="table vtable-hover">
+	            <colgroup>
+	               	<col width="150px" style="padding-left: 25px;"/><col />
+	            </colgroup>
+            	<tr ng-repeat="dev in $data track by $index" ng-click="clickTr(dev)" ng-class="{visited:dev.visited}">
+	            	<td>
+	            		<li style="list-style: none">
+		            		<div class="positionDiv">
+			                    <div class="userNum" ng-bind="$index+1"></div>
+			                    <div class="userInfo" style="margin-left: 25px;">
+			                        <p class="personName" style="margin-bottom: 3px">
+			                            <span ng-bind="dev.personName"></span>
+			                            <input type="button" class="btn-sm btn-warning" value="足迹" ng-click="searchInfo(2,dev)">
+			                        </p>
+			                        <p class="fs12 fc9" ng-bind="dev.personCode" style="margin-bottom: 8px"></p>
+			                        <p class="fs12 fc9" ng-bind="dev.deptName"></p>
+			                        <p class="fs12 fc9" ng-bind="dev.imei"></p>
+			                    </div>
+		            		</div>
+			             	<hr class="hr-solid">
+		                </li>
+	            	</td>
+            	</tr>
+            	</table>
+            	<p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParamsPatrol.total() > tableParamsPatrol.count()]"></p>
+            </ul>
+        </li>
+    </ul>
+    
+<!--     <hr class="hr-solid"> -->
+<!--     <button ng-click="searchInfo()">进入详情页</button> -->
+</form>
+
+<!--右侧-->
+<div class="locateMap" id="mapContainer" style="width: 80%;height: 650px;">
+
+</div>

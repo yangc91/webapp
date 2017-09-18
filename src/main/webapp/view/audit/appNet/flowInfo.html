@@ -1,0 +1,54 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回列表</a>
+    <div><span class="deviceTitle" ng-bind="deviceInfo.personName" style="margin-right: 5px;font-weight: bold"></span><span class="fc9">（<span ng-bind="deviceInfo.personCode"></span>）</span></div>
+    <p class="fc6" ng-bind="deviceInfo.deptName"></p>
+    <hr class="hr-solid">
+    <div style="height: 85px;">
+        <img src="${base}/themes/default/images/device.png" style="float: left; margin-right: 20px; width: 85px;" />
+        <p class="personName" style="font-size:14px; margin-bottom: 10px;padding-top:10px" ng-bind="deviceInfo.model"></p>
+        <p class="fc6"><span ng-bind="deviceInfo.osName + deviceInfo.osVersion"></span></p>
+        <p class="fc6">已激活</p>
+    </div>
+    <hr class="hr-solid">
+    <div ng-click="changestate()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState"></span>
+        <span>时间区间</span>
+    </div>
+
+    <ul class="role-list">
+        <li class="curpos">
+            <input type="radio" class="rdo_1" name="stateRadioFlow" id="nowMonth" ng-model="tabFlowTime" value="5" ng-change="changeTimeType()">
+            <label for="nowMonth"></label>
+            <label for="nowMonth"  class="curpos">当月</label>
+        </li>
+        <li class="curpos">
+            <input type="radio" class="rdo_1" name="stateRadioFlow" id="topMonth" ng-model="tabFlowTime" value="6" ng-change="changeTimeType()">
+            <label for="topMonth"></label>
+            <label for="topMonth"  class="curpos">上月</label>
+        </li>
+    </ul>
+</form>
+
+<!--右侧-->
+<div class="admin-list" style="overflow: auto;height: 100%;">
+    <div class="tz-right-content">
+        <ul tabset>
+            <!-- 网络监测 -->
+            <li tab class="tz-tab-left" active="tabNotice[0].active" ng-click="netTabClickFir()" disable="true" heading="{{tabNotice[0].heading}}"></li>
+            <!-- 网络监测结束 -->
+
+            <!-- 流量监测 -->
+            <li tab class="tz-tab" active="tabNotice[1].active" disable="tabNotice[1].disabled" heading="{{tabNotice[1].heading}}">
+                <div style="width: 100%;padding: 20px;height: 470px;">
+                    <div class="tableTitle">设备已用流量趋势图</div>
+                    <div style="border: 1px solid #ececec;">
+                        <highchart style="width: 77.5%;" id="chart1" config="chartConfig"></highchart>
+                    </div>
+                </div>
+            </li>
+            <!-- 流量监测结束 -->
+        </ul>
+    </div>
+</div>

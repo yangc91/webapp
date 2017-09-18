@@ -1,0 +1,128 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+	<a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回列表</a>
+    <div>
+		<span class="deviceTitle">编辑策略</span>
+		<p class="editName">{{modelName}}</p>
+	</div>
+
+    <hr class="hr-solid">
+	<!--<div>
+        <ul class="stgyAddList">
+            <li ng-repeat="addStep in addStepList" ng-class="'addstep'+addStep.id">
+                <p>
+                    <img class="stepLine" src="${base}/themes/default/images/blue-line.png" ng-show="(addStep.active) && (addStep.lineShow)"/>
+                    <img class="stepLine" src="${base}/themes/default/images/gray-line.png" ng-show="(!addStep.active) && (addStep.lineShow)"/>
+                </p>
+                <img ng-src="{{'${base}/themes/default/images/' + addStep.pic +'.png'}}" width="40px" ng-show="addStep.active"/>
+                <img ng-src="{{'${base}/themes/default/images/' + addStep.pic2 +'.png'}}" width="40px" ng-show="!addStep.active" />
+                <span style="margin-left: 10px" ng-class="{'fc9':!addStep.active}" ng-bind="addStep.name"></span>
+            </li>
+        </ul>
+    </div>-->
+</form>
+<!--右侧-->
+<!--第一步-->
+<!--第二步-->
+<div>
+	<div class="admin-list">
+		<div class="handle-div" style="height: 100px;">
+			<div class="groupLogo">
+				<img src="${base}/themes/default/images/policy.png" width="50px" />
+			</div>
+			<p class="editGroupDevice strategyTitle">配置模式策略信息</p>
+			<p class="fc9">通过配置模式策略信息编辑策略</p>
+		</div>
+		<div class="pwdDiv" style="position: absolute; left: 280px; top: 100px; bottom: 80px; overflow: auto; right: 0px;padding:20px;">
+			<p class="editGroupDevice" style="font-size: 14px;">模式策略基本信息</p>
+			<form name="addFrm"  novalidate="novalidate">
+				<p class="fc9" style="line-height: 30px;">策略名称</p>
+				<p ng-class="{'has-success':addFrm.strategyName.$valid, 'has-error':addFrm.strategyName.$invalid && addFrm.strategyName.$dirty}">
+					<input type="text" class="form-control w350" readonly ng-model="styleStrategyItems.name" name="strategyName" required ng-maxlength="15"
+						placeholder="如:财务部日常策略" 
+						tooltip="{{addFrm.strategyName.$error.required?'策略项必填' : addFrm.strategyName.$error.maxlength?'策略项至多15位' :''}}" tooltip-placement="bottom"/>
+				</p>
+				<p class="fc9" style="line-height: 30px;">备注</p>
+				<p>
+					<input type="text" class="form-control w350" maxlength="64" ng-model="styleStrategyItems.note" placeholder="如:这是一段关于'财务部日常策略'的备注" mdc-placeholder />
+				</p>
+			
+				<p class="editGroupDevice" style="font-size: 14px;">配置上报周期</p>
+				<p class="fc9" style="line-height: 30px;margin-bottom: 10px">请选择设备位置信息上报周期(最小时间为5分钟)</p>
+				<div ng-show="itemCode=='work'">
+					<select ng-model="styleStrategyItems.content.cycleTime" ng-change="cycleTimeSelect()">
+						<option ng-model="styleStrategyItems.content.cycleTime"  value=300>5分钟</option>
+						<option ng-model="styleStrategyItems.content.cycleTime"  value=600>10分钟</option>
+						<option ng-model="styleStrategyItems.content.cycleTime" selected="true" value=1200>20分钟(推荐)</option>
+						<option ng-model="styleStrategyItems.content.cycleTime" value=1800>30分钟</option>
+						<option ng-model="styleStrategyItems.content.cycleTime" value=3600>1小时</option>
+						<option ng-model="styleStrategyItems.content.cycleTime" value=0>自定义</option>
+					</select>
+					<span ng-show="styleStrategyItems.content.cycleTime==0">
+						<input type="text" class="input-sm" tooltip="必须是整数且不能为空" ng-keyup="checkCycleTime('hour')"
+							   ng-model="selfStrategyTime.hour" tooltip-placement="bottom">小时
+						<input type="text" class="input-sm" tooltip="必须是整数且不能为空" ng-keyup="checkCycleTime('minites')"
+							   ng-model="selfStrategyTime.minites" tooltip-placement="bottom">分钟
+						<!--<input type="text" class="input-sm" tooltip="必须是整数且不能为空"
+							   ng-model="selfStrategyTime.seconds" tooltip-placement="bottom">秒-->
+					</span>
+					<span class="fc9">({{flowILLustrate}})</span>
+					<!--<span ng-show="styleStrategyItems.content.cycleTime<=1200">流量消耗高</span>
+					<span ng-show="styleStrategyItems.content.cycleTime<=1800&&styleStrategyItems.content.cycleTime>1200">流量消耗普通</span>
+					<span ng-show="styleStrategyItems.content.cycleTime>1800">流量消耗少</span>-->
+				</div>
+				<div ng-show="itemCode=='loose'">
+					<select ng-model="styleStrategyItems.content.cycleTime" ng-change="cycleTimeSelect()">
+						<!--<option ng-model="styleStrategyItems.content.cycleTime" value=60>1分钟</option>-->
+						<option ng-model="styleStrategyItems.content.cycleTime"  value=300>5分钟</option>
+						<option ng-model="styleStrategyItems.content.cycleTime" selected value=600>10分钟(推荐)</option>
+						<option ng-model="styleStrategyItems.content.cycleTime" value=1200>20分钟</option>
+						<option ng-model="styleStrategyItems.content.cycleTime" value=0>自定义</option>
+					</select>
+					<span ng-show="styleStrategyItems.content.cycleTime==0">
+						<input type="text" class="input-sm" tooltip="必须是整数且不能为空" ng-keyup="checkCycleTime('hour')"
+							   ng-model="selfStrategyTime.hour" tooltip-placement="bottom">小时
+						<input type="text" class="input-sm" tooltip="必须是整数且不能为空" ng-keyup="checkCycleTime('minites')"
+							   ng-model="selfStrategyTime.minites" tooltip-placement="bottom">分钟
+						<!--<input type="text" class="input-sm" tooltip="必须是整数且不能为空"
+							   ng-model="selfStrategyTime.seconds" tooltip-placement="bottom">秒-->
+					</span>
+					<span class="fc9">({{flowILLustrate}})</span>
+				</div>
+			<div ng-hide="itemCode=='loose'" style="margin-bottom: 20px;">
+				<p class="editGroupDevice" style="font-size: 14px;line-height: 14px;margin-bottom: 15px;">配置执勤时间段</p>
+				<p class="fc6" style="line-height: 30px;margin-bottom: 10px">
+					连续执勤天数<span class="fc9">（{{workDateTime}}天）</span>
+				</p>
+				<div class="input-group" style="float: left">
+			        <input id="startDate" type="text" placeholder="开始时间" name="startDate" ng-model="styleStrategyItems.content.startDate" 
+			        ng-change="changeDate()" mydatepicker maxDate="{{styleStrategyItems.content.endDate}}" class="form-control" style="border-radius: 3px;">
+			    </div>
+			    <div class="input-group" style="position: relative; left: 20px;">
+			        <input id="endDate" type="text" placeholder="结束时间" name="endDate" ng-model="styleStrategyItems.content.endDate" 
+			         ng-change="changeDate()"	mydatepicker minDate="{{styleStrategyItems.content.startDate}}" class="form-control" style="border-radius: 3px;">
+			    </div>
+			    <div class="clearfloat"></div>
+				<p class="fc6" style="line-height: 30px;margin-bottom: 10px;margin-top: 10px;">每天执勤小时数<span class="fc9">（{{workDateTimeHour}}小时{{workDateTimeMiniute}}分钟）</span></p>
+				<div class="input-group" style="float: left">
+			        <input id='perStartTime' type="text" placeholder="开始时间" name="perStartTime" ng-model="styleStrategyItems.content.perStartTime" 
+			        ng-change="changeDate()"	mytimepicker class="form-control" style="border-radius: 3px;">
+			    </div>
+			    <div class="input-group" style="position: relative; left: 20px;">
+			        <input id="perEndTime" type="text" placeholder="结束时间" name="perEndTime" ng-model="styleStrategyItems.content.perEndTime" 
+			       ng-change="changeDate()" mytimepicker class="form-control" style="border-radius: 3px;">
+			    </div>
+			</div>
+			 <p class="fs12" style="color: red" ng-show="firstErrorShow">{{errorNote}}</p>
+			</form>
+		</div>
+	</div>
+	<div class="psdBtns">
+		<button type="button" class="btn btn-gray" ng-click="goBack()">取消</button>
+		<!--<button type="button" class="btn btn-green" ng-click="finsh()">完成</button>-->
+		<button ng-if="itemCode!='loose'" type="button" class="btn btn-disable rightGryArrow" ng-click="disableShow()" ng-show="firstErrorShow||!threeNext">完成</button>
+		<button ng-if="itemCode!='loose'" type="button" class="btn btn-green rightArrow" ng-click="finsh()" ng-show="!firstErrorShow&&threeNext">完成</button>
+		<button ng-if="itemCode=='loose'" type="button" class="btn btn-disable rightGryArrow" ng-click="disableShow()" ng-show="!threeNext">完成</button>
+		<button ng-if="itemCode=='loose'" type="button" class="btn btn-green rightArrow" ng-click="finsh()" ng-show="threeNext">完成</button>
+	</div>
+</div>

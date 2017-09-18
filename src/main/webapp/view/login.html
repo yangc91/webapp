@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="zh-cn">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no" />
+
+<title>XX管理平台登录</title>
+
+<script type="text/javascript">
+	var base = webdemo;
+</script>
+
+<link rel="shortcut icon" href="/webdemo/images/favicon.ico" />
+<!-- Bootstrap core CSS -->
+<link href="/webdemo/script/lib/ui-bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/webdemo/themes/login.css" rel="stylesheet" />
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+  <script src="/webdemo/script/lib/html5shiv/html5shiv.min.js"></script>
+  <script src="/webdemo/script/lib/respond/respond.min.js"></script>
+<![endif]-->
+    
+<style type="text/css">
+	body {
+		font-family:   "Noto Sans","Microsoft Yahei",Arial,Helvetica,sans-serif;
+		padding-top: 0px;
+	}
+	html, header, body{
+    	min-width: 1300px !important ;
+    }
+	header{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		right: 0px;
+		height: 60px;
+		margin-bottom: 0px !important;
+		background-color: #1e82c6 !important;
+		padding-top: 10px;
+		border-radius: 0 !important;
+		border: none !important;
+	}
+    .container, .jumbotron{
+    	min-width: 1200px !important;
+    }
+	.navbar-nav li:HOVER, .navbar-nav li.active{
+		background: #0094e4;
+	}
+	
+	.navbar-nav li:HOVER a,  .navbar-nav li.active a{
+		color: #fff !important;
+	}
+	
+	#username, #password, #pin{
+		padding-left: 0px;
+	}
+	
+	.mdc-layer{
+		z-index: 999;
+		position: relative;
+	}
+	.input-group-addon{
+		border:1px solid #bdbdbd !important;
+		height:40px !important;
+		width:40px !important;
+		padding: 0px !important;
+	}
+	input[class="form-control"]{
+		width:266px !important;
+		border-left:0px !important;
+		border:1px solid #bdbdbd;
+	}
+	div[class="form-control"]{
+		width:266px !important;
+		border-left:0px !important;
+		/* border-right:0px !important; */
+	}
+	.form-control{
+		padding-top:10px !important;
+		height:40px !important;
+		padding-left:10px !important;
+	}
+	.loginTitle{
+		color:#5e5e5e;
+		font-size:16px;
+	}
+</style>
+</head>
+<body>
+	<header class="navbar navbar-default">
+		<div class="container">
+			<div class="navbar-header" style="margin-left:120px;">
+				<a id="header-logo-link" class="navbar-brand logo-link hidden-xs" href="javascript:void(0)">
+					<img alt="webdemo" src="/webdemo/images/logo-new.png" style="float: left;" />
+					<span class="logoWord" style="line-height: 40px">webdemo</span>
+				</a>
+			</div>
+			<!--/.nav-collapse -->
+		</div>
+	</header>
+
+	<div class="jumbotron oa-login-jumbotron ecss-login-jumbotron">
+		<div class="oa-login-panel" ></div>
+		<div class="cloudDiv">
+			<div class="topTwoCloud">
+				<div class="scroll-containerFirst scoll-first">
+					<img src="/webdemo/themes/default/images/cloud1.png" border="0" />
+				</div>
+			</div>
+
+			<div class="middleCloud">
+				<div class="srcoll-containerSecond scoll-second">
+					<img src="/webdemo/themes/default/images/cloud2.png" border="0" />
+				</div>
+			</div>
+
+			<div class="lowCloud">
+				<div class="srcoll-containerThird scoll-third">
+					<img src="/webdemo/themes/default/images/cloud3.png" border="0" />
+				</div>
+			</div>
+		</div>
+	  	<div class="container">
+			<div class="loginText">
+				<!--<img src="/webdemo/themes/default/images/text.png"/>-->
+			</div>
+	  		<div id="ecss-login-form" class="oa-login-form">
+	  			<form id="frm" role="form" method="post" action="${loginUrl}" >
+					<input type="hidden" name="cardId" id="cardId" />
+					<!--<span class="loginTitle">登录集团客户移动管理平台</span>-->
+					<div id="infoDiv" class="info" style="font-size: 14px;font-family: inherit;font-weight: 500;border: 1px solid #ffe57d;background-color:#fff6d2;width:306px;height:26px;line-height:26px;padding-left:14px;">
+						<img src="/webdemo/themes/default/images/warn.png" style="vertical-align: sub;"/>
+						<span id="read-msg" style="color:#383838;padding-left:4px;">注意保护好您的账户和密码</span>
+					</div>
+					<div class="input-group">
+						<span class="input-group-addon" id="basic-addon1">
+							<img src="/webdemo/images/admin.png" />
+						</span>
+						<input type="text" id="userName" class="form-control" size="25" tabindex="1" name="userName" placeholder="登录账号"/>
+					</div>
+
+					<div class="input-group">
+						<span class="input-group-addon" id="basic-addon1">
+							<img src="/webdemo/images/safeKEY.png"/>
+						</span>
+						<input type="password" id="password" name="password" class="form-control" size="25" tabindex="2"  placeholder="登录密码" />
+					</div>
+
+ 					<div class="input-group ">
+						<div class="btnLogin" id="btn-login">登&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;录</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="loginFooter">
+		<div class="container">
+			<div class="lefthill footerImg">
+				<img src="/webdemo/themes/default/images/hill2.png"/>
+			</div>
+			<div class="shipImg footerImg">
+				<img src="/webdemo/themes/default/images/ship.png"/>
+			</div>
+			<div class="righthill footerImg">
+				<img src="/webdemo/themes/default/images/hill1.png"/>
+			</div>
+			<p class="fs12" style="color: #FFFFFF;opacity: 0.8;text-align: center;margin-top: 50px;">
+				&copy;技术支持：xxxx
+			</p>
+		</div>
+	</div>
+
+        <script src="/webdemo/script/lib/jquery/jquery-1.11.1.min.js"></script>
+        <script src="/webdemo/script/lib/jquery/jquery.cookie.js"></script>
+
+        <script src="/webdemo/script/lib/card/card.ws-1.0.0.js" type="text/javascript"></script>
+        <script src="/webdemo/script/lib/card/card-1.0.1.js" type="text/javascript"></script>
+
+    <!--<script src="/webdemo/script/lib/jquery.placeholder.js"></script>-->
+
+	<script src="/webdemo/script/lib/jquery/app_login.js"></script>
+	<script src="/webdemo/script/lib/jquery/config.js"></script>
+	<script src="/webdemo/script/utils/common.js"></script>
+	<script>
+		var base = "/webdemo";
+
+		var wrong = function(result,isSuccess) {
+			if (isSuccess) {
+				$("#infoDiv").css({
+					"border" : "1px solid #ffe57d",
+					"background-color" : "#fff6d2"
+				});
+				$("#infoDiv img").attr("src", "/webdemo/themes/default/images/warn.png");
+				$("#read-msg").css("color","#383838");
+			} else {
+				$("#infoDiv").css({
+					"border" : "1px solid #e4393c",
+					"background-color" : "#ffebeb"
+				});
+				$("#infoDiv img").attr("src", "/webdemo/themes/default/images/stop.png");
+				$("#read-msg").css("color","red");
+			}
+
+			$("#read-msg").html(result);
+			
+		}
+
+		if("${RequestParameters.message!}" != "") {
+ 			wrong("${RequestParameters.message!}",false);
+ 		}
+		
+		function refrshThis(){
+			location.href = base + '/login.do';
+		}
+
+		// 用户名密码登录按钮事件
+		function btnSubmit(){
+			var $this = $(this).unbind('click');
+			
+			var fn = function(){
+			};
+			
+			setTimeout(fn, 10);
+		}
+
+		// 监听Enter键进行登陆
+		$(document.documentElement).keydown(function(event) {
+			if (event.keyCode == 13 && !$("#btn-login").prop('disabled')) {
+				$("#btn-login").click();
+			}
+		});
+
+		//校验表单
+		function checkForm() {
+			if ($("#userName").val() == '') {
+				//密码不能为空
+				wrong('用户名不能为空',false);
+				return ;
+			}
+			
+			if ($("#password").val() == '') {
+				//密码不能为空
+				wrong('密码不能为空',false);
+				return ;
+			}
+			
+//			if (!/^\w{6,16}$/g.test($("#userName").val()) || !/^\w{6,16}$/g.test($("#password").val()) ) {
+//				//密码不能为空
+//				wrong('安通帐号或密码错误');
+//				return ;
+//			}
+
+			return true;
+		}
+
+    </script>
+     <script type="text/javascript">
+    	$(function(){
+
+//    		$("#userName").placeholder({
+//    			   // 将删除原有 placehodler 属性，强制用 JS 实现替代
+//    			   useNative: true,
+//    			   // focus 时不清除提示文本， keypress 有效字符时才清空
+//    			   hideOnFocus: false,
+//    			   // 附加样式
+//    			  	style: {
+//    			     textShadow: 'none'
+//    			   },
+//    			   customClass:'my-placeholder'
+//    		});
+//
+//    		$("#password").placeholder({
+// 			   // 将删除原有 placehodler 属性，强制用 JS 实现替代
+// 			   useNative: true,
+// 			   // focus 时不清除提示文本， keypress 有效字符时才清空
+// 			   hideOnFocus: false,
+// 			   // 附加样式
+// 			   style: {
+// 			     textShadow: 'none'
+// 			   }
+// 			});
+    		
+//    		$("#header-logo-link").attr("href", safecenterUrl);
+//   		$("#header-oa-link").attr("href", oaLoginUrl);
+
+    		 $(".oa-screen-action a").mouseover(function () {
+    		
+    			 var btns = $(".oa-screen-action .btn");
+    			 $(".oa-pic").hide();
+    			 var target = $(this).attr("target");
+
+    			 $("#"+target).show();
+    			 btns.each(function( i, n ) {
+   					$(n).removeClass("active");
+				});
+    			 $(this).addClass("active");
+    		 });
+
+			//云漂浮的轨迹
+			var container = document.querySelector('.scroll-containerFirst');
+			setTimeout(function (){
+				container.className="scroll-containerFirst scoll";
+			}, 20000);
+
+			var containerSecond = document.querySelector('.srcoll-containerSecond');
+			setTimeout(function (){
+				containerSecond.className="srcoll-containerSecond scoll";
+			}, 80000);
+
+			var containerThird = document.querySelector('.srcoll-containerThird');
+			setTimeout(function (){
+				containerThird.className="srcoll-containerThird scoll";
+			}, 100000);
+    	});
+    </script>
+</body>
+</html>
+

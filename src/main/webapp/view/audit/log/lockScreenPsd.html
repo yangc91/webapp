@@ -1,0 +1,10 @@
+<form id="screenForm">
+<div>
+	<label class='float-left'>锁屏密码：</label>
+	<input placeholder='请输入4-8位锁屏密码' style='width:70%' type='password' class='form-control'  id="screenPassword" name="screenPassword"
+		reg="notempty,minLength:4,maxLength:8,number" message="{notempty:'锁屏密码不允许为空',minLength:format('锁屏密码长度不能小于4'),maxLength:format('锁屏密码长度不能大于8')}"/>
+	<label class='float-left mt25'>确认密码：</label>
+	<input placeholder='请输入确认密码' style='width:70%' type='password' class='form-control mt25'
+		reg="notempty,equalsTo:screenPassword,number" message="{notempty:'锁屏密码不允许为空',equalsTo:format('确认密码与锁屏密码不一致')}"/>
+</div>
+</form>

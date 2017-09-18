@@ -1,0 +1,169 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <div><span class="listNum" ng-bind="totalRecords"></span>台设备</div>
+
+    <hr class="hr-solid">
+    <div>
+        <input type="text" placeholder="搜索IMEI、姓名、警号..." mdc-placeholder ng-keyup="myKeyup($event)" class="form-control leftsearch" ng-model="search">
+        <span ng-click="searchClick()" class="glyphicon glyphicon-search form-search"></span>
+        <span ng-click="cleanSearch()" ng-show="search" class="curpos cleanSearchBtn">×</span>
+    </div>
+    <hr class="hr-solid">
+
+    <div class="ztreeDiv" ng-mouseleave="closeTree()">
+        <div class="input-group icon-search"  ng-click="showDept()">
+            <div class="form-control leftTree">
+                <input class="searchDept" type="text" placeholder="要筛选的部门..."  mdc-placeholder readonly ng-show="!selectDept.name" ng-model="selectDept.name">
+                <p ng-bind="selectDept.name" class="whiteSpace" title="{{selectDept.name}}"></p>
+                <button class="close searchDeptBtn" ng-click="removeSelectDept()" type="button" ng-show="selectDept.name">×</button>
+            </div>
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-triangle-bottom searchDeptLogo"></span>
+            </span>
+        </div>
+        <hr class="hr-solid">
+        <div class=" form-control authChoose flowZtree" ng-show="showTree" when-scrolled="loadMoreDeptList()">
+            <div class="input-group icon-search">
+                <input type="text" placeholder="搜索部门..." mdc-placeholder ng-keyup="myKeyupdept($event)" class="form-control" ng-model="d.deptName">
+                <span class="input-group-addon">
+                <span class="glyphicon glyphicon-search" ng-click="searchdept()"></span>
+                </span>
+            </div>
+            <div>
+                <ul>
+                    <li ng-repeat="dept in deptList" class="deptListLi">
+                        <img src="${base}/themes/default/images/deptGroup.png">
+                        <span ng-click="onSelectedDept(dept)" title="{{dept.name}}" ng-bind="dept.name | cut:true:10:' ...'"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div ng-click="clickState()" class="curpos liTitle">
+        <span class="glyphicon glyphicon glyphicon-triangle-bottom" ng-show="deviceState"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState"></span>
+        <span>设备状态</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceState">
+    	<li ng-repeat="deviceStu in status">
+            <input type="checkbox" ng-model="deviceStu.check" id="{{deviceStu.name}}" class="chk_1" ng-change="statusChange(deviceStu)">
+            <label for="{{deviceStu.name}}" ng-class="{'checkStyle':deviceStu.check}"></label>
+            <label for="{{deviceStu.name}}" class="curpos" ng-bind="deviceStu.text"></label>
+    	</li>
+    </ul>
+
+    <hr class="hr-solid">
+    <div ng-click="clickType()" class="curpos liTitle">
+        <span class="glyphicon glyphicon glyphicon-triangle-bottom" ng-show="deviceType"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceType"></span>
+        <span>设备型号</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceType">
+        <li ng-repeat="deviceModel in deviceModelList">
+            <input type="checkbox" ng-model="deviceModel.selected" id="{{deviceModel.itemCode}}" class="chk_1" ng-change="deviceModelSelect()">
+            <label for="{{deviceModel.itemCode}}" ng-class="{'checkStyle':deviceModel.selected}"></label>
+            <label for="{{deviceModel.itemCode}}"  class="curpos" ng-bind="deviceModel.name"></label>
+        </li>
+    </ul>
+
+    <hr class="hr-solid">
+
+    <div ng-click="clickGroup()" class="curpos liTitle">
+        <span class="glyphicon glyphicon glyphicon-triangle-bottom" ng-show="deviceGroupShow"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceGroupShow"></span>
+        <span>设备组</span>
+    </div>
+
+    <ul class="role-list mbt30" ng-show="deviceGroupShow" >
+        <li ng-repeat="deviceGroup in deviceGroupList" title="{{deviceGroup.name}}">
+            <input type="checkbox" ng-model="deviceGroup.selected" id="{{deviceGroup.id}}" class="chk_1" ng-change="deviceGroupSelect()">
+            <label for="{{deviceGroup.id}}" ng-class="{'checkStyle':deviceGroup.selected}"></label>
+            <label for="{{deviceGroup.id}}" class="table-whitespace curpos w140"  ng-bind="deviceGroup.name"></label>
+        </li>
+    </ul>
+
+</form>
+
+<!--右侧-->
+<div class="admin-list userList" ng-show="tableParams.total() > 0">
+    <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+
+        <!--自定义表头-->
+        <colgroup>
+            <col width="160px" style="padding-left: 25px;"/>
+            <col width="160px"/>
+            <col width="160px"/>
+            <col width="160px"/>
+            <col />
+        </colgroup>
+
+        <tr ng-repeat="item in $data track by $index" ng-click="clickTr(item)" ng-class="{visited:item.visited}">
+            <td data-title="'设备所属人员'">
+                <div class="td left-border default">
+                    <span ng-bind="item.personName"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'警号'">
+                <div class="td default">
+                    <span ng-bind="item.personCode"></span>
+
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'设备型号'">
+                <div class="td default">
+                    <span ng-bind="item.model"></span>
+
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'设备状态'">
+                <div class="td default deviceStatusTd">
+                    <img title="已违规" class="ml10 mt10" ng-show="item.violationStatus == 1" src="${base}/themes/default/images/illegal.png"/>
+                    <img title="已被拉入黑名单" class="ml10 mt10" ng-show="item.blackStatus == 1" src="${base}/themes/default/images/blackList.png"/>
+                    <img title="执勤模式中" class="ml10 mt10" ng-show="item.patrolModelStatus == 1" src="${base}/themes/default/images/working.png" />
+                    <img title="丢失模式中" class="ml10 mt10" ng-show="item.lostModelStatus == 1" src="${base}/themes/default/images/loose.png" />
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'操作'">
+                <div class="td default right-border">
+                    <span ng-click="deviceControl(item.id)" class="desc-text" >设备管控</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]" ng-bind="'当前'+totalCount+'条'"></p>
+</div>
+
+<div class="admin-list userList noResultContent" ng-show="noResultContent">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img src="${base}/themes/default/images/secondConfirm.png" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm">啊呀，没有检索到任何内容……</p>
+            <p class="fs14">
+                <img src="${base}/themes/default/images/circleRight.png" />
+                请更改条件后再次搜索或筛选
+            </p>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>
+
+<div class="foot" ng-show="tableParams.total() > 0">
+	<div class="infoImg">
+		<img src="${base}/themes/default/images/device.png" />
+	</div>
+    <p class="personName">
+        {{prevItem.personName}}
+    </p>
+    <p class="fcb pbt10" ng-bind="prevItem.deptName"></p>
+    <p class="deviceInfo"><span class="deviceInfoName">设备型号:</span><span ng-bind="prevItem.model||'--'"></span></p>
+    <p class="deviceInfo"><span class="deviceInfoName">设备状态:</span><span ng-bind="prevItem.statusStr"></span></p>
+    <p class="deviceInfo"><span class="deviceInfoName">IMEI号:&nbsp;&nbsp;&nbsp;</span><span ng-bind="prevItem.imei||'--'"></span></p>
+</div>

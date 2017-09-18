@@ -1,0 +1,101 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回</a>
+    <div>
+        <span class="deviceTitle" style="font-weight: bold" ng-bind="deviceInfo.personName"></span>
+        <span class="fc9">(<span ng-bind="deviceInfo.personCode"></span>)</span>
+    </div>
+    <p class="fc6" style="margin-top: 5px;" ng-bind="deviceInfo.deptName"></p>
+    <hr class="hr-solid">
+    <div style="height: 85px;">
+        <img src="${base}/themes/default/images/device.png" style="float: left; margin-right: 20px; width: 85px;" />
+        <p class="personName" style="font-size:14px; margin-bottom: 10px;padding-top:10px" ng-bind="deviceInfo.model"></p>
+        <p class="fc6"><span ng-bind="deviceInfo.osName + deviceInfo.osVersion"></span></p>
+        <p class="fc6">已激活</p>
+    </div>
+
+    <hr class="hr-solid">
+    <div class="input-group" style="border: 1px solid #CCCCCC;border-radius: 3px;">
+        <p ng-show="!startTime" class="fs14 fc9" style="position: absolute;top: 5px;left:12px;">开始时间……</p>
+        <input type="text" ng-model="startTime" ng-change="changeStartTime()" ng-class="{'opacZero':startTimeClass}" mydatepicker maxDate="{{endTime}}" class="form-control" style="width: 185px;border: none" >
+    </div>
+    <div class="input-group endTime" class="input-group" style="border: 1px solid #CCCCCC;border-radius: 3px;">
+        <p ng-show="!endTime" class="fs14 fc9" style="position: absolute;top: 5px;left:12px;">结束时间……</p>
+        <input type="text" ng-model="endTime" ng-change="changeEndTime()" ng-class="{'opacZero':endTimeClass}" mydatepicker minDate="{{startTime}}" class="form-control" style="width: 185px;">
+    </div>
+
+    <hr class="hr-solid">
+    <div ng-click="changestate()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState"></span>
+        <span>连接状态</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceState">
+        <li  class="curpos" ng-repeat="status in statusArray">
+            <input type="checkbox" class="chk_1" ng-model="status.selected" id="{{status.id}}" ng-change="statusSelect()">
+            <label for="{{status.id}}"></label>
+            <label for="{{status.id}}"  class="curpos" ng-bind="status.name"></label>
+        </li>
+    </ul>
+</form>
+
+<!--右侧-->
+<div class="admin-list" style="overflow: auto;height: 100%;" ng-show="tableParams.total() > 0">
+    <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+
+        <!--自定义表头-->
+        <colgroup>
+            <col width="60px"/>
+            <col width="160px" style="padding-left: 25px;"/>
+            <col />
+        </colgroup>
+
+        <tr ng-repeat="item in $data track by $index" ng-click="clickNetTr(item)" ng-class="{visited:item.visited}">
+            <td data-title="'序号'" style="width: 15%; min-width: 60px;" >
+                <div class="td left-border default">
+                    <span>{{(params.page()-1) * (params.count()) + $index + 1}}</span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'连接状态'">
+                <div class="td default">
+                    <span ng-bind="item.states == 1 ? '已连接' : '已断开'"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'连接/断开时间'">
+                <div class="td default right-border">
+                    <span ng-bind="item.time | date:'yyyy-MM-dd HH:mm' "></span>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]" ng-bind="'当前' + tableParams.total() + '条'"></p>
+</div>
+
+<div class="admin-list userList noResultContent" ng-show="noResultContent">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img src="${base}/themes/default/images/secondConfirm.png" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm">啊呀，没有检索到任何内容……</p>
+            <p class="fs14">
+                <img src="${base}/themes/default/images/circleRight.png" />
+                请更改条件后再次搜索或筛选
+            </p>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>
+
+<section ng-show="alert.msg" style="position: absolute; top: 20px; left: 400px; right: 400px; z-index: 9999;">
+    <div class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), alert.closeable ? 'alert-dismissable' : null]" role="alert">
+        <button ng-show="alert.closeable" type="button" class="close" ng-click="alert=null" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div>
+            <span class="ng-scope ng-binding" ng-bind="alert.msg"></span></div>
+    </div>
+</section>

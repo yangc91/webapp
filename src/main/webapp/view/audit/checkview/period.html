@@ -1,0 +1,524 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<@p.script value=["datepicker", "calendar", "ztree", "ztree.combox"]/>
+		<link rel="stylesheet" type="text/css"href="${base}/themes/default/css_ecss/statistics.css" />
+		<meta charset="UTF-8" />
+	    <title>监测视图-周期监测视图</title>
+		<style>
+			.highcharts-series-group{
+				cursor:pointer;
+			}
+	
+			#appDownloadArea .highcharts-container{
+				cursor:pointer;
+			}
+			.meg-menu{
+				margin-top:20px;
+				border:1px solid #eee;
+			}
+			.nav-tabs > .active > a,
+			.nav-tabs > .active > a:hover, 
+			.nav-tabs > .active > a:focus, 
+			.nav-tabs > li > a:hover, 
+			.nav-tabs > li > a:focus,
+			.nav-tabs > li >a{
+				border-top:0px !important;
+			}
+			.deviceNum{
+				background:url("${base}/image/blue.png") no-repeat;
+			}
+			.activate{
+				background:url("${base}/image/green.png") no-repeat;
+			}
+			.noActive{
+				background:url("${base}/image/ori.png") no-repeat;
+			}
+		</style>
+	</head>
+<body>
+	<div class="pageheader fix">
+		<h2>
+			<img src="${base}/themes/default/images/auditBig.png" />
+			监测视图<span>查看监测项的具体信息</span>
+		</h2>
+	</div>
+	<div class="content-bianju mt25" style="border:1px solid #eee">
+		<ul class="nav nav-tabs" >
+			<li class="firstLi widthIn3"><a data-toggle="tab">总体视图</a></li>
+			<li class="secondLi widthIn3 active"><a href="#second" data-toggle="tab">周期监测视图</a></li>
+			<li class="thirdLi widthIn3"><a data-toggle="tab">违规事件统计视图</a></li>
+		</ul>
+		<!--切换tab开始-->
+		<div class="paddingLr tab-content">
+			<div class="second tab-pane active" id="second">
+			<!-- 共用搜索条件 -->
+            <div class="handle-search" >
+          		<div class="handle-div">
+					<div class="btn-toolbar">
+						<div class="btn-group ml0">
+						 	<button id="refreshBtn" type="button" class="btn btn-default">刷新</button>
+						</div>
+					</div>
+				</div>
+            	
+				<div class="search-div">
+					<div class="btn-toolbar" role="toolbar">
+						<div class="form-search right" style="margin-right: 10px;">
+							<div class="input-group" style="width:160px">
+								<input class="form-control" type="text" id="startTime" name="startTime" style="float:left;width:72% " placeholder=""/>
+							</div>
+						</div>
+						
+						<div class="input-group w220">
+							<input class="form-control xlk" type="text" readOnly="readonly" name="deptId" id="deptId" placeholder="选择部门" value="" />
+							<span class="input-group-btn">
+								<input class="select-pic" id="selectBtn" type="button" />
+							</span>
+							<div id="menuContent" style="display:none">
+								<ul id="tree" class="ztree"></ul>
+							</div>
+						</div>
+						
+						<div class="btn-group search-text ml15">
+							<input type="text" class="form-control border-radius4" reg="specialchar1" id="personName" name="personName" value="" placeholder="请输入警号或姓名"/>
+						</div>
+						
+						<div class="btn-group" role="group">
+							<button id="searchButton" title="搜索" type="button"class="btn btn-default">搜索</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 共用搜索条件 END-->
+			
+            <div class="meg-menu" style="width:100%">
+				<ul class="nav nav-tabs">
+                <li class="fourthLi widthIn5 active"><a>CPU利用率</a></li>
+			  	<li class="fifthLi widthIn5"><a>内存使用率</a></li>
+		  		<li class="sixthLi widthIn5"><a>设备电量剩余</a></li>	
+                <li class="seventhLi widthIn5"><a>操作系统版本分布</a></li>
+			  	<li class="eighthLi widthIn5"><a>警员GPS定位</a></li>
+                </ul>
+				<!-- 警员定位 -->
+			 	<div class="constablePosition" style="width:100%;">
+					<div id="appDownloadArea" class="mt25">
+						<!--div class="menu-ul gray-br">
+							<div class="order-execute" >警员定位<span class="fs14 fc83">/查看警力分布以及当天警员行动轨迹</span></div>
+						</div-->
+						<!-- 地图 -->
+						<div id="gisContainer" class="audit-online" style="margin-top:20px;overflow:hidden;height:300px">
+							<iframe id="periodMap" src="" height="350px" width="100%" scrolling="auto" frameborder="0" ></iframe>
+						</div>						
+					</div>
+				</div>
+				<!-- 警员定位end -->
+				
+				<!-- cpu 负载 -->
+				<div class ="mt25 cpuLoad" style="width:100%">
+					<!--div class="menu-ul gray-br">
+						<div class="order-execute" >CPU负载<span class="fs14 fc83">/查看设备某个时间点cpu负载</span></div>
+					</div-->
+					<div class="audit-cpu" style="margin-top:20px; width: 98%;height:300px"></div>
+					<table class="highchart table" data-graph-container=".audit-cpu" data-graph-type="column" data-graph-legend-disabled="0">
+					  	<thead>
+					    	<tr>
+						    	<th>百分比</th>
+						      	<th>设备数量</th>
+					    	</tr>
+					  	</thead>
+						<tbody id="cpuTbody">
+					   		<tr>
+						   		<td>0-20%</td>
+						   		<td>2</td>
+					   		</tr>
+						</tbody>
+					</table>
+				</div>
+				<!-- cpu 负载 end -->
+				
+				<!-- 内存使用率 -->
+				<div class ="mt25 memoryUsage" style="width:100%">
+					<!--div class="menu-ul gray-br">
+						<div class="order-execute" >内存使用率<span class="fs14 fc83">/查看设备内存的使用情况</span></div>
+					</div-->
+					<div class="audit-memory" style="margin-top:20px; width: 98%;height:300px"></div>
+					<table class="highchart table" data-graph-container=".audit-memory" data-graph-type="column" data-graph-legend-disabled="0">
+					  	<thead>
+					    	<tr>
+						    	<th>百分比</th>
+						      	<th>设备数量</th>
+					    	</tr>
+					  	</thead>
+						<tbody id="ramTbody">
+					   		<tr>
+						   		<td>0-20%</td>
+						   		<td>0</td>
+					   		</tr>
+						</tbody>
+					</table>
+				</div>
+				<!-- 内存使用率 end -->
+				
+				<!-- 设备电量剩余 -->
+				<div class ="mt25 stateOfCharge" style="width:100%">
+					<!--div class="menu-ul gray-br">
+						<div class="order-execute" >设备电量剩余<span class="fs14 fc83">/查看设备电量剩余情况</span></div>
+					</div-->
+					<div class="audit-elec" style="margin-top:20px; width: 98%;height:300px"></div>
+					<table class="highchart table" data-graph-container=".audit-elec" data-graph-type="column" data-graph-legend-disabled="0">
+					  	<thead>
+					    	<tr>
+						    	<th>百分比</th>
+						      	<th>设备数量</th>
+					    	</tr>
+					  	</thead>
+						<tbody id="elecTbody">
+					   		<tr>
+						   		<td>0-20%</td>
+						   		<td>0</td>
+					   		</tr>
+						</tbody>
+					</table>
+				</div>
+				<!-- 设备电量剩余 end -->
+				
+				<!-- 外设开启时长 -->
+				<div class ="mt25 operatingSys" style="width:100%">
+					<!--div class="menu-ul gray-br">
+						<div class="order-execute">设备监测信息<span class="fs14 fc83">/展现最近一次的信息上报数据</span></div>
+					</div-->
+					<!-- 操作系统类型 -->
+					<div class="audit-sys" style="margin-top:20px; width: 98%;height:300px"></div>
+					<table class="highchart table" data-graph-container=".audit-sys" data-graph-type="pie" data-graph-legend-disabled="0"
+							data-graph-legend-layout="vertical" data-graph-legend-align="right">
+					  	<caption>操作系统类型</caption>
+					  	<thead>
+					    	<tr>
+						    	<th>操作系统</th>
+						      	<th>设备数量</th>
+					    	</tr>
+					  	</thead>
+						<tbody id="osTbody">
+					   		<tr>
+						   		<td>Android</td>
+						   		<td data-graph-name="Android">0</td>
+					   		</tr>
+						</tbody>
+					</table>
+					<!-- 操作系统类型 end -->
+				</div>
+				<!-- 外设开启时长 end -->
+                </div>
+ 			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="${base}/script/datepickerdefined.js"></script>
+	<script type="text/javascript">
+		var preTime,
+			checkstartTime1,
+			setting,
+			deptTree;
+  		$(function(){
+            $(".constablePosition").hide();
+            $(".operatingSys").hide();
+            $(".stateOfCharge").hide();
+            $(".memoryUsage").hide();
+            
+  			$(".firstLi").click(function(){
+  				window.location.href="${base}/audit/checkview/index.do";
+  			})
+  			$(".thirdLi").click(function(){
+  				window.location.href="${base}/audit/checkview/violation.do";
+  			})
+            
+            preTime = '${preTime!""}';
+  			$('#startTime').val(preTime);
+
+			checkstartTime1 = $('#startTime').datepicker({
+ 	  			onRender: function(date) {
+ 			        var result = '';
+ 			        if(date){
+ 			        	if(date.valueOf() > new Date().getTime()) result = 'disabled';
+ 			        } 
+ 			        return result;
+			    }
+			}).on('changeDate', function(ev) {
+				checkstartTime1.hide();
+			    checkstartTime1.setValue(ev.date.valueOf());
+			    
+			    //changeTime();
+			}).data('datepicker');
+			
+			//初始化部门树
+  			setting = {
+				basePath: "${base}",
+				combox : {
+					target:"#deptId",
+					trigger:"#selectBtn",
+					search:true,
+					width:210
+				},
+				data : {
+					simpleData : {
+						enable : true,
+						idKey : "id",
+						pIdKey : "parentId"
+						
+					}
+				},
+				view: {
+					dblClickExpand: false,
+					showIcon: false
+				},
+				callback: {
+					afterSelectNode: function(event, treeId, node) {
+						//loadChar();
+					},
+					afterClear: function() {
+						//loadChar();
+					},
+					afterDropdown: function() {
+					 	$("#selectBtn").addClass("open");
+					},
+					afterDropup: function() {
+						$("#selectBtn").removeClass("open");
+					}
+				}
+			};
+  			deptTree = $.fn.zTree.combox($("#tree"), setting, ${deptJson});
+			
+			//cpu汇总
+ 			<#if (percentCpuResult != "")>
+ 				var percentCpuResult = ${percentCpuResult};
+ 				$("#cpuTbody").empty();
+ 				$.each(percentCpuResult, function(i, o) {
+ 					$("#cpuTbody").append("<tr><td>"+i+"</td><td>"+o+"</td></tr>");
+ 				});
+ 			</#if>
+  		  	$('table.highchart').highchartTable();
+			
+/**
+  	  		//加载地图==========================================  	  		
+  	  		//step1:初始化地图
+  	  		Map.init({
+	  	  		containerId : "gisContainer",
+				markerPath : "${base}/themes/default/images/police.png"
+  	  		});
+  	  		//step2:解析违规事件数据，循环调用addMarkers(lon, lat, strMsg)方法
+  	  		//step3:点击条件搜索，先清空标记Map.clearMarkers，然后在循环调用addMarkers
+
+  	  		//加载地图 END==========================================
+**/
+  		  	
+            $(".fourthLi").click(function(){//cpu
+                $(".constablePosition").hide();
+                $(".operatingSys").hide();
+                $(".stateOfCharge").hide();
+                $(".memoryUsage").hide();
+                $(".cpuLoad").show();
+  				$(".fourthLi").addClass("active");
+                $(".fifthLi").removeClass("active");
+                $(".sixthLi").removeClass("active");
+                $(".seventhLi").removeClass("active");
+                $(".eighthLi").removeClass("active");
+                
+                loadChar('cpu');
+  			})
+            $(".fifthLi").click(function(){//ram
+                $(".constablePosition").hide();
+                $(".operatingSys").hide();
+                $(".stateOfCharge").hide();
+                $(".cpuLoad").hide();
+                $(".memoryUsage").show();
+  				$(".fifthLi").addClass("active");
+                $(".fourthLi").removeClass("active");
+                $(".sixthLi").removeClass("active");
+                $(".seventhLi").removeClass("active");
+                $(".eighthLi").removeClass("active");
+                
+                loadChar('ram');
+  			})
+            $(".sixthLi").click(function(){//elec
+                $(".constablePosition").hide();
+                $(".operatingSys").hide();
+                $(".memoryUsage").hide();
+                $(".cpuLoad").hide();
+                $(".stateOfCharge").show();
+  				$(".sixthLi").addClass("active");
+                $(".fourthLi").removeClass("active");
+                $(".fifthLi").removeClass("active");
+                $(".seventhLi").removeClass("active");
+                $(".eighthLi").removeClass("active");
+                
+                loadChar('elec');
+  			})
+            $(".seventhLi").click(function(){//os
+                $(".constablePosition").hide();
+                $(".stateOfCharge").hide();
+                $(".memoryUsage").hide();
+                $(".cpuLoad").hide();
+                $(".operatingSys").show();
+  				$(".seventhLi").addClass("active");
+                $(".fourthLi").removeClass("active");
+                $(".fifthLi").removeClass("active");
+                $(".sixthLi").removeClass("active");
+                $(".eighthLi").removeClass("active");
+                
+                loadChar('os');
+  			})
+            $(".eighthLi").click(function(){//position
+                $(".operatingSys").hide();
+                $(".stateOfCharge").hide();
+                $(".memoryUsage").hide();
+                $(".cpuLoad").hide();
+                $(".constablePosition").show();
+  				$(".eighthLi").addClass("active");
+                $(".fourthLi").removeClass("active");
+                $(".fifthLi").removeClass("active");
+                $(".sixthLi").removeClass("active");
+                $(".seventhLi").removeClass("active");
+                
+                loadperiodMap();
+  			})
+  			
+  			$("#searchButton").click(function(){
+  				var tab = "";
+  				if($(".fourthLi").hasClass("active")){tab = "cpu"}
+  				else if($(".fifthLi").hasClass("active")){tab = "ram"}
+  				else if($(".sixthLi").hasClass("active")){tab = "elec"}
+  				else if($(".seventhLi").hasClass("active")){tab = "os"}
+  				else if($(".eighthLi").hasClass("active")){tab = "position"}
+  				
+  				if($(".eighthLi").hasClass("active")){
+  					loadIframeFunc();				
+  				} else {
+	  				loadChar(tab);
+  				}
+  			})
+  			
+  			$("#refreshBtn").click(function(){
+  				deptTree.clear();
+  	  			$("#startTime").val(preTime);
+  	  			$("#personName").val('');
+  	  			
+  				var tab = "";
+  				if($(".fourthLi").hasClass("active")){tab = "cpu"}
+  				else if($(".fifthLi").hasClass("active")){tab = "ram"}
+  				else if($(".sixthLi").hasClass("active")){tab = "elec"}
+  				else if($(".seventhLi").hasClass("active")){tab = "os"}
+  				else if($(".eighthLi").hasClass("active")){tab = "position"}
+  				
+  				if($(".eighthLi").hasClass("active")){
+  					loadIframeFunc();				
+  				} else {
+	  				loadChar(tab);
+  				}
+  			})
+			
+  		})
+  		
+  		function loadChar(tab){
+  			//alert(tab);//cpu,ram,elec,os,position
+  			var deptId = $("[name='deptId']").val();
+  			var deptName = $('#deptId').val();  			
+  			var startTime = $('#startTime').val();
+			var personName = $('#personName').val();
+  			
+  			//alert(deptId+','+deptName+','+startTime+','+personName);
+  			$.ajax({
+  				url: "${base}/audit/checkview/periodAjaxTab.do",
+  				type: "post",
+  				data: {deptId:deptId,startTime:startTime,personName:personName,tab:tab},
+  				success: function(result) {//alert(JSON.stringify(result));
+  					if(tab=='cpu'){
+  						
+  						var percentCpuResult = result.percentCpuResult;
+  						var obj = JSON.parse(percentCpuResult);
+  						$("#cpuTbody").empty();
+  		 				$.each(obj, function(i, o) {
+  		 					$("#cpuTbody").append("<tr><td>"+i+"</td><td>"+o+"</td></tr>");
+  		 				});
+  		 				$('table.highchart').highchartTable();
+  		 				
+  					}else if(tab=='ram'){
+  						
+  						var percentRamResult = result.percentRamResult;
+  						var obj = JSON.parse(percentRamResult);
+  						$("#ramTbody").empty();
+  		 				$.each(obj, function(i, o) {
+  		 					$("#ramTbody").append("<tr><td>"+i+"</td><td>"+o+"</td></tr>");
+  		 				});
+  		 				$('table.highchart').highchartTable();
+  						
+  					}else if(tab=='elec'){
+  						
+  						var percentElecResult = result.percentElecResult;
+  						var obj = JSON.parse(percentElecResult);
+  						$("#elecTbody").empty();
+  		 				$.each(obj, function(i, o) {
+  		 					$("#elecTbody").append("<tr><td>"+i+"</td><td>"+o+"</td></tr>");
+  		 				});
+  		 				$('table.highchart').highchartTable();
+  		 				
+  					}else if(tab=='os'){
+  						
+  						var percentOsResult = result.percentOsResult;
+  						var obj = JSON.parse(percentOsResult);
+  						$("#osTbody").empty();
+  		 				$.each(obj, function(i, o) {//data-graph-name="ios"
+  		 					$("#osTbody").append('<tr><td>'+i+'</td><td data-graph-name="'+i+'">'+o+'</td></tr>');
+  		 				});
+  		 				$('table.highchart').highchartTable();
+
+  					}else if(tab=='position'){
+/**					
+						//加载地图==========================================
+						Map.clearMarkers();
+						var personPositionList = result.personPositionList;
+						$.each(personPositionList, function(i,item){
+			                //alert(i + "," + item.time+","+item.name+","+item.imei+","+item.lon+","+item.lat);
+			                var lon = item.lon;
+			  	  			var lat = item.lat;
+ 				  	  		Map.addMarker({
+ 			  	  				lon:lon,
+ 			  	  				lat:lat,
+ 			  	  				msg:""
+ 			  	  			});
+			            });
+						//加载地图==========================================
+**/
+  					}
+  				}
+  			});
+  			
+  			
+  		}
+  		
+        //tab切换到定位
+        function loadperiodMap() {
+        	var obj = $('#periodMap');
+        	var type="period";
+  			var deptId = $("[name='deptId']").val();			
+  			var startTime = $('#startTime').val();
+			var personName = $('#personName').val();
+
+  			var url = "${base}/audit/checkview/toPosition.do?type="+type+"&deptId="+deptId+"&startTime="+startTime+"&personName="+personName;
+        	obj.attr('src',url);
+        	
+        }
+        
+        //调用iframe页面的方法
+        function loadIframeFunc(){
+        	var type="period";
+        	var deptId = $("[name='deptId']").val();			
+  			var startTime = $('#startTime').val();
+			var personName = $('#personName').val();
+  			
+  			var frames=document.getElementById("periodMap");
+  			frames.contentWindow.loadGisMap(type, "", deptId, startTime, personName);
+  			
+        }
+  		
+	</script>
+</body>

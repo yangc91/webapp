@@ -1,0 +1,60 @@
+<!--左侧搜索表单-->
+<form class="role-frm" >
+	<div class="deviceTitle">修改密码</div>
+
+    <hr class="hr-solid">
+    <div>
+        <img src="${base}/themes/default/images/circleRight.png" />
+        <span class="fc6">
+        	您可以这里修改密码，修改后请使用新密码进行登录。
+        </span>
+    </div>
+</form>
+
+<form name="addFrm"  novalidate="novalidate">
+<!--右侧-->
+<div class="admin-list modifyPsdDiv" style="position: absolute;top: 0px;bottom:80px;right: 0px;left: 0px;">
+	<div class="pwdDiv">
+		<table class="modifyPsd" >
+			<tr>
+				<td ng-class="{'has-success':addFrm.password.$valid, 'has-error':addFrm.password.$invalid && addFrm.password.$dirty}">
+					旧密码
+					<input class="form-control psdInput" name="password" ng-blur="addFrm.password.$dirty=true" required ng-minlength="6" type="password" autocomplete="off" ng-model="oldPasswd" 
+					placeholder="请输入旧密码"
+					tooltip="{{addFrm.password.$error.required?'密码必填' : addFrm.password.$error.minlength?'密码至少6位' :''}}" tooltip-placement="bottom"/>
+				</td>
+			</tr>
+			<tr>
+				<td ng-class="{'has-success':addFrm.newPasswd.$valid, 'has-error':addFrm.newPasswd.$invalid && addFrm.newPasswd.$dirty}">
+					新密码
+					<input class="form-control psdInput" type="password" ng-blur="addFrm.newPasswd.$dirty=true" name="newPasswd" ng-model="newPasswd"
+						   required ng-minlength="6" placeholder="请输入新密码"
+					tooltip="{{addFrm.newPasswd.$error.required?'新密码必填' : addFrm.newPasswd.$error.minlength?'密码至少6位' :''}}" tooltip-placement="bottom"/>
+				</td>
+			</tr>
+			<tr>
+				<td ng-class="{'has-success':addFrm.verifyPasswd.$valid, 'has-error':addFrm.verifyPasswd.$invalid && addFrm.verifyPasswd.$dirty}">
+					重复新密码
+					<input class="form-control psdInput" type="password" pw-check="newPasswd" ng-blur="addFrm.verifyPasswd.$dirty=true" ng-model="verifyPasswd"  name="verifyPasswd" required
+						   ng-minlength="6" placeholder="请再次输入密码"
+					tooltip="{{addFrm.verifyPasswd.$error.required?'重复密码必填' : addFrm.verifyPasswd.$error.repeat?'两次密码不一致' :''}}" tooltip-placement="bottom" />
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<div class="psdBtns">
+	<button type="reset" ng-click="clear()" class="btn btn-gray">取消</button>
+	<button type="button" ng-click="save()" class="btn btn-green">保存更改</button>
+</div>
+</form>
+<section ng-show="alert.msg" class="col-md-4" style="position: absolute; top: 20px; left: 500px; z-index: 9999;">
+    <div class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), alert.closeable ? 'alert-dismissable' : null]" role="alert">
+        <button ng-show="alert.closeable" type="button" class="close" ng-click="alertInf.close(0)" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <div>
+            <span class="ng-scope ng-binding" ng-bind="alert.msg"></span>
+        </div>
+    </div>
+</section>

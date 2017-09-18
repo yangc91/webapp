@@ -52,7 +52,7 @@
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
-      com.yc.learn.root
+      com.yc.learn.rootconf
     </param-value>
   </context-param>
 
@@ -73,7 +73,7 @@
 
     <init-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>com.yc.learn.rest</param-value>
+      <param-value>com.yc.learn.restconf</param-value>
     </init-param>
 
     <init-param>

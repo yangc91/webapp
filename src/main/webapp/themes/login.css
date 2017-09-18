@@ -1,0 +1,583 @@
+/* 
+ * 自定义bootstrap模板
+ */
+html {
+	position: relative;
+	min-height: 100%;
+}
+
+body {
+	font-family:   "Noto Sans","Microsoft Yahei",Arial,Helvetica,sans-serif;
+	padding-top: 98px;
+}
+
+@media (max-width: 768px) {
+	body {
+		padding-top: 90px;
+	}
+}
+
+.btn:FOCUS, .btn:ACTIVE, .btn:HOVER{
+  outline:0 !important;
+}
+
+.navbar {
+	min-height: 60px;
+}
+
+.navbar-nav>li>a {
+	line-height: 30px;
+}
+
+.navbar-default .navbar-nav>li>a {
+	color: #333;
+	font-size: 16px;
+}
+
+.d-block{
+	display: block;
+}
+
+.d-none{
+	display: none;
+}
+
+.light-border{
+	border:1px solid #fff;
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover,
+	.navbar-default .navbar-nav>.active>a:focus {
+	background: none;
+	color: #0094e4;
+}
+
+.navbar-default {
+	background: #fff;
+	border-color: #ccc;
+}
+
+/* Don't let the lead text change font-size. */
+.lead {
+	font-size: 16px;
+}
+
+/* Finesse the page header spacing */
+.page-header {
+	margin-bottom: 30px;
+}
+
+.page-header .lead {
+	margin-bottom: 10px;
+}
+
+/* Non-responsive overrides
+ *
+ * Utilitze the following CSS to disable the responsive-ness of the container,
+ * grid system, and navbar.
+ */
+
+/* Reset the container */
+.container {
+	max-width: none !important;
+	padding: 0 15px;
+}
+
+.navbar-toggle .icon-bar {
+	height: 3px;
+}
+
+
+.footer {
+	background: #fff;
+	color: #777;
+	padding: 30px 0 0px;
+	margin-top: 40px;
+}
+
+.footer ul{
+	padding: 0;
+	list-style: none;
+}
+
+.footer ul li{
+	line-height: 30px;
+}
+
+.footer ul li a{
+	color: #777;
+	text-decoration: none;
+}
+
+.footer ul li a:HOVER, .footer ul li:HOVER{
+	color: #23527C;
+}
+
+.footer .copyright {
+	margin: 0px auto 0px;
+	font-size: 12px;
+	padding: 20px 0px 20px 0px;
+}
+.footer #hotline{
+	cursor: default;
+}
+
+.footer #hotline:HOVER{
+	color: #fff;
+	background-color: #5bc0de;
+	border-color: #46b8da
+}
+
+
+#logo-link, .logo-link  {
+	padding: 0;
+}
+
+.logo-link-mobile{
+	width: 150px;
+	padding: 8px 0;
+	margin: auto;
+	vertical-align: middle;
+	float: none;
+}
+
+.none-border{
+	border: none;
+}
+
+.logo-link-mobile img{
+	width: 100%;
+	
+}
+
+.btn {
+	padding: 4px 12px;
+	border-radius: 2px;
+}
+
+.btn-primary {
+	background: #0094e4;
+	border: #ccc;
+}
+
+.btn-yellow {
+	color: #fff;
+	background-color: #e37100;
+	border-color: #eea236;
+}
+
+.btn-yellow:HOVER{
+	color: #fff;
+	background-color: #d46a00;
+}
+
+.btn-blue{
+	color: #fff;
+	background-color: #0094e4;
+	border-color: #ccc;
+}
+
+.btn-blue:HOVER{
+	color: #fff;
+	background-color: #008ad4;
+}
+
+#navbar .btn {
+	margin: 15px 6px;
+}
+
+.input-group-addon, .form-control{
+	background: #fff;
+	border-radius:0;
+}
+
+.footer-contact{
+	text-align: right;
+}
+
+.footer-contact h3{
+	color: #333;
+}
+
+.footer-contact .btn-info{
+	background: #0094e4;
+}
+
+.fp-controlArrow{
+	display: none;
+}
+
+.red{
+	color: #cc0000;
+}
+
+.boder-bottom{
+	border-bottom: 1px #ccc solid;
+}
+
+.mobile-footer-contact{
+	background: #0094e4;
+	color: #fff;
+	margin: 10px auto;
+	vertical-align: middle;
+}
+
+.mobile-footer-contact h4{
+	vertical-align: middle;
+	display: block;
+	line-height: 40px;
+}
+
+#accordion .panel-default>.panel-heading{
+	background: none;
+	border-bottom: 1px #ddd solid;
+}
+
+#accordion  .panel-default{
+	border: 0px;
+	-webkit-box-shadow:none;
+	box-shadow:none;
+}
+
+#accordion .panel-body{
+	border: 0px;
+	padding-bottom: 0px;
+}
+
+#accordion .panel-default a{
+	text-decoration: none;
+	color: #333;
+}
+
+#accordion .panel-default ul{
+	padding-left: 20px;
+}
+
+#accordion .panel-default ul li{
+	list-style: none;
+	line-height: 25px;
+}
+
+.navbar-toggle{
+	margin-left: 8px;
+}
+
+.footer-copyright{
+	background: #292a2c;
+	color: #999;
+	margin-top: 20px;
+}
+
+.newheader{
+	background: #292a2c;
+	color: #999;
+	height: 38px;
+}
+
+@media (max-width: 768px) {
+	.newheader{
+		display: none;
+	}
+	body {
+		padding-top: 60px;
+	}
+}
+
+.newheader span{
+	display:block;
+	margin: auto 0;
+	line-height: 38px;
+}
+
+.newheader a{
+	color: #999;
+	text-decoration: none;
+}
+
+#scrollUp {  
+    bottom: 20px;  
+    right: 20px;  
+    padding: 10px 20px;  
+    background: #555;  
+    color: #fff;  
+} 
+
+/*****************上边为通用css*******************/
+
+
+/******************************OA登录********************************/
+
+.oa-login-jumbotron .container {
+	position: relative;
+	height: 100%;
+}
+
+.oa-login-form {
+	width: 380px;
+	padding:0 23px;
+	position: absolute;
+	right: 100px;
+	top:80px;
+	color: #fff;
+	z-index: 99;
+}
+
+.oa-login-form form{
+	width: 350px;
+	height:500px;
+	padding-top:15px;
+	padding-left: 20px;
+	border-radius: 5px;
+	background-color: rgba(86,180,230,0.6);
+	height: 315px;
+}
+
+.oa-login-form form .input-group{
+	margin-bottom: 22px;
+}
+
+.oa-login-form .info{
+	color: #900;
+	margin: 15px 0;
+	line-height:20px;
+	min-height: 20px;
+}
+
+.oa-login-form .btn-primary{
+	border-radius:0;
+	height: 35px;;
+	width: 314px;
+}
+
+.ecss-login-jumbotron {
+	background: #479cd7;
+	position: absolute;
+	top: 60px;
+	left: 0px;
+	right: 0px;
+	height: 70%;
+	padding: 0;
+	margin-bottom: 0px !important;
+}
+.loginFooter{
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 25%;
+	background-color: #1362ae;
+}
+
+.ecss-login-jumbotron .login-welcome{
+	color: #443432;
+	width: 600px;
+ 	height: 242px
+}
+
+.ecss-login-jumbotron .login-welcome h3{
+	font-size: 34px;
+	margin-top: 40px;
+}
+
+.ecss-login-jumbotron .login-welcome p{
+	font-size: 22px;
+	width: 508px
+}
+
+#ecss-login-form {
+	top: 15%;
+}
+
+.ecss-desc{
+	width: 990px;
+	margin: 20px auto;
+	font-size: 18px;
+	line-height: 35px;
+}
+.cur-poi{
+	cursor:pointer;
+}
+/*登录按钮*/
+.btnLogin{
+	width:310px;
+	height:35px;
+	background:#f6d154;
+	color: #333333;
+	font-size: 18px;
+	text-align: center;
+	padding-top: 5px;
+	border-radius: 3px;
+	cursor: pointer;
+}
+.btnLogin:hover{
+	background:#fbdc74;
+}
+.btnLogin:active{
+	background:#fad145;
+}
+.shipImg{
+	margin-top: -194px;
+	margin-left: 313px;
+}
+.lefthill{
+	margin-top: -45px;
+}
+.footerImg{
+	position: absolute;
+	top: 0;
+	z-index: 3;
+}
+.righthill{
+	margin-top: -45px;
+	right: 5%;
+}
+.cloudDiv{
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	left: 0px;
+}
+.topTwoCloud{
+	margin-top: 30px;
+	position: absolute;
+	right: 0px;
+	left: 0px;
+	overflow: hidden;
+}
+.middleCloud{
+	margin-top: 180px;
+	position: absolute;
+	right: 0px;
+	left: 0px;
+	overflow: hidden;
+}
+
+.lowCloud{
+	margin-top: 346px;
+	position: absolute;
+	right: 0px;
+	left: 0px;
+	overflow: hidden;
+}
+.loginText{
+	position: absolute;
+	margin-left: 110px;
+	top: 15%;
+}
+/*云漂浮的轨迹*/
+@keyframes scoll{
+	from{
+		left:100%;
+	}
+	to{
+		left:-698px;
+	}
+}
+
+@keyframes scoll-first{
+	from{
+		left:0;
+	}
+	to{
+		left:-698px;
+	}
+}
+
+@keyframes scoll-second{
+	from{
+		left: 55%;
+	}
+	to{
+		left: -700px;
+	}
+}
+
+@keyframes scoll-third{
+	from{
+		left: 20%;
+	}
+	to{
+		left: -698px;
+	}
+}
+
+@-webkit-keyframes scoll{
+	from{
+		left:100%;
+	}
+	to{
+		left:-698px;
+	}
+}
+
+@-webkit-keyframes scoll-first{
+	from{
+		left:0;
+	}
+	to{
+		left:-698px;
+	}
+}
+
+@-webkit-keyframes scoll-second{
+	from{
+		left: 55%;
+	}
+	to{
+		left: -700px;
+	}
+}
+
+@-webkit-keyframes scoll-third{
+	from{
+		left: 20%;
+	}
+	to{
+		left: -698px;
+	}
+}
+
+.scroll-containerFirst {
+	left:0;
+	display:inline-block;
+	position: relative;
+}
+
+.srcoll-containerSecond {
+	left:55%;
+	display:inline-block;
+	position: relative;
+}
+
+.srcoll-containerThird {
+	left: 20%;
+	display:inline-block;
+	position: relative;
+}
+
+.scoll-first{
+	animation:scoll-first 20s linear 0s infinite;
+	-webkit-animation: scoll-first 20s linear 0s infinite;
+}
+
+.scoll-second{
+	animation:scoll-second 80s linear 0s infinite;
+	-webkit-animation:scoll-second 80s linear 0s infinite;
+}
+
+.scoll-third{
+	animation:scoll-third 100s linear 0s infinite;
+	-webkit-animation:scoll-third 100s linear 0s infinite;
+}
+
+.scoll {
+	animation:scoll 60s linear 0s infinite;
+	-webkit-animation: scoll 60s linear 0s infinite;
+}
+
+.logoWord{
+	font-size: 24px;
+	font-weight: bold;
+	margin-left: 10px;
+	color: #E3EEF4;
+}

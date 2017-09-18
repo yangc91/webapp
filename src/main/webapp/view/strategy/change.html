@@ -1,0 +1,126 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+	<a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回列表</a>
+    <div class="deviceTitle">{{strategyName}}</div>
+    <div class="editName">已部署<span>{{totalDevice}}</span>台设备</div>
+
+    <hr class="hr-solid">
+</form>
+
+<div>
+	<div class="admin-list">
+		<div class="handle-div" style="height: 100px;">
+			<div class="groupLogo">
+				<img src="${base}/themes/default/images/policy.png" width="50px" />
+			</div>
+			<p class="editGroupDevice" ng-bind="addStepList[5].name"></p>
+			<p class="fc9">
+				将已配置的策略部署到设备或设备组。
+			</p>
+		</div>
+
+		<div class="pwdDiv" style="position: absolute; left: 280px; top: 100px; bottom: 80px; overflow: auto; right: 0px;">
+			<p class="editGroupDevice" style="font-size:14px;margin-left:20px" >选择部署设备的方式</p>
+			<ul>
+				<li class="strgFirstStep" ng-repeat="mapWay in mapList" ng-click="mapWapFn(mapWay.device)" ng-class="{'active':mapWay.device == device}" >
+					<span ng-show="mapWay.device == device" class="glyphicon glyphicon-ok rightOk"></span>
+					<img style="margin-bottom: 10px;" ng-src="{{'${base}/themes/default/images/'+mapWay.pic+'.png'}}" />
+					<span class="editGroupDevice" style="margin-bottom: 10px;font-size:14px;"><span ng-bind="mapWay.deviceTitle"></span></span>
+					<p ng-bind="mapWay.content"></p>
+				</li>
+			</ul>
+			<div class="mapDeviceDiv" ng-show="device == 'self'" style="margin-left: 20px;border-bottom: none;">
+				<span class="glyphicon glyphicon-triangle-top" style="position: relative; float: right;top: -35px;left: -140px;color: #ccc;font-size: 20px;"></span>
+				<input type="radio" ng-click="groupCheck('group')" name="groupChecked" id="deployGroup" class="rdo_1 "/>
+				<label for="deployGroup"></label>
+				<label for="deployGroup" class="curpos" >
+					<span>部署到设备组</span>
+				</label>
+				<img src="${base}/themes/default/images/down.png" class="float-right curpos menuLogo" ng-click="groupshowMenu()" ng-show="!groupShow" />
+				<img src="${base}/themes/default/images/up.png" class="float-right curpos menuLogo" ng-click="groupshowMenu()" ng-show="groupShow"/>
+				<div class="mapDeviceGroup" ng-show="groupShow">
+					<p>设备组({{selGroupListSize.length}}/{{groupSize}})</p>
+					<div ng-repeat="group in groupListTotal" class="float-left" title="{{group.name}}">
+						<input type="checkbox" ng-model="group.selected" class="chk_1 strgChk" id="{{group.id}}"  ng-change="selGroup(group.id)" ng-checked="group.checked"/>
+						<label for="{{group.id}}" ng-class="{'checkStyle':group.selected}"></label>
+						<label for="{{group.id}}" class="curpos table-whitespace" style="width: 130px;">
+							<span ng-bind="group.name"></span>
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="mapDeviceDiv" ng-show="device == 'self'" style="margin-left: 20px">
+				<input type="radio" ng-click="groupCheck('device')" name="groupChecked"  class="rdo_1" id="deployDevice"/>
+				<label for="deployDevice"></label>
+				<label for="deployDevice" class="curpos" >
+					<span>部署到设备</span>
+				</label>
+				<img src="${base}/themes/default/images/down.png" class="float-right curpos menuLogo" style="margin-right: 20px;" ng-click="groupshowMenu2()" ng-show="!groupShow2"/>
+				<img src="${base}/themes/default/images/up.png" class="float-right curpos menuLogo" style="margin-right: 20px;" ng-click="groupshowMenu2()" ng-show="groupShow2"/>
+				<div ng-show="groupShow2" class="modifyPsd" style="margin-top: 20px;">
+					<div class="chooseDevice">
+						<div class="leftChooseDiv">
+				 			<input class="chooseSearchInput" type="text" placeholder="搜索人员" ng-keyup="myKeyup($event)" ng-model="personName"/> 
+				 			<div class="chooseSearch curpos" ng-click="searchPerson()"></div>
+							<div class="zTreeDemoBackground">
+								<div class="tree-start" style="height:260px;">
+							        <div class="ztree">
+							            <div ivh-treeview="list"
+							                 ivh-treeview-expand-to-depth="0"
+							                 ivh-treeview-id-attribute="'id'"
+							                 ivh-treeview-label-attribute="'name'"
+							                 ivh-treeview-children-attribute="'children'"
+							                 ivh-treeview-use-checkboxes="true"
+							                 ivh-treeview-twistie-collapsed-tpl="'<span class=\'button level0 switch center_close\'></span>'"
+							                 ivh-treeview-twistie-expanded-tpl="'<span class=\'button level0 switch center_open\'></span>'"
+							                 ivh-treeview-twistie-leaf-tpl="'<span class=\'button level1 switch center_docu\'></span>'"
+							                 ivh-treeview-on-cb-change="selectCallback(ivhNode, ivhIsSelected, ivhTree)"
+											 ivh-treeview-on-toggle="toggleCallback(ivhNode, ivhIsExpanded, ivhTree)">
+							            </div>
+							        </div>
+								</div>
+							</div>
+						</div>
+						<div class="rightchooseDiv">
+							<div style="text-align:right;width:100%;">
+								<span class="fc9 tableTip">（提示：部署策略到设备时，不能选择已加入设备组中的设备）</span>
+								<input type="checkbox" id="checkAll" class="chk_1 titleChk" ng-model="checkboxes.checked" ng-change="checkAll()" name="checkAll" autocomplete="off" style="vertical-align:bottom"/>
+								<label style="display:none;" for="checkAll"></label>
+								<label for="checkAll"  class="desc-text" style="width: 80px;height: 24px;background-color: #FFFFFF;">全选</label>
+							</div>
+							<input type="hidden" name="deptmentId" id="deptmentId" >
+							<div class="chooseTable" style="width: 100%;height: 200px;overflow: auto;" when-scrolled="loadMore()" >
+							<div class="deviceList" ng-repeat="person in personList track by $index" title="{{person.imei}}">
+								<label for="{{person.imei}}"  class="curpos phoneBg" ng-class="{'fc9':person.isGroup==1,'curBle':person.isGroup!=1,'active':person.selected}">
+									<span>{{person.name}}</span>
+								</label>
+								<input ng-if="person.isGroup!=1" class="chk_1" id="{{person.imei}}" type="checkbox" ng-change="toggleCheckPerson(person)" ng-model="person.selected">
+								<label ng-if="person.isGroup!=1" for="{{person.imei}}" ng-class="{'checkStyle':person.selected}"></label>
+							</div>
+					</div>
+						<div class="clearfloat"></div>
+						</div>
+						<div class="bottomChooseDiv">
+							<div style="width:100%;">
+								<p>
+									<span class="float-left choosenSpan">已选</span>
+									<span id="chooseNum" class="choosenSpan">（{{selectPerson.length}}）</span>
+									<span class="cleanAllBtn float-right desc-text" ng-click="deleteAllPerson(person)">清除</span>
+								</p>
+								<div ng-repeat="person in selectPerson track by $index" title="{{person.imei}}" class="chooseElesDiv float-left">
+									<div style="width: 50px" class="table-whitespace float-left">{{person.name}}</div>
+									<a class="deleteLabel curpos" ng-click="deletePerson(person)"></a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="psdBtns">
+		<button type="button" class="btn btn-gray" ng-click="goBack()">取消</button>
+		<button type="button" class="btn btn-disable" ng-show = '!nextshow'>完成</button>
+		<button type="button" class="btn btn-green" ng-show="nextshow" ng-click="finish()">完成</button>
+	</div>
+</div>

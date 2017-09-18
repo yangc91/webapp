@@ -1,0 +1,113 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+	<div><span class="listNum" ng-bind="totalRecords"></span>名人员</div>
+
+    <hr class="hr-solid">
+    <div>
+        <input type="text" placeholder="搜索姓名或警号" ng-model="searchKey" mdc-placeholder ng-keyup="myKeyup($event)" class="form-control leftsearch">
+        <span ng-click="clickSearch()" class="glyphicon glyphicon-search form-search"></span>
+        <span ng-click="cleanSearch()" ng-show="searchKey" class="curpos cleanSearchBtn">×</span>
+    </div>
+</form>
+
+<!--右侧-->
+<div class="admin-list userList" ng-show="tableParams.total() > 0 && totalRecords > 0">
+    <div class="handle-div">
+        <button type="button" class="btn btn-blue" ng-click="addWhiteList()">添加设备</button>
+        <button type="button" ng-class="{ true : 'btn btn-disable', false : 'btn btn-red' }[checkedItem == 0]" ng-click="deleteWhite()">移除设备</button>
+    </div>
+    
+    <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+        <!--自定义表头-->
+        <colgroup>
+            <col width="60px" style="padding-left: 25px;"/>
+            <col width="150px"/>
+            <col width="150px"/>
+            <col width="200px"/>
+            <col/>
+        </colgroup>
+        
+        <tr ng-repeat="person in $data track by $index" ng-click="clickTr(person)" ng-class="{visited:person.visited}">
+            <td header="'headerCheckbox.html'"style="width: 10%;min-width: 60px;">
+                <div class="td left-border default">
+                    <div class="checkbox-valign">
+                    	<input type="checkbox" ng-change="toggleCheck(person)" id="{{person.id}}" class="chk_1 table_chk" ng-model="person.selected">
+                        <label for="{{person.id}}" ng-class="{'checkStyle':person.selected}"></label>
+                    </div>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            
+            <td data-title="'人员'">
+                <div class="td default">
+                    <span ng-bind="person.personName"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'警号'">
+                <div class="td default">
+                    <span ng-bind="person.personCode"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'添加时间'">
+                <div class="td default">
+                    <span ng-bind="person.createTime|date:'yyyy-MM-dd HH:mm:ss'"></span>
+                    <div class="vline right-vline"></div>
+                </div>
+            </td>
+            <td data-title="'操作'">
+                <div class="td default right-border">
+                    <span class="desc-text" ng-click="deleteDevice(person)">移除设备</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+    
+    <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]">共{{resultRecords}}条</p>
+    
+    <section class="col-md-4 alertTip">
+		<div ng-repeat="alert in alerts" class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), closeable ? 'alert-dismissable' : null]" role="alert">
+	   		<button ng-show="closeable" type="button" class="close" ng-click="closeAlert($index)" data-dismiss="alert" aria-label="close">
+		        <span aria-hidden="true">×</span>
+		    </button>
+    		<div>
+    		<span class="ng-scope ng-binding">{{alert.msg}}</span></div>
+		</div>
+	</section>
+</div>
+
+<div class="admin-list userList noResultContent" ng-show="noResultContent">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img ng-src="{{'${base}/themes/default/images/' + faceImg +'.png'}}" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm" ng-bind="noContent"></p>
+            <ul>
+            	<li ng-repeat="chooseCheck in chooseList" style="list-style:none;">
+            		<p class="fs14">
+	                	<img src="${base}/themes/default/images/circleRight.png" />
+	                	<span ng-bind="chooseCheck.prevLink"></span>
+		               	<span ng-bind="chooseCheck.content" ng-click="addWhiteDevice(chooseCheck.textLink)" ng-class="{'desc-text':chooseCheck.textLink}"></span>
+		               	<span ng-bind="chooseCheck.nextLink"></span>
+		            </p>
+            	</li>
+            </ul>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>
+
+<div class="foot" ng-show="tableParams.total() > 0 && totalRecords > 0">
+	<div class="infoImg">
+		<img src="${base}/themes/default/images/people.png" />
+	</div>
+	<p class="personName">姓名：{{prevItem.personName}}</p>
+    <p class="fcb" style="padding-bottom:10px">警号：{{prevItem.personCode}}</p>
+</div>
+
+<script type="text/ng-template" id="headerCheckbox.html">
+    <input style="margin-left: 7px;" type="checkbox" id="tableAll" class="chk_1 titleChk" ng-model="checkboxes.checked" ng-change="checkAll()"  value="" />
+    <label for="tableAll" ng-class="{'checkStyle':checkboxes.checked}"></label>
+</script>

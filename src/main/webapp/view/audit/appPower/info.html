@@ -1,0 +1,141 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回列表</a>
+    <div><span ng-bind="totalRecords" class="listNum"></span>个应用</div>
+    <hr class="hr-solid">
+    <div><span class="deviceTitle" ng-bind="deviceInfo.personName"></span><span class="fc9">(<span ng-bind="deviceInfo.personCode"></span>)</span></div>
+    <p class="fc6" ng-bind="deviceInfo.deptName"></p>
+	
+    <hr class="hr-solid">
+
+    <div>
+		<img src="${base}/themes/default/images/device.png" style="float: left; margin-right: 20px; width: 85px;" />
+		<p class="personName" style="margin-bottom: 10px;padding-top:10px" ng-bind="deviceInfo.model"></p>
+		<p class="fc6"><span ng-bind="deviceInfo.osName"></span> <span ng-bind="deviceInfo.osVersion"></span></p>
+		<p class="fc6">已激活</p>
+    </div>
+    <hr class="hr-solid">
+    <div ng-click="changestate()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="deviceState"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!deviceState"></span>
+        <span>时间区间</span>
+    </div>
+
+    <ul class="role-list" ng-show="deviceState">
+        <li ng-click="tableShow()" class="curpos">
+            <input type="radio" class="rdo_1" name="stateRadio" id="statusDay" value="1" ng-model="status" ng-change="changeTime()" >
+            <label for="statusDay"></label>
+            <label for="statusDay"  class="curpos">近24小时内</label>
+        </li>
+        <li ng-click="timeLineShow()" class="curpos">
+            <input type="radio" class="rdo_1" name="stateRadio" id="statusWeek" value="2" ng-model="status" ng-checked="status == 2" ng-change="changeTime()">
+            <label for="statusWeek"></label>
+            <label for="statusWeek"  class="curpos">过去7天内</label>
+        </li>
+    </ul>
+
+    <hr class="hr-solid">
+
+    <div ng-click="changeAppType()" class="curpos liTitle">
+        <span class="glyphicon glyphicon-triangle-bottom" ng-show="appType"></span>
+        <span class="glyphicon glyphicon-triangle-right" ng-show="!appType"></span>
+        <span>应用类型</span>
+    </div>
+
+    <ul class="role-list" ng-show="appType">
+
+        <li ng-repeat="appType in appTypeList">
+            <input type="checkbox" class="chk_1" ng-model="appType.selected" id="{{appType.value}}" ng-change="appTypeSelect()">
+            <label for="{{appType.value}}"></label>
+            <label for="{{appType.value}}"  class="curpos">{{appType.name}}</label>
+        </li>
+    </ul>
+</form>
+
+<!--右侧-->
+<div class="admin-list" style="overflow: auto;height: 100%;">
+    <div class="tz-right-content">
+        <ul tabset>
+            <!-- 整体设备应用耗电监测 -->
+            <li tab class="tz-tab-left" active="tabNotice[0].active" ng-click="goBackIndex()" disable="true" heading="{{tabNotice[0].heading}}"></li>
+            <!-- 整体设备应用耗电监测结束 -->
+
+            <!-- 单个设备应用耗电监测 -->
+            <li tab class="tz-tab" active="tabNotice[1].active" disable="tabNotice[1].disabled" heading="{{tabNotice[1].heading}}">
+                <div ng-show="powerInfoShow&&turnPageInfoShow">
+                    <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
+
+                        <!--自定义表头-->
+                        <colgroup>
+                            <col width="100px" style="padding-left: 25px;"/>
+                            <col width="500px"/>
+                            <col width="150px"/>
+                            <col width="150px"/>
+                            <col/>
+                        </colgroup>
+
+                        <tr ng-repeat="oneDeviceElec in $data track by $index" ng-class="{visited:oneDeviceElec.visited}" ng-click="clickTr(oneDeviceElec)">
+                           <td data-title="'排名'">
+                                <div class="td left-border default h100">
+                                    <span>{{(params.page()-1) * (params.count()) + $index + 1}}</span>
+                                    <div class="vline right-vline"></div>
+                                </div>
+                            </td>
+                            <td data-title="'应用名称'" >
+                                <div class="td default h100">
+                                    <span>
+                                        <img src="${base}/themes/default/images/system-app.png" ng-show="oneDeviceElec.type==1"/>
+                                        <img style="width: 60px;height: 60px;" ng-show="oneDeviceElec.type!=1" ng-src="{{ supportB64?(oneDeviceElec.icon || '${base}/themes/default/images/thir app.png') : ('${base}/ecss/downloadImg.do?imgId=' + oneDeviceElec.appId || '${base}/themes/default/images/thir app.png')}}"/>
+                                        <span ng-bind="oneDeviceElec.appName||oneDeviceElec.packageName"></span>
+                                    </span>
+                                    <div class="vline right-vline"></div>
+                                </div>
+                            </td>
+                            <td data-title="'应用版本号'">
+                                <div class="td default h100">
+                                    <span ng-bind="oneDeviceElec.version||'--'"></span>
+                                    <div class="vline right-vline"></div>
+                                </div>
+                            </td>
+                            <td data-title="'耗电百分比'">
+                                <div class="td default h100">
+                                    <span>{{oneDeviceElec.elec/oneDeviceElec.count | number:0}}%</span>
+                                    <div class="vline right-vline"></div>
+                                </div>
+                            </td>
+                            <td data-title="'应用类型'">
+                                <div class="td right-border default h100">
+                                    <span ng-bind="oneDeviceElec.type == 1 ? '系统应用' : '第三方应用'"></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <p ng-class="{ true : 'recordsNumGtTen', false : 'recordsNumLeTen' }[tableParams.total() > tableParams.count()]" ng-bind="'当前'+tableParams.total()+'条'"></p>
+                </div>
+                <div ng-show="!powerInfoShow">
+                    <img class="animationGif" src="${base}/themes/default/images/animation.gif"/>
+                </div>
+                <div ng-show="!turnPageInfoShow">
+                    <img class="animationGif" src="${base}/themes/default/images/turnPage.gif"/>
+                    <p class="animationWord">数据加载中……</p>
+                </div>
+            </li>
+            <!-- 单个设备应用耗电监测结束 -->
+        </ul>
+    </div>
+</div>
+<div class="admin-list userList noResultContent" style="top: 80px;" ng-show="noResultContent2">
+    <div class="dialogNormal noResult">
+        <div class="faceLogo">
+            <img src="${base}/themes/default/images/secondConfirm.png" />
+        </div>
+        <div class="dialogContent">
+            <p class="secondConfirm">啊呀，没有检索到任何内容……</p>
+            <p class="fs14">
+                <img src="${base}/themes/default/images/circleRight.png" />
+                请更改条件后再次搜索或筛选
+            </p>
+        </div>
+        <div class="clearfloat"></div>
+    </div>
+</div>

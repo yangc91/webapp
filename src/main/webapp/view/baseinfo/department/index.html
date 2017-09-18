@@ -1,0 +1,61 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+    <div class="deviceTitle">部门信息</div>
+
+    <hr class="hr-solid">
+    <div>
+        <img src="${base}/themes/default/images/circleRight.png" />
+        <span class="fc6">
+        	您可以点击部门树以查看部门的详细信息。
+        </span>
+    </div>
+</form>
+
+<!--右侧-->
+<div class="admin-list overflowDiv">
+	<!-- 左侧树结构开始 -->
+	<div class="leftDeptTree form-control authChoose">
+        <div class="ztree">
+            <div ivh-treeview="list"
+                 ivh-treeview-expand-to-depth="0"
+                 ivh-treeview-id-attribute="'id'"
+                 ivh-treeview-label-attribute="'name'"
+                 ivh-treeview-children-attribute="'children'"
+                 ivh-treeview-use-checkboxes="false"
+                 ivh-treeview-twistie-collapsed-tpl="'<span class=\'button level0 switch center_close\'></span>'"
+                 ivh-treeview-twistie-expanded-tpl="'<span class=\'button level0 switch center_open\'></span>'"
+                 ivh-treeview-twistie-leaf-tpl="'<span class=\'button level1 switch center_docu\'></span>'"
+                 ivh-treeview-on-toggle="toggleCallback(ivhNode, ivhIsExpanded, ivhTree)">
+            </div>
+        </div>
+	</div>
+	<!-- 左侧树结构开始end -->
+	
+	<!--右侧部门详细信息-->
+	<!--<div class="right">
+		<form id="frm" action="" method="post">
+			<input id="parentId" name="parentId" type="hidden"></input>
+			<input id="nodeId" name="id" type="hidden"></input>
+			<input id="ecCode" name="ecCode" type="hidden"></input>
+			<table>
+				<tr>
+					<td>
+						<div class="form-group">
+							<label class="control-label textr">上级部门&nbsp;&nbsp;&nbsp;</label>
+							<input class="form-control" type="text" readonly="readonly" id="parentName" style="width:360px" />
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div class="form-group">
+							<label class="control-label textr">部门名称&nbsp;&nbsp;&nbsp;</label>
+							<input class="form-control" type="text" id="deptName" name="name" readonly="readonly" style="width:360px"/>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>-->
+	<!--右侧部门详细信息end-->
+</div>

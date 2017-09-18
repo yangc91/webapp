@@ -1,0 +1,97 @@
+<!--左侧搜索表单-->
+<form class="role-frm">
+	<a class="backToList" ng-click="goBack()"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回列表</a>
+    <div class="deviceTitle">添加白名单设备</div>
+
+    <hr class="hr-solid">
+    <div>
+        <img src="${base}/themes/default/images/circleRight.png" />
+        <span class="fc6">
+        	白名单中的设备不接受任何管控和监测。
+        </span>
+    </div>
+</form>
+
+<!--右侧-->
+<div class="admin-list">
+	<div class="pwdDiv" style="position: absolute; left: 280px; top: 0px; bottom: 80px; overflow: auto; right: 0px;">
+		<div class="modifyPsd">
+			<div class="chooseDevice">
+			
+				<!-- 左边树 -->
+				<div class="leftChooseDiv">
+		 			<input class="chooseSearchInput" type="text" placeholder="搜索姓名或警号" ng-keyup="myKeyup($event)" ng-model="personName"/> 
+		 			<div class="chooseSearch curpos" ng-click="searchPerson()"></div>
+
+					<div class="zTreeDemoBackground">
+						<div class="tree-start" style="height:260px;">
+							        <div class="ztree">
+            <div ivh-treeview="list"
+                 ivh-treeview-expand-to-depth="0"
+                 ivh-treeview-id-attribute="'id'"
+                 ivh-treeview-label-attribute="'name'"
+                 ivh-treeview-children-attribute="'children'"
+                 ivh-treeview-use-checkboxes="true"
+                 ivh-treeview-twistie-collapsed-tpl="'<span class=\'button level0 switch center_close\'></span>'"
+                 ivh-treeview-twistie-expanded-tpl="'<span class=\'button level0 switch center_open\'></span>'"
+                 ivh-treeview-twistie-leaf-tpl="'<span class=\'button level1 switch center_docu\'></span>'"
+                 ivh-treeview-on-cb-change="selectCallback(ivhNode, ivhIsSelected, ivhTree)"
+				 ivh-treeview-on-toggle="toggleCallback(ivhNode, ivhIsExpanded, ivhTree)">
+            </div>
+        </div>
+						</div>
+					</div>
+				</div>
+				
+				<!-- 右边列表 -->
+				<div class="rightchooseDiv" style="">
+					<div style="text-align:right;width:100%;">
+						<input type="checkbox" id="checkAll" class="chk_1 titleChk" ng-model="checkboxes.checked" ng-change="checkAll()" name="checkAll" autocomplete="off" style="vertical-align:bottom"/>
+						<label style="display:none;" for="checkAll" ng-class="{'checkStyle':checkboxes.checked}"></label>
+						<label for="checkAll" class="desc-text" style="width: 80px;height: 24px;background-color: #FFFFFF;">全选</label>
+					</div>
+					
+					<input type="hidden" name="deptmentId" id="deptmentId" ng-model="deptId" >
+					
+					<div class="chooseTable" style="width: 100%;height:200px;overflow-y:auto;" when-scrolled="loadMore()" >
+						<div class="deviceList" ng-repeat="person in personList" title="{{person.code}}">
+							<label for="{{person.id}}"  class="curpos phoneBg" ng-class="{'fc9':person.isGroup==1,'curBle':person.isGroup!=1,'active':person.selected}">
+								<span>{{person.name}}</span>
+							</label>
+							<input type="checkbox" id="{{person.id}}" class="chk_1" ng-change="toggleCheckPerson(person)" ng-model="person.selected">
+							<label for="{{person.id}}" ng-class="{'checkStyle':person.selected}"></label>
+						</div>
+					</div>
+					
+				</div>
+				
+				<!-- 底部已选 -->
+				<div class="bottomChooseDiv">
+					<div style="width:100%;">
+						<p><span class="float-left">已选</span>（<span id="chooseNum">{{selectPerson.length}}</span>）
+						<span class="cleanAllBtn float-right desc-text" ng-click="deleteAllPerson(person)">清除</span></p>
+						<div ng-repeat="person in selectPerson track by $index" title="{{person.imei}}" class="chooseElesDiv" style="float: left;">
+							<div style="width: 50px" class="table-whitespace float-left">{{person.name}}</div>
+							<a class="deleteLabel" ng-click="deletePerson(person)" style="cursor: pointer;"></a>
+						</div>
+					</div>
+				</div>
+				
+				<section ng-show="alert.msg" class="col-md-4" style="position: absolute; top: 20px; left: 500px; z-index: 9999;">
+				    <div class="alert ng-scope ng-isolate-scope alert-dismissable" ng-class="['alert-' + (alert.type || 'warning'), alert.closeable ? 'alert-dismissable' : null]" role="alert">
+				        <button ng-show="alert.closeable" type="button" class="close" ng-click="alertInf.close(0)" data-dismiss="alert" aria-label="close">
+				            <span aria-hidden="true">×</span>
+				        </button>
+				        <div>
+				            <span class="ng-scope ng-binding" ng-bind="alert.msg"></span></div>
+				    </div>
+				</section>
+				
+			</div>
+		</div>
+	</div>
+</div>
+<div class="psdBtns">
+	<button type="button" class="btn btn-gray" ng-click="goBack()">取消</button>
+	<button type="button" class="btn btn-green" ng-click="addPerson()">添加设备</button>
+</div>
