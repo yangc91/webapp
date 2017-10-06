@@ -24,7 +24,7 @@
 	
 	<logger name="org.apache.shiro" level="ERROR" />
 	<logger name="org.springframework" level="DEBUG"/>
-	<logger name="org.directwebremoting" level="DEBUG"/>
+	<logger name="org.directwebremoting" level="ERROR"/>
 	<logger name="org.apache" level="ERROR"/>
 	<logger name="com.yc" level="DEBUG"/>
 

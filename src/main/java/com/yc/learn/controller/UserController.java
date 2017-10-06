@@ -1,6 +1,7 @@
 package com.yc.learn.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.yc.learn.bean.PageBean;
 import com.yc.learn.entity.UserInfo;
 import com.yc.learn.service.IUserService;
 import com.yc.learn.utils.JsonMapperProvide;
@@ -10,6 +11,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,17 +21,23 @@ import org.springframework.web.bind.annotation.RestController;
  * @Date: 2017-9-15 10:36
  */
 @RestController
-@RequestMapping("system/user/auth")
+@RequestMapping("system/user")
 public class UserController extends BaseController {
+
+  public UserController() {
+    System.out.println("---------");
+  }
 
   @Resource
   private IUserService userService;
 
   @RequestMapping("add")
-  public Object add(@RequestBody UserInfo userInfo, HttpServletResponse response, HttpServletRequest request)
+  public Object add(@RequestBody UserInfo userInfo, HttpServletResponse response,
+      HttpServletRequest request)
       throws JsonProcessingException {
-    if (logger.isInfoEnabled() ) {
-      logger.info("调用添加用户接口，输入参数：{}", JsonMapperProvide.alwaysMapper().writeValueAsString(userInfo));
+    if (logger.isInfoEnabled()) {
+      logger.info("调用添加用户接口，输入参数：{}",
+          JsonMapperProvide.alwaysMapper().writeValueAsString(userInfo));
     }
     Map<String, Object> result = new HashMap<>();
     result.put("success", "false");
@@ -42,8 +50,9 @@ public class UserController extends BaseController {
 
   @RequestMapping("update")
   public Object add(@RequestBody UserInfo userInfo) throws JsonProcessingException {
-    if (logger.isInfoEnabled() ) {
-      logger.info("调用编辑用户接口，输入参数：{}", JsonMapperProvide.alwaysMapper().writeValueAsString(userInfo));
+    if (logger.isInfoEnabled()) {
+      logger.info("调用编辑用户接口，输入参数：{}",
+          JsonMapperProvide.alwaysMapper().writeValueAsString(userInfo));
     }
     Map<String, Object> result = new HashMap<>();
     result.put("success", "false");
@@ -58,7 +67,7 @@ public class UserController extends BaseController {
 
   @RequestMapping("get")
   public Object add(String id) {
-    if (logger.isInfoEnabled() ) {
+    if (logger.isInfoEnabled()) {
       logger.info("调用查询指定用户接口，输入参数：{}", id);
     }
 
@@ -66,14 +75,12 @@ public class UserController extends BaseController {
   }
 
   @RequestMapping("list")
-  public Object get() {
-
-    if (logger.isInfoEnabled() ) {
+  @PreAuthorize("hasAuthority('user:list')")
+  public Object list(@RequestBody PageBean pageBean) {
+    if (logger.isInfoEnabled()) {
       logger.info("调用查询用户列表接口");
     }
-
-    LitePaging<UserInfo> pagination = new LitePaging<UserInfo>();
-    pagination.setDataList(userService.list());
+    LitePaging<UserInfo> pagination = userService.list(pageBean.getPageNumber(), pageBean.getPageSize());
     return pagination;
   }
 
@@ -82,5 +89,4 @@ public class UserController extends BaseController {
   public Object add() {
     return "";
   }
-
 }

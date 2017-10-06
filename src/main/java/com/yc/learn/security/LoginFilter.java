@@ -1,17 +1,22 @@
 package com.yc.learn.security;
 
+import com.yc.learn.exception.RestException;
 import com.yc.learn.utils.JsonMapperProvide;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +29,11 @@ import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import static org.springframework.security.jwt.codec.Codecs.utf8Decode;
 import static org.springframework.security.jwt.codec.Codecs.utf8Encode;
@@ -35,14 +44,18 @@ import static org.springframework.security.web.authentication.UsernamePasswordAu
  * @Auther: yangchun
  * @Date: 2017-8-26 16:09
  */
-public class LoginFilter  extends AbstractAuthenticationProcessingFilter {
+public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 
   private Logger logger = LoggerFactory.getLogger(LoginFilter.class);
 
   private String usernameParameter = SPRING_SECURITY_FORM_USERNAME_KEY;
   private String passwordParameter = SPRING_SECURITY_FORM_PASSWORD_KEY;
 
-  static final MacSigner hmacsha256 = new MacSigner(utf8Encode("uuidtest123456qwert"));
+  @Autowired
+  private MacSigner macSigner;
+
+  @Autowired
+  private JedisPool jedisPool;
 
   public LoginFilter(String defaultFilterProcessesUrl) {
     super(defaultFilterProcessesUrl);
@@ -53,21 +66,23 @@ public class LoginFilter  extends AbstractAuthenticationProcessingFilter {
       throws AuthenticationException, IOException, ServletException {
 
     if (true && !httpServletRequest.getMethod().equals("POST")) {
-      throw new AuthenticationServiceException("Authentication method not supported: " + httpServletRequest.getMethod());
+      throw new AuthenticationServiceException(
+          "Authentication method not supported: " + httpServletRequest.getMethod());
     }
-    //RunAsUserToken auth = new RunAsUserToken(null, null, null,null);
-    //if(!au)
-    //String token = httpServletRequest.getHeader("token");
-    //if ( null == token ) {
-    //  throw new RestException(HttpStatus.UNAUTHORIZED, "xxx", "xxx");
-    //}
+    //WebUtils
 
-    //if (logger.isDebugEnabled()) {
-    //  logger.debug("获取请求携带的Authorization:{}", token);
-    //}
-
-    String username = obtainUsername(httpServletRequest);
-    String password = obtainPassword(httpServletRequest);
+    // 表单参数
+    // String username = obtainUsername(httpServletRequest);
+    // String password = obtainPassword(httpServletRequest);
+    String username = null;
+    String password = null;
+    // 获取application/json
+    String params = getRequestPostBytes(httpServletRequest);
+    if (StringUtils.isNotBlank(params)) {
+      Map<String, String> map = JsonMapperProvide.alwaysMapper().readValue(params, Map.class);
+      username = map.get("username");
+      password = map.get("password");
+    }
 
     if (username == null) {
       username = "";
@@ -79,34 +94,63 @@ public class LoginFilter  extends AbstractAuthenticationProcessingFilter {
 
     username = username.trim();
 
-    UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
-    Jwt jwt = JwtHelper.encode(JsonMapperProvide.alwaysMapper().writeValueAsString(authRequest), hmacsha256);
+    UsernamePasswordAuthenticationToken authRequest =
+        new UsernamePasswordAuthenticationToken(username, password);
 
-    String token = utf8Decode(jwt.bytes());
-
-    Jwt jwtTest = JwtHelper.decodeAndVerify(token, hmacsha256);
     return this.getAuthenticationManager().authenticate(authRequest);
   }
 
-  //@Override
+  @Override
   public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
       throws IOException, ServletException {
 
+    String token = ((HttpServletRequest) req).getHeader("x-auth-token");
+    // TODO 校验token是否过期
+    if (null != token) {
+      try {
+        //Jwt jwt = JwtHelper.decodeAndVerify(token, hmacsha256);
+        //Map<String, Object> map = JsonMapperProvide.alwaysMapper().readValue (jwt.getClaims(), Map.class);
+        Jedis jedis = jedisPool.getResource();
+        String userStr = jedis.get(token);
+        jedis.close();
+        if (StringUtils.isNotBlank(userStr)) {
 
-    //String token = ((HttpServletRequest)req).getHeader("token");
-    List<GrantedAuthority> test = new ArrayList<>();
-    String token = ((HttpServletRequest)req).getParameter("token");
-
-    //TODO 暂时不拦截
-    //if ( null != token ) {
-      //Jwt jwt = JwtHelper.decodeAndVerify(token, hmacsha256);
-      //throw new RestException(HttpStatus.UNAUTHORIZED, "xxx", "xxx");
-      User user =new User("test", "123", true, true, true,true, test);
-      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, "123", test);
-      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-    //}
+          Map<String, Object> map = JsonMapperProvide.alwaysMapper().readValue(userStr, Map.class);
+          User user =
+              new User(map.get("username").toString(), "", new ArrayList<GrantedAuthority>());
+          UsernamePasswordAuthenticationToken authenticationToken =
+              new UsernamePasswordAuthenticationToken(user, user.getPassword(),
+                  user.getAuthorities());
+          authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(
+              (HttpServletRequest) req));
+          SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        }
+      } catch (Exception e) {
+        logger.error("----解析token出现异常-------", e);
+        //throw new AuthenticationException("token无效", e);
+        //unsuccessfulAuthentication(req, res, );
+        //authenticationEntryPoint.commence(request, response, failed);
+      }
+    }
 
     super.doFilter(req, res, chain);
+  }
+
+  private String getRequestPostBytes(HttpServletRequest request) throws IOException {
+    int contentLength = request.getContentLength();
+    if (contentLength < 0) {
+      return null;
+    }
+    byte buffer[] = new byte[contentLength];
+    for (int i = 0; i < contentLength; ) {
+      int readLen = request.getInputStream().read(buffer, i, contentLength - i);
+      if (readLen == -1) {
+        break;
+      }
+      i += readLen;
+    }
+
+    return new String(buffer);
   }
 
   protected String obtainUsername(HttpServletRequest request) {

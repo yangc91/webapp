@@ -3,6 +3,7 @@ package com.yc.learn.service.impl;
 import com.yc.learn.dao.UserDao;
 import com.yc.learn.entity.UserInfo;
 import com.yc.learn.service.IUserService;
+import com.yc.learn.utils.page.LitePaging;
 import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -40,5 +41,10 @@ public class UserServiceImpl implements IUserService {
   @Override
   public List<UserInfo> list() {
     return userDao.list();
+  }
+
+  @Override
+  public LitePaging<UserInfo> list(Integer pageNumber, Integer pageSize) {
+    return userDao.list(pageNumber, pageSize);
   }
 }

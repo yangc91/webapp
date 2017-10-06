@@ -1,63 +1,48 @@
 package com.yc.learn.exception;
 
-import java.util.Arrays;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 
 public class ApiError {
 
-    private HttpStatus status;
-    private String message;
-    private List<String> errors;
+  private HttpStatus status;
+  private String code;
+  private String msg;
 
-    //
+  //
 
-    public ApiError() {
-        super();
-    }
+  public ApiError() {
+    super();
+  }
 
-    public ApiError(final HttpStatus status, final String message, final List<String> errors) {
-        super();
-        this.status = status;
-        this.message = message;
-        this.errors = errors;
-    }
+  public ApiError(final HttpStatus status, final String code, final String msg) {
+    super();
+    this.status = status;
+    this.code = code;
+    this.msg = msg;
+  }
 
-    public ApiError(final HttpStatus status, final String message, final String error) {
-        super();
-        this.status = status;
-        this.message = message;
-        errors = Arrays.asList(error);
-    }
+  //
+  public HttpStatus getStatus() {
+    return status;
+  }
 
-    //
+  public void setStatus(final HttpStatus status) {
+    this.status = status;
+  }
 
-    public HttpStatus getStatus() {
-        return status;
-    }
+  public String getMsg() {
+    return msg;
+  }
 
-    public void setStatus(final HttpStatus status) {
-        this.status = status;
-    }
+  public void setMsg(String msg) {
+    this.msg = msg;
+  }
 
-    public String getMessage() {
-        return message;
-    }
+  public String getCode() {
+    return code;
+  }
 
-    public void setMessage(final String message) {
-        this.message = message;
-    }
-
-    public List<String> getErrors() {
-        return errors;
-    }
-
-    public void setErrors(final List<String> errors) {
-        this.errors = errors;
-    }
-
-    public void setError(final String error) {
-        errors = Arrays.asList(error);
-    }
-
+  public void setCode(String code) {
+    this.code = code;
+  }
 }

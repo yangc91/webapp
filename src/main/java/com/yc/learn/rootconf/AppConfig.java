@@ -31,28 +31,28 @@ import redis.clients.jedis.JedisPoolConfig;
     ignore-unresolvable=
  *
  */
-@Configuration
+//@Configuration
 //@ComponentScan(basePackages = {"com.yc.learn"})
-@ComponentScan(basePackages = {"com.yc.learn"},excludeFilters = {@ComponentScan.Filter(type= FilterType.ANNOTATION, value = {EnableWebMvc.class,
+//@ComponentScan(basePackages = {"com.yc.learn"},excludeFilters = {@ComponentScan.Filter(type= FilterType.ANNOTATION, value = {EnableWebMvc.class,
     //org.springframework.stereotype.Controller.class
-    })
+//    })
 //,@ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, value = FooController.class)
-    ,@ComponentScan.Filter(type= FilterType.REGEX, pattern = {"com.yc.learn.controller.*", "com.yc.learn.restconf.*"})
+//    ,@ComponentScan.Filter(type= FilterType.REGEX, pattern = {"com.yc.learn.controller.*", "com.yc.learn.restconf.*"})
     //, "com.yc.learn.restconf.*"
-})
-@PropertySource({"classpath:system.properties"})
-@ImportResource({"classpath*:/rest_config.xml"})
+//})
+//@PropertySource({"classpath:system.properties"})
+//@ImportResource({"classpath*:/rest_config.xml"})
 public class AppConfig {
 
-  @Bean
+  //@Bean
   public static PropertySourcesPlaceholderConfigurer properties() {
     return new PropertySourcesPlaceholderConfigurer();
   }
 
-  @Autowired
+  //@Autowired
   private Environment environment;
 
-  @Bean
+  //@Bean
   public NutDao nutDao(DataSource dataSource) {
     return new NutDao(dataSource);
   }
@@ -73,7 +73,7 @@ public class AppConfig {
     return dataSource;
   }
 
-  @Bean
+  //@Bean
   public JedisPool jedisPool() {
     String host = environment.getProperty("redis.host", "localhost");
     String port = environment.getProperty("redis.port", "6379");

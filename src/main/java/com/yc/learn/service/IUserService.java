@@ -1,6 +1,7 @@
 package com.yc.learn.service;
 
 import com.yc.learn.entity.UserInfo;
+import com.yc.learn.utils.page.LitePaging;
 import java.util.List;
 
 /**
@@ -39,8 +40,15 @@ public interface IUserService {
   void update(UserInfo userInfo);
 
   /**
-   * 查询用户列表
+   * 查询用户列表(全部)
    * @return
    */
   List<UserInfo> list();
+
+  /**
+   * 分页查询用户列表
+   * @return
+   */
+  LitePaging<UserInfo> list(Integer pageNo, Integer pageSize);
+
 }

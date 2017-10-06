@@ -1,16 +1,21 @@
 package com.yc.learn.security.detailsService;
 
+import com.yc.learn.bean.UserGrantedAuthority;
+import com.yc.learn.bean.UserLoginInfo;
+import com.yc.learn.entity.UserInfo;
+import com.yc.learn.service.IUserService;
 import java.util.Collection;
 import java.util.HashSet;
-import javax.sql.DataSource;
+import java.util.Set;
+import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.provisioning.UserDetailsManager;
 
 /**
  * @Auther: yangchun
@@ -18,49 +23,44 @@ import org.springframework.security.provisioning.UserDetailsManager;
  */
 public class CustomUserDetailsService implements UserDetailsService {
 
-  private final Logger logger = LoggerFactory.getLogger(CustomUserDetailsService.class);
+    private static Logger logger = LoggerFactory.getLogger(CustomUserDetailsService.class);
 
-  @Autowired
-  private DataSource dataSource;
+    @Resource
+    private IUserService userService;
 
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    try {
-      User user = new User("user", "password", null);
-      //if (user != null) return new CustomUserDetails(user, getAuthorities(user));
-      return user;
-    } catch (Exception ex) {
-      logger.error("Exception in CustomUserDetailsService: " + ex);
+    public CustomUserDetailsService() {
+        super();
     }
-    return null;
-  }
 
-  public void createUser(UserDetails userDetails) {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserInfo userInfo = null;
+        try {
+            userInfo = userService.getUserByName(username);
+        } catch (Exception ex) {
+            logger.error("查询用户信息出现异常: " + ex);
+        }
+        if (userInfo != null) {
+            //TODO 权限
+            UserGrantedAuthority authority = new UserGrantedAuthority("user:list");
+            Set<UserGrantedAuthority> set = new HashSet<UserGrantedAuthority>();
+            set.add(authority);
 
-  }
+            UserLoginInfo user =
+                new UserLoginInfo(userInfo.getId(), userInfo.getLoginName(), userInfo.getPassword(),
+                    set);
+            return user;
+        } else {
+            logger.error("Query returned no results for user '" + username + "'");
+            throw new UsernameNotFoundException("未知用户");
+        }
+    }
 
-  public void updateUser(UserDetails userDetails) {
-
-  }
-
-  public void deleteUser(String s) {
-
-  }
-
-  public void changePassword(String s, String s1) {
-
-  }
-
-  public boolean userExists(String s) {
-    return false;
-  }
-
-  //private Collection<GrantedAuthority> getAuthorities(User user) {
-  //  Collection<GrantedAuthority> authorities = new HashSet<>();
-  //  for (Role role : user.getRoles()) {
-  //    GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getRole());
-  //    authorities.add(grantedAuthority);
-  //  }
-  //  return authorities;
-  //}
-
+    private Collection<GrantedAuthority> getAuthorities(User user) {
+        Collection<GrantedAuthority> authorities = new HashSet<>();
+        //for (Role role : user.getRoles()) {
+        //  GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getRole());
+        //  authorities.add(grantedAuthority);
+        //}
+        return authorities;
+    }
 }

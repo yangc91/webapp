@@ -1,6 +1,7 @@
 package com.yc.learn.dao;
 
 import com.yc.learn.entity.UserInfo;
+import com.yc.learn.utils.page.LitePaging;
 import java.util.ArrayList;
 import java.util.List;
 import org.nutz.dao.Cnd;
@@ -41,5 +42,21 @@ public class UserDao {
     Criteria cri = Cnd.cri();
     List<UserInfo> list = nutDao.query(UserInfo.class, cri);
     return list;
+  }
+
+  public LitePaging<UserInfo> list(Integer pageNumber, Integer pageSize) {
+    Pager pager = nutDao.createPager(pageNumber, pageSize);
+    Criteria cri = Cnd.cri();
+
+    List<UserInfo> list = nutDao.query(UserInfo.class, cri, pager);
+    int count = nutDao.count(UserInfo.class, cri);
+
+    LitePaging<UserInfo> litePaging = new LitePaging<>();
+    litePaging.setDataList(list);
+    litePaging.setPageNo(pageNumber);
+    litePaging.setPageSize(pageSize);
+    litePaging.setTotalCount(count);
+
+    return litePaging;
   }
 }
