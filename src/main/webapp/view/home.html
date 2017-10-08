@@ -11,7 +11,7 @@
 </script>
 <![endif]-->
 <head>
-    <title>title</title>
+    <title>集团管理平台</title>
     <link href="../images/favicon.ico" rel="shortcut icon"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -59,9 +59,9 @@
 
 <!--首页头部开始-->
 <div class="logoPic">
-    <img class="curpos float-left" style="margin-right: 5px;height: 40px;" ng-click="goIndex()" title="spring security learn" src="../themes/default/images/tree.svg"/>
+    <img class="curpos float-left" style="margin-right: 5px;height: 40px;" ng-click="goIndex()" title="集团管理平台" src="../themes/default/images/tree.svg"/>
     <!--<img class="curpos float-left" style="margin-right: 5px;height: 40px;" ng-click="goIndex()" title="spring security learn" src="../themes/default/images/tree.svg"/>-->
-    <p class="logoWord">Spring Security Learn</p>
+    <p class="logoWord">集团管理平台</p>
 </div>
 <ul class="index-menu">
     <li ng-repeat="it in menus" ng-class="{'selected':selected == it}" ng-click="clickMenu(it)">
@@ -89,7 +89,7 @@
 				<span class="lockDiv"></span> 修改密码
 			</a>
 		</li>
-		<li class="lock">
+		<li class="lock" ng-click="logout()">
             <a href="#">
 				<span class="quitDiv"></span>
 				退出系统
@@ -128,5 +128,7 @@
     <script src="../script/app.js" type="text/javascript" charset="utf-8"></script>
     <script src="../script/controllers/rootCtr.js" type="text/javascript" charset="utf-8"></script>
 
+    <script src="/webdemo/script/lib/jquery/jquery-1.11.1.min.js"></script>
+    <script src="/webdemo/script/utils/common.js"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
  * Created by 马德成
  * @date 2016/6/6
  */
-app.controller('rootCtr', ['$rootScope', '$scope', '$timeout', '$state', function ($rootScope, $scope, $timeout, $state) {
+app.controller('rootCtr', ['$rootScope', '$scope', '$http', '$timeout', '$state', function ($rootScope, $scope, $http, $timeout, $state) {
     $scope.selected;
     //$scope.menus = menus;
     //$scope.menus = [{ 'text': "首页",'url': '/index'}];
@@ -95,10 +95,18 @@ app.controller('rootCtr', ['$rootScope', '$scope', '$timeout', '$state', functio
      * 退出
      * @param message
      */
-    var logout = function() {
-        //location.href = "../logout.do";
+    $scope.logout = function() {
+        $http({
+            url: base + '/public/logout', method: 'POST',
+            //data: condition,
+            //cache: false,
+            headers: {"x-auth-token" : cookieObj.get("x-auth-token")},
+            responseType: "json"
+        })
+        .success(function (result) {
+            cookieObj.remove("x-auth-token");
+            location.href = "./login.html";
+        });
     }
-
-
 
 }]);

@@ -2,6 +2,7 @@ package com.yc.learn.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yc.learn.bean.PageBean;
+import com.yc.learn.bean.UserListBean;
 import com.yc.learn.entity.UserInfo;
 import com.yc.learn.service.IUserService;
 import com.yc.learn.utils.JsonMapperProvide;
@@ -74,13 +75,15 @@ public class UserController extends BaseController {
     return userService.getUserById(id);
   }
 
+  // TODO 过滤密码属性
   @RequestMapping("list")
-  @PreAuthorize("hasAuthority('user:list')")
-  public Object list(@RequestBody PageBean pageBean) {
+  //@PreAuthorize("hasAuthority('user:list')")
+  public Object list(@RequestBody UserListBean userListBean) {
     if (logger.isInfoEnabled()) {
       logger.info("调用查询用户列表接口");
     }
-    LitePaging<UserInfo> pagination = userService.list(pageBean.getPageNumber(), pageBean.getPageSize());
+    LitePaging<UserInfo> pagination = userService.list(userListBean.getPageBean().getPageNumber(),
+        userListBean.getPageBean().getPageSize());
     return pagination;
   }
 

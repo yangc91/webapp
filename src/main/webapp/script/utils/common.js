@@ -282,86 +282,86 @@ String.prototype.formatComma = function () {
   }
 };
 
-var layer;
-//配置全局拦截器
-layui.use('layer', function () {
-  layer = layui.layer;
-  layer.config({
-    btnAlign: 'c',//默认按钮居中对齐
-    resize: false,//默认不可拉伸
-    closeBtn: 0//默认不显示右上角关闭阿牛
-  });
-  $.ajaxPrefilter(function (options) {
-    options.timeout = 60000;
-    options.dataType = "json";
-    //options.contentType = "application/json";
-    if (options.headers && options.headers.ticket) {
-
-    } else {
-      options.headers = {
-        "ticket": cookieObj.get("ticket") == "undefined" ? "" : cookieObj.get("ticket")
-      }
-    }
-    options.cache = false;
-  });
-  $(document).ajaxStart(function () {
-    layer.load();
-  }).ajaxSend(function (event, request, settings) {
-  }).ajaxError(function (event, xhr, options, exc) {
-    var status = xhr.status;
-    if (status == 401) {
-      layer.open({
-        title: '提示'
-        , content: '页面已过期，请重新登录'
-        ,yes: function(index){
-          window.location.href = "login.html";
-          layer.close(index);
-        }
-      });
-    } else if (status == 403) {
-      layer.open({
-        title: '提示'
-        , content: '页面已过期，请重新登录'
-        ,yes: function(index){
-          window.location.href = "login.html";
-          layer.close(index);
-        }
-      });
-    } else if (status == 404) {
-      layer.open({
-        title: '提示'
-        , content: '请求地址不存在'
-      });
-    } else if (status == 500) {
-      layer.open({
-        title: '提示'
-        , content: '服务器内部异常'
-      });
-    } else if (status == 502) {
-      layer.open({
-        title: '提示'
-        , content: '服务未启动，请先检查服务状态'
-      });
-    } else if (status == 503) {
-      layer.open({
-        title: '提示'
-        , content: '服务器已超载或维护中导致请求无法完成'
-      });
-    } else if (status == 504) {
-      layer.open({
-        title: '提示'
-        , content: '请求超时,请稍候重试'
-      });
-    } else {
-      layer.open({
-        title: '提示'
-        , content: '网络异常'
-      });
-    }
-  }).ajaxComplete(function () {
-    layer.closeAll('loading');
-  });
-});
+// var layer;
+// //配置全局拦截器
+// layui.use('layer', function () {
+//   layer = layui.layer;
+//   layer.config({
+//     btnAlign: 'c',//默认按钮居中对齐
+//     resize: false,//默认不可拉伸
+//     closeBtn: 0//默认不显示右上角关闭阿牛
+//   });
+//   $.ajaxPrefilter(function (options) {
+//     options.timeout = 60000;
+//     options.dataType = "json";
+//     //options.contentType = "application/json";
+//     if (options.headers && options.headers.ticket) {
+//
+//     } else {
+//       options.headers = {
+//         "ticket": cookieObj.get("ticket") == "undefined" ? "" : cookieObj.get("ticket")
+//       }
+//     }
+//     options.cache = false;
+//   });
+//   $(document).ajaxStart(function () {
+//     layer.load();
+//   }).ajaxSend(function (event, request, settings) {
+//   }).ajaxError(function (event, xhr, options, exc) {
+//     var status = xhr.status;
+//     if (status == 401) {
+//       layer.open({
+//         title: '提示'
+//         , content: '页面已过期，请重新登录'
+//         ,yes: function(index){
+//           window.location.href = "login.html";
+//           layer.close(index);
+//         }
+//       });
+//     } else if (status == 403) {
+//       layer.open({
+//         title: '提示'
+//         , content: '页面已过期，请重新登录'
+//         ,yes: function(index){
+//           window.location.href = "login.html";
+//           layer.close(index);
+//         }
+//       });
+//     } else if (status == 404) {
+//       layer.open({
+//         title: '提示'
+//         , content: '请求地址不存在'
+//       });
+//     } else if (status == 500) {
+//       layer.open({
+//         title: '提示'
+//         , content: '服务器内部异常'
+//       });
+//     } else if (status == 502) {
+//       layer.open({
+//         title: '提示'
+//         , content: '服务未启动，请先检查服务状态'
+//       });
+//     } else if (status == 503) {
+//       layer.open({
+//         title: '提示'
+//         , content: '服务器已超载或维护中导致请求无法完成'
+//       });
+//     } else if (status == 504) {
+//       layer.open({
+//         title: '提示'
+//         , content: '请求超时,请稍候重试'
+//       });
+//     } else {
+//       layer.open({
+//         title: '提示'
+//         , content: '网络异常'
+//       });
+//     }
+//   }).ajaxComplete(function () {
+//     layer.closeAll('loading');
+//   });
+// });
 
 
 
