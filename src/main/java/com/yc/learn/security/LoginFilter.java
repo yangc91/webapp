@@ -1,5 +1,6 @@
 package com.yc.learn.security;
 
+import com.yc.learn.bean.UserLoginInfo;
 import com.yc.learn.exception.RestException;
 import com.yc.learn.utils.JsonMapperProvide;
 import java.io.IOException;
@@ -61,6 +62,7 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
     super(defaultFilterProcessesUrl);
   }
 
+  @Override
   public Authentication attemptAuthentication(HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse)
       throws AuthenticationException, IOException, ServletException {
@@ -114,15 +116,15 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
         String userStr = jedis.get(token);
         jedis.close();
         if (StringUtils.isNotBlank(userStr)) {
-
-          Map<String, Object> map = JsonMapperProvide.alwaysMapper().readValue(userStr, Map.class);
-          User user =
-              new User(map.get("username").toString(), "", new ArrayList<GrantedAuthority>());
+          UserLoginInfo userLoginInfo = JsonMapperProvide.alwaysMapper().readValue(userStr, UserLoginInfo.class);
+          //User user =
+          //    new User(userLoginInfo.getUsername(), "", new ArrayList<GrantedAuthority>());
           UsernamePasswordAuthenticationToken authenticationToken =
-              new UsernamePasswordAuthenticationToken(user, user.getPassword(),
-                  user.getAuthorities());
-          authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(
-              (HttpServletRequest) req));
+              new UsernamePasswordAuthenticationToken(userLoginInfo, userLoginInfo.getPassword(),
+                  userLoginInfo.getAuthorities());
+          //authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(
+          //    (HttpServletRequest) req));
+          authenticationToken.setDetails(userLoginInfo);
           SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
       } catch (Exception e) {

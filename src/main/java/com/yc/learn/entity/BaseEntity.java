@@ -16,6 +16,26 @@ public class BaseEntity implements Serializable {
 	@Prev(els=@EL("$me.genID()"))
 	private String id;
 
+	/**
+	 * 创建人
+	 */
+	private String creater;
+
+	/**
+	 * 创建时间
+	 */
+	private Long createTime;
+
+	/**
+	 * 更新人
+	 */
+	private String updater;
+
+	/**
+	 * 更新时间
+	 */
+	private Long updateTime;
+
 	public String getId() {
 		return id;
 	}

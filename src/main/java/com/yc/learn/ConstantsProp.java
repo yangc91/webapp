@@ -11,4 +11,10 @@ public class ConstantsProp {
    * 登录信息redis前缀
    */
   public static final String REDIS_LONGIN_PREFIX = "login-";
+
+  /**
+   * 默认密码
+   */
+  public static String DEFAULT_PASSWORD = "000000";
+
 }

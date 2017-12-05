@@ -15,9 +15,12 @@ public class FileNameChange {
   public static Logger logger = LoggerFactory.getLogger(FileNameChange.class);
 
   public static void main(String[] args) throws Exception {
-    File rootFile = new File("./");
+    String s = "ab";
+    String b = "ab";
+    System.out.println(s == b);
+    //File rootFile = new File("./");
     //recursionCopyDir(rootFile);
-    recursionDeleteDir(rootFile);
+    //recursionDeleteDir(rootFile);
   }
 
   /**

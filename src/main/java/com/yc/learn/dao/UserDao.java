@@ -1,14 +1,30 @@
 package com.yc.learn.dao;
 
+import com.yc.learn.ConstantsProp;
+import com.yc.learn.bean.UserGrantedAuthority;
+import com.yc.learn.entity.Authority;
 import com.yc.learn.entity.UserInfo;
 import com.yc.learn.utils.page.LitePaging;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import javax.annotation.Resource;
 import org.nutz.dao.Cnd;
+import org.nutz.dao.Sqls;
 import org.nutz.dao.impl.NutDao;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.sql.Criteria;
+import org.nutz.dao.sql.Sql;
+import org.nutz.dao.sql.SqlCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -18,8 +34,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UserDao {
 
-  @Autowired
-  public NutDao nutDao;
+  public Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  @Resource
+  private NutDao nutDao;
 
   public UserInfo add(UserInfo userInfo) {
     return nutDao.insert(userInfo);
@@ -58,5 +76,30 @@ public class UserDao {
     litePaging.setTotalCount(count);
 
     return litePaging;
+  }
+
+  /**
+   * 修改密码
+   */
+  public Boolean updatePassword(String userId, String newPwd) {
+    StringBuffer sqlBuffer =
+        new StringBuffer(" UPDATE t_sys_user SET c_password = @password WHERE C_ID = @id");
+    Sql sql = Sqls.create(sqlBuffer.toString());
+    sql.params().set("password", newPwd).set("id", userId);
+    nutDao.execute(sql);
+
+    return true;
+  }
+
+  public Set<String> listAuthroty(String userId) {
+    Sql sql = Sqls.create(
+        " SELECT nsi.c_id as itemId FROM t_uaas_net_strategy_item nsi where nsi.c_item_code in (@codes) ");
+    //sql.params().set("codes", codes.toArray(new String[0]));
+    sql.setCallback(Sqls.callback.strList());
+    nutDao.execute(sql);
+    List<String> authoritys = sql.getList(String.class);
+    Set<String> set = new HashSet<String>();
+    set.addAll(authoritys);
+    return set;
   }
 }

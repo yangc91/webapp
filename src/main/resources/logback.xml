@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 	<!--日志文件的名称，根据系统自动追加日期和后缀-->
-	<property name="LOG_FILE_NAME" value="rias"/>
+	<property name="LOG_FILE_NAME" value="webapp"/>
 	<!-- 控制台输出，开发调试可以在下文root中添加项-->
 	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
@@ -23,7 +23,7 @@
 	</appender>
 	
 	<logger name="org.apache.shiro" level="ERROR" />
-	<logger name="org.springframework" level="DEBUG"/>
+	<logger name="org.springframework" level="ERROR"/>
 	<logger name="org.directwebremoting" level="ERROR"/>
 	<logger name="org.apache" level="ERROR"/>
 	<logger name="com.yc" level="DEBUG"/>

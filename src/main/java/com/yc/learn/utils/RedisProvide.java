@@ -27,9 +27,9 @@ public class RedisProvide {
     //config.setMaxIdle(Integer.valueOf(maxIdle));
     //config.setMaxTotal(Integer.valueOf(maxTotal));
 
-    JedisPool pool = new JedisPool(config, "11.12.108.83", Integer.valueOf("6379"), Integer.valueOf("6000"));
+    JedisPool pool = new JedisPool(config, "11.12.109.122", Integer.valueOf("6379"), Integer.valueOf("6000"));
     Jedis jedis = pool.getResource();
-    String info = jedis.hget("uaas_login_info_unique","020022");
+    String info = jedis.hget("uaas_login_info_unique","000001");
     System.out.println(info);
   }
 }

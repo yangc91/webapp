@@ -2,7 +2,6 @@ package com.yc.learn.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yc.learn.annotation.PrePermission;
-import com.yc.learn.service.FooService;
 import com.yc.learn.service.IUserService;
 import com.yc.learn.utils.JsonMapperProvide;
 import java.util.HashMap;
@@ -25,20 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("foo")
 public class FooController {
 
-  public FooController() {
-    //SecurityContextHolder.getContext().setAuthentication();
-    System.out.println("FooController init……");
-  }
-
   @Autowired
   @Qualifier("userServiceImpl")
   private IUserService userService;
 
   @Resource
   private IUserService userServiceImpl;
-
-  @Autowired
-  private FooService fooService;
 
   @Autowired
   private NutDao nutDao;

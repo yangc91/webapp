@@ -7,7 +7,7 @@ app.add.controller('userListCtr', ['$scope', '$state', '$sce', 'ngTableParams', 
 
   $scope.faceImg = "littleTrouble";
   // draw 参数，后台修改后可去除
-  var condition = {};
+  var condition = {draw: 1};
 
   //回车键搜索
   $scope.myKeyup = function (e) {
@@ -172,7 +172,6 @@ app.add.controller('userListCtr', ['$scope', '$state', '$sce', 'ngTableParams', 
   $scope.tableParams = new ngTableParams({
     page: 1,  // 初始化显示第几页
     count: window.innerWidth > 1600 ? 10 : (window.innerWidth > 1366 ? 7 : 5) //初始化分页大小
-    //count: 2
   }, {
     counts: [/*5,10,20*/], //控制每页显示大小
     paginationMaxBlocks: 5, //最多显示页码按钮个数
@@ -182,35 +181,32 @@ app.add.controller('userListCtr', ['$scope', '$state', '$sce', 'ngTableParams', 
       var size = params.count();
 
       //condition.start = ( page - 1 ) * size;
-      //condition.pageNumber = page;
-      //condition.pageSize = size;
+      condition.pageNumber = page;
+      condition.pageSize = size;
       condition.search = $scope.search;
-      condition.pageBean = {
-        pageNumber : page,
-        pageSize : size
+
+      if (null != $scope.selectDept) {
+        condition.deptId = $scope.selectDept.id;
+      } else {
+        condition.deptId = null;
       }
-      // if (null != $scope.selectDept) {
-      //   condition.deptId = $scope.selectDept.id;
-      // } else {
-      //   condition.deptId = null;
-      // }
 
       condition.bindAsset = bindAsset;
       condition.deviceModelArray = deviceModelSelectList;
       condition.deviceGroupArray = deviceGroupSelectList;
 
       $http({
-        url: base + '/system/user/list',
+        url: base + '/system/user/auth/list',
         method: 'POST',
-        headers: {"x-auth-token" : cookieObj.get("x-auth-token")},
-        data: JSON.stringify(condition),
+        data: condition,
         cache: false,
         responseType: "json"
       })
       .success(function (result) {
         //var data = result.data;
         //$scope.totalRecords = result.persionTotalNum;
-        $scope.totalRecords = result.totalCount;
+        $scope.totalRecords = 10;
+
         var totalCount = result.totalCount;
         var dataList = result.dataList;
         $scope.totalCount = totalCount;
@@ -277,186 +273,4 @@ app.add.controller('userListCtr', ['$scope', '$state', '$sce', 'ngTableParams', 
   $scope.changeGroup = function () {
     $scope.deviceGroupShow = !$scope.deviceGroupShow;
   }
-
-
-  $scope.addUser = function(check){
-    if(check){
-      $scope.openUserDialog();
-    }else{
-      return;
-    }
-  }
-  //确认重置密码提示
-  $scope.confirmPwd = function (user) {
-    var _scope = $scope;
-    var id = user.id;
-    dialog.openDialog({
-      title:"重置密码",
-      icon:'secondConfirm',
-      content:'<p class="confirmTip">确定要重置该管理员的密码吗？</p>\
-		        		<p class="w300 fs14">\
-		        			重置后的密码是111111\
-		        		</p>\
-		        		<p class="w300 fs14 mt10">\
-		        			别忘了提示他及时登录并修改密码哦~\
-		        		</p>',
-      buttons:[
-        {
-          name:"取消",
-          className:"btn-gray",
-          callback:function($scope, dia, button, config){
-
-          }
-        },
-        {
-          name:"重置",
-          className:"btn-red",
-          callback:function($scope, dia, button, config){
-            $http({
-              method : 'POST',
-              url : 'system/user/resetPwd.do',
-              params : {userId:id},
-              responseType :  "json"
-            }).success(function (result) {
-              if (result.result && result.result == "success") {
-                var length = _scope.alerts.push(
-                    {
-                      type:'success',
-                      msg:"恭喜,重置密码成功!"
-                    }
-                );
-
-                $timeout(function(){
-                  _scope.alerts.splice(length-1, 1);
-                }, 2000);
-              }
-            });
-          }
-        }
-      ]
-    })
-  };
-
-  //删除单个管理员
-  $scope.deleteOneUser = function(user){
-    var _scope = $scope;
-    var ids = user.id;
-    dialog.openDialog({
-      title:"删除管理员",
-      icon:'secondConfirm',
-      contentClass:"w350",
-      content:'<p class="secondConfirm">确定要删除该管理员吗？</p>\
-		        		<p class="w300 fs14">\
-		        			删除后不可恢复\
-		        		</p>',
-      buttons:[
-        {
-          name:"取消",
-          className:"btn-gray",
-          callback:function($scope, dia, button, config){
-
-          }
-        },
-        {
-          name:"删除",
-          className:"btn-red",
-          callback:function($scope, dia, button, config){
-            $http({
-              method : 'POST',
-              url : 'system/user/remove.do',
-              params : {ids:ids},
-              responseType :  "json"
-            }).success(function (result) {
-              _scope.alerts.push(
-                  {
-                    type:'success',
-                    msg:"恭喜,删除成功!"
-                  }
-              );
-
-              $timeout(function(){
-                _scope.alerts.splice(0, 1);
-              }, 2000);
-              tableReload();
-            });
-          }
-        }
-      ]
-    })
-  }
-
-  //删除管理员
-  $scope.deleteUser = function(){
-    var _scope = $scope;
-    var items = Object.keys(checkboxes.items);
-    if (items.length > 0) {
-      dialog.openDialog({
-        title:"删除管理员",
-        icon:'secondConfirm',
-        contentClass:"w350",
-        content:'<p class="secondConfirm">确定要删除该管理员吗？</p>\
-			        		<p class="w300 fs14">\
-			        			删除后不可恢复\
-			        		</p>',
-        buttons:[
-          {
-            name:"取消",
-            className:"btn-gray",
-            callback:function($scope, dia, button, config){
-
-            }
-          },
-          {
-            name:"删除",
-            className:"btn-red",
-            callback:function($scope, dia, button, config){
-              var ids = items;
-              $http({
-                method : 'POST',
-                url : 'system/user/remove.do',
-                params : {ids:ids},
-                responseType :  "json"
-              }).success(function (result) {
-                _scope.alerts.push(
-                    {
-                      type:'success',
-                      msg:"恭喜,删除成功!"
-                    }
-                );
-
-                $timeout(function(){
-                  _scope.alerts.splice(0, 1);
-                }, 2000);
-                tableReload();
-                checkboxes.checked = false;
-                checkboxes.items = {}; //清空已选择
-              });
-            }
-          }
-        ]
-      })
-    } else {
-      _scope.alerts = [{
-        type:'warning',
-        msg:"请先选择管理员!"
-      }];
-      $timeout(function(){
-        _scope.alerts = [];
-      }, 2000);
-
-      return;
-    }
-  }
-
-  //进入添加页面和控制器
-  $scope.openUserDialog = function () {
-    $state.go("ecss/system/user/toAddUser");
-  }
-
-  //进入编辑页面和控制器
-  $scope.openEditUserDialog = function (editorData) {
-    editorData = editorData || {};
-    $state.go("ecss/system/user/toEdit", { id : editorData.id});
-  }
-
 }]);

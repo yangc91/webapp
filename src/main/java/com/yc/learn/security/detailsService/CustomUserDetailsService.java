@@ -23,44 +23,42 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  */
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private static Logger logger = LoggerFactory.getLogger(CustomUserDetailsService.class);
+  private static Logger logger = LoggerFactory.getLogger(CustomUserDetailsService.class);
 
-    @Resource
-    private IUserService userService;
+  @Resource
+  private IUserService userService;
 
-    public CustomUserDetailsService() {
-        super();
+  public CustomUserDetailsService() {
+    super();
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    UserInfo userInfo = null;
+    try {
+      userInfo = userService.getUserByName(username);
+    } catch (Exception ex) {
+      logger.error("查询用户信息出现异常: " + ex);
     }
+    if (userInfo != null) {
 
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserInfo userInfo = null;
-        try {
-            userInfo = userService.getUserByName(username);
-        } catch (Exception ex) {
-            logger.error("查询用户信息出现异常: " + ex);
-        }
-        if (userInfo != null) {
-            //TODO 权限
-            UserGrantedAuthority authority = new UserGrantedAuthority("user:list");
-            Set<UserGrantedAuthority> set = new HashSet<UserGrantedAuthority>();
-            set.add(authority);
-
-            UserLoginInfo user =
-                new UserLoginInfo(userInfo.getId(), userInfo.getLoginName(), userInfo.getPassword(),
-                    set);
-            return user;
-        } else {
-            logger.error("Query returned no results for user '" + username + "'");
-            throw new UsernameNotFoundException("未知用户");
-        }
+      Set<UserGrantedAuthority> authoritySet = userService.listAuthroty(userInfo.getId());
+      UserLoginInfo user =
+          new UserLoginInfo(userInfo.getId(), userInfo.getLoginName(), userInfo.getPassword(),
+              authoritySet);
+      return user;
+    } else {
+      logger.error("Query returned no results for user '" + username + "'");
+      throw new UsernameNotFoundException("未知用户");
     }
+  }
 
-    private Collection<GrantedAuthority> getAuthorities(User user) {
-        Collection<GrantedAuthority> authorities = new HashSet<>();
-        //for (Role role : user.getRoles()) {
-        //  GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getRole());
-        //  authorities.add(grantedAuthority);
-        //}
-        return authorities;
-    }
+  //private Collection<GrantedAuthority> getAuthorities(User user) {
+  //  Collection<GrantedAuthority> authorities = new HashSet<>();
+  //  for (Role role : user.getRoles()) {
+  //    GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getRole());
+  //    authorities.add(grantedAuthority);
+  //  }
+  //  return authorities;
+  //}
 }

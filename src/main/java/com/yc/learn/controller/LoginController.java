@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.nutz.dao.impl.NutDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,10 +48,10 @@ public class LoginController extends BaseController {
   private JedisPool jedisPool;
 
   @RequestMapping(value = "public/login", method = RequestMethod.POST)
-  public Object login(@RequestBody AuthenticationRequest authenticationRequest)
+  public Object login(@RequestBody AuthenticationRequest authenticationRequest, HttpServletRequest request, HttpServletResponse response)
       throws JsonProcessingException {
 
-    logger.info("==========获取登录请求的输入参数: username: {}", authenticationRequest.getUsername());
+    logger.info("==========获取登录请求的输入参数: username: {}",authenticationRequest.getUsername());
 
     if (StringUtils.isBlank(authenticationRequest.getUsername()) || StringUtils.isBlank(
         authenticationRequest.getPassword())) {
@@ -68,8 +70,6 @@ public class LoginController extends BaseController {
       throw new RestException(HttpStatus.BAD_REQUEST, "0x003", "用户名或密码错误");
     }
 
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-
     String token = UUID.randomUUID().toString().replace("-", "");
 
     UserLoginInfo userLoginInfo =
@@ -84,29 +84,10 @@ public class LoginController extends BaseController {
     jedis.close();
     Map<String, Object> map = new HashMap<String, Object>();
     map.put("token", token);
-    map.put("username", userLoginInfo.getUsername());
-    //map.put("menu", token);
 
-    return map;
-  }
+    ((UsernamePasswordAuthenticationToken)authentication).setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-  @RequestMapping(value = "public/logout")
-  public Object logout(HttpServletRequest request) throws JsonProcessingException {
-
-    logger.info("==========调用注销接口=============");
-    String token = request.getHeader("x-auth-token");
-
-    if (StringUtils.isBlank(token)) {
-      throw new RestException(HttpStatus.BAD_REQUEST, "0x0001", "缺少必要参数");
-    }
-
-    // 将用户信息从redis中删除
-    Jedis jedis = jedisPool.getResource();
-    // 1个小时有效期
-    jedis.del(REDIS_LONGIN_PREFIX + token);
-    jedis.close();
-    Map<String, Object> map = new HashMap<String, Object>();
-    map.put("success", true);
     return map;
   }
 }

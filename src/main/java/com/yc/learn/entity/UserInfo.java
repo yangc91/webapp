@@ -17,16 +17,36 @@ public class UserInfo extends BaseEntity {
   private String loginName;
 
   /**
-   * 密码值SHA1后的小写16进制字符串
+   * 密码, 不可为空
    */
   @Column("c_password")
   private String password;
 
+  /**
+   * 真实姓名
+   */
   @Column("c_real_name")
   private String realName;
 
+  /**
+   * 邮箱
+   */
   @Column("c_email")
   private String email;
+
+  /**
+   * 状态： 0-删除，1-正常, 2-未激活，3-冻结
+   */
+  private Integer state;
+
+  /**
+   * 排序号， n_order
+   */
+  private Integer order;
+
+  private String deptId;
+
+  private String deptName;
 
   public String getLoginName() {
     return loginName;

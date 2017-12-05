@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xmlns:tx="http://www.springframework.org/schema/tx"
     xmlns:aop="http://www.springframework.org/schema/aop"
-    xmlns:mvc="http://www.springframework.org/schema/mvc"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context
-       http://www.springframework.org/schema/context/spring-context-4.0.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/jee
+        http://www.springframework.org/schema/jee/spring-jee.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
 
   <!--<context:component-scan base-package="com.xdja.rias" />-->
   <!--<aop:aspectj-autoproxy />-->
@@ -18,6 +19,22 @@
     <property name="url" value="${jdbc.uaa.url}" />
     <property name="username" value="${jdbc.uaa.userName}"/>
     <property name="password" value="${jdbc.uaa.password}" />
+
+    <!-- oracle -->
+    <!--<property name="url" value="jdbc:oracle:thin:@localhost:1521:ORCL" />-->
+    <!--<property name="username" value="c##activiti"/>-->
+    <!--<property name="password" value="111111" />-->
+
+    <!--mysql-->
+    <!--<property name="url" value="jdbc:mysql://localhost:3306/activiti?useUnicode=true&amp;characterEncoding=utf8" />-->
+    <!--<property name="username" value="root"/>-->
+    <!--<property name="password" value="root" />-->
+
+    <!--h2-->
+    <!--<property name="url" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />-->
+    <!--<property name="username" value="sa" />-->
+    <!--<property name="password" value="" />-->
+
     <!-- 配置初始化大小、最小、最大 -->
     <property name="initialSize" value="1" />
     <property name="minIdle" value="1" />
@@ -48,4 +65,68 @@
   <!--<bean id="nutzDao" class="org.nutz.dao.impl.NutDao">-->
     <!--<property name="dataSource" ref="dataSource"/>-->
   <!--</bean>-->
+
+  <!--<bean id="xxx" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">-->
+    <!--<property name="driverClass" value="oracle.jdbc.driver.OracleDriver" />-->
+    <!--<property name="url" value="jdbc:oracle:thin:@localhost:1521:ORCL" />-->
+    <!--<property name="username" value="c##activiti" />-->
+    <!--<property name="password" value="111111" />-->
+  <!--</bean>-->
+
+  <!--<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+    <!--<property name="dataSource" ref="xxx" />-->
+  <!--</bean>-->
+
+  <!--<bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">-->
+    <!--<property name="dataSource" ref="xxx" />-->
+    <!--<property name="transactionManager" ref="transactionManager" />-->
+    <!--<property name="databaseSchemaUpdate" value="true" />-->
+    <!--<property name="asyncExecutorActivate" value="false" />-->
+  <!--</bean>-->
+
+  <!--<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">-->
+    <!--<property name="processEngineConfiguration" ref="processEngineConfiguration" />-->
+  <!--</bean>-->
+
+  <!--<bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />-->
+  <!--<bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />-->
+  <!--<bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />-->
+  <!--<bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />-->
+  <!--<bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />-->
+
+  <!--<tx:annotation-driven transaction-manager="transactionManager"/>-->
+
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSourceActivi3"/>
+  </bean>
+
+  <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+      <tx:method name="search*" read-only="true"/>
+      <tx:method name="find*" read-only="true"/>
+      <tx:method name="query*" read-only="true"/>
+      <tx:method name="get*" read-only="true"/>
+      <tx:method name="count*" read-only="true"/>
+      <tx:method name="check*" read-only="true"/>
+      <tx:method name="add*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="save*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="create*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="modify*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="del*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="remove*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="exec*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="do*" propagation="REQUIRED" rollback-for="Exception" />
+      <tx:method name="log" propagation="REQUIRES_NEW" rollback-for="Exception" /> <!-- 记录日志专用，在主事务回滚后日志仍记录成功 -->
+      <tx:method name="*" propagation="SUPPORTS" read-only ="false" />
+    </tx:attributes>
+  </tx:advice>
+
+  <aop:config>
+    <aop:pointcut expression="execution(public * com..*Impl.*(..))" id ="serviceMethod"/>
+    <aop:advisor pointcut-ref="serviceMethod" advice-ref="txAdvice" />
+  </aop:config>
+
 </beans>

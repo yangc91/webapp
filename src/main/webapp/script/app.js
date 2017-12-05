@@ -62,13 +62,14 @@ app.config(['$ocLazyLoadProvider', '$locationProvider', 'modulesConfig', functio
 app.config(function ($httpProvider) {
   var headers = $httpProvider.defaults.headers;
   //headers.common['X-Requested-By'] = 'MDC'; //统一添加请求头信息
+
   //删除AngularJS默认的X-Request-With头
-  //delete headers.common['X-Requested-With'];
-  //headers.common['x-auth-token'] = cookieObj.get("x-auth-token");
+  delete headers.common['X-Requested-With'];
+
   // 头信息配置,缺少X-Requested-With时解析错误
-  headers.post['Content-Type'] = 'application/json;charset=utf-8';
+  headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
   headers.post['Accept'] = 'application/json, text/javascript, */*; q=0.01';
-  // headers.post['X-Requested-With'] = 'XMLHttpRequest';
+  headers.post['X-Requested-With'] = 'XMLHttpRequest';
 
   /**
    * The workhorse; converts an object to x-www-form-urlencoded serialization.

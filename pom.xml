@@ -25,6 +25,11 @@
 
     <commons-lang3.version>3.3.2</commons-lang3.version>
     <commons-io.version>2.4</commons-io.version>
+
+    <activiti-version>6.0.0</activiti-version>
+    <h2-version>1.4.193</h2-version>
+
+
   </properties>
 
   <dependencies>
@@ -70,6 +75,12 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aspects</artifactId>
       <version>${spring.version}</version>
     </dependency>
 
@@ -167,11 +178,11 @@
       <version>${mysql.version}</version>
     </dependency>
 
-    <!--<dependency>-->
-      <!--<groupId>com.oracle</groupId>-->
-      <!--<artifactId>ojdbc14</artifactId>-->
-      <!--<version>${ojdbc14.version}</version>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>ojdbc14</artifactId>
+      <version>${ojdbc14.version}</version>
+    </dependency>
 
     <!--nutz-->
     <dependency>
@@ -227,22 +238,24 @@
     </dependency>
     <!-- GENERAL UTILS end -->
 
+    <!-- activiti -->
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>1.4.193</version>
+      <groupId>org.activiti</groupId>
+      <artifactId>activiti-engine</artifactId>
+      <version>${activiti-version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.activiti</groupId>
-      <artifactId>activiti-engine</artifactId>
-      <version>6.0.0</version>
+      <artifactId>activiti-spring</artifactId>
+      <version>${activiti-version}</version>
     </dependency>
 
+    <!-- h2 -->
     <dependency>
-      <groupId>com.squareup.okhttp3</groupId>
-      <artifactId>okhttp</artifactId>
-      <version>3.9.0</version>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${h2-version}</version>
     </dependency>
 
   </dependencies>
