@@ -112,7 +112,9 @@ public class LitePaging<T> implements Serializable {
    * @return
    */
   public int getTotalCount() {
-    if (totalCount != -1) return totalCount;
+    if (totalCount != -1) {
+      return totalCount;
+    }
 
     totalCount = totalPage * pageSize;
 
@@ -140,7 +142,9 @@ public class LitePaging<T> implements Serializable {
    * @return
    */
   public int getTotalPage() {
-    if (totalPage != -1) return totalPage;
+    if (totalPage != -1) {
+      return totalPage;
+    }
 
     totalPage = totalCount / pageSize;
     if (totalPage == 0 || totalCount % pageSize != 0) {

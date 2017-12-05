@@ -22,6 +22,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
   private static Logger logger = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
 
+  @Override
   public Authentication authenticate(Authentication auth) throws AuthenticationException {
 
     String username = auth.getName();
@@ -43,9 +44,11 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
       }
     }
 
-    throw new BadCredentialsException(messages.getMessage("CustomDaoAuthenticationProvider.badCredentials", "Bad credentials"));
+    throw new BadCredentialsException(
+        messages.getMessage("CustomDaoAuthenticationProvider.badCredentials", "Bad credentials"));
   }
 
+  @Override
   public boolean supports(Class<?> aClass) {
     return true;
     //return false;
