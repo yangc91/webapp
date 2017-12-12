@@ -178,11 +178,11 @@
       <version>${mysql.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>ojdbc14</artifactId>
-      <version>${ojdbc14.version}</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.oracle</groupId>-->
+      <!--<artifactId>ojdbc14</artifactId>-->
+      <!--<version>${ojdbc14.version}</version>-->
+    <!--</dependency>-->
 
     <!--nutz-->
     <dependency>

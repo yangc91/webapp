@@ -93,10 +93,12 @@ public class UserDao {
 
   public Set<String> listAuthroty(String userId) {
     Sql sql = Sqls.create(
-        " SELECT nsi.c_id as itemId FROM t_uaas_net_strategy_item nsi where nsi.c_item_code in (@codes) ");
-    //sql.params().set("codes", codes.toArray(new String[0]));
+        " SELECT auth.c_code from t_sys_authorities auth LEFT JOIN t_sys_user_auth uauth ON auth.c_id = uauth.c_auth_id where uauth.c_user_id = @userId");
+    sql.params().set("userId", userId);
+
     sql.setCallback(Sqls.callback.strList());
     nutDao.execute(sql);
+
     List<String> authoritys = sql.getList(String.class);
     Set<String> set = new HashSet<String>();
     set.addAll(authoritys);

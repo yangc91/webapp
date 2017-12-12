@@ -152,6 +152,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     .antMatchers("/images/**")
     .antMatchers("/script/**")
     .antMatchers("/themes/**")
+    .antMatchers("/materialize/**")
     .antMatchers("/view/**");
   }
 

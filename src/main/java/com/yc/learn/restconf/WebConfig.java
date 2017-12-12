@@ -84,13 +84,13 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     return new NutDao(dataSource);
   }
 
-  @Bean
+  //@Bean
   public SimpleDriverDataSource dataSourceActivi3() {
     SimpleDriverDataSource driverDataSource = new SimpleDriverDataSource();
     driverDataSource.setUrl("jdbc:oracle:thin:@localhost:1521:orcl");
     driverDataSource.setUsername("c##activiti");
     driverDataSource.setPassword("111111");
-    driverDataSource.setDriverClass(oracle.jdbc.driver.OracleDriver.class);
+    //driverDataSource.setDriverClass(oracle.jdbc.driver.OracleDriver.class);
 
     return driverDataSource;
   }
