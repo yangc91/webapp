@@ -1,16 +1,8 @@
 package com.yc.learn.dao;
 
-import com.yc.learn.ConstantsProp;
-import com.yc.learn.bean.UserGrantedAuthority;
-import com.yc.learn.entity.Authority;
 import com.yc.learn.entity.UserInfo;
 import com.yc.learn.utils.page.LitePaging;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Resource;
@@ -20,15 +12,12 @@ import org.nutz.dao.impl.NutDao;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.sql.Criteria;
 import org.nutz.dao.sql.Sql;
-import org.nutz.dao.sql.SqlCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 /**
- * @Auther: yangchun
+ * @author: yangchun
  * @Date: 2017-9-15 10:58
  */
 @Repository
@@ -56,7 +45,6 @@ public class UserDao {
   }
 
   public List<UserInfo> list() {
-    //Pager pager = nutDao.createPager(pageNu, pageSize);
     Criteria cri = Cnd.cri();
     List<UserInfo> list = nutDao.query(UserInfo.class, cri);
     return list;

@@ -4,7 +4,7 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
- * @Auther: yangchun
+ * @author: yangchun
  * @Date: 2017-9-15 11:03
  */
 @Table("t_sys_user")

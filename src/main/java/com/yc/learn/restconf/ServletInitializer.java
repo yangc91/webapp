@@ -1,6 +1,5 @@
 package com.yc.learn.restconf;
 
-import com.yc.learn.rootconf.AppConfig;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
@@ -9,17 +8,19 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
  */
 public class ServletInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
+  @Override
   protected Class<?>[] getRootConfigClasses() {
     return null;
-    //return new Class<?>[]{AppConfig.class, };
   }
 
+  @Override
   protected Class<?>[] getServletConfigClasses() {
-    return new Class<?>[]{WebConfig.class, SecurityConfig.class};
+    return new Class<?>[] {WebConfig.class, SecurityConfig.class};
   }
 
+  @Override
   protected String[] getServletMappings() {
-    return new String[]{"/*"};
+    return new String[] {"/*"};
   }
 
   //@Override
@@ -39,5 +40,4 @@ public class ServletInitializer extends AbstractAnnotationConfigDispatcherServle
   //  filter.setContextAttribute("org.springframework.web.servlet.FrameworkServlet.CONTEXT.dispatcher");
   //  servletContext.addFilter(name, filter).addMappingForUrlPatterns(null, false, "/*");
   //}
-
 }

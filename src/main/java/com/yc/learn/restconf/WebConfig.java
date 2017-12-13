@@ -52,11 +52,12 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * @Auther: yangchun
+ * @author: yangchun
  * @Date: 2017-7-28 17:38
  * @EnableWebMvc == <mvc:annotation-driven />
  * @ComponentScan == < context:component-scan base-package= "org.rest" />
  * @EnableAspectJAutoProxy == <aop:aspectj-autoproxy>
+ * @ImportResource == <import resource=”classpath*:/rest_config.xml” />
  */
 @Configuration
 @EnableWebMvc
@@ -84,17 +85,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     return new NutDao(dataSource);
   }
 
-  //@Bean
-  public SimpleDriverDataSource dataSourceActivi3() {
-    SimpleDriverDataSource driverDataSource = new SimpleDriverDataSource();
-    driverDataSource.setUrl("jdbc:oracle:thin:@localhost:1521:orcl");
-    driverDataSource.setUsername("c##activiti");
-    driverDataSource.setPassword("111111");
-    //driverDataSource.setDriverClass(oracle.jdbc.driver.OracleDriver.class);
-
-    return driverDataSource;
-  }
-
   @Bean
   public JedisPool jedisPool() {
     String host = environment.getProperty("redis.host", "localhost");
@@ -112,9 +102,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     return pool;
   }
 
-  //@SuppressWarnings("SpringJavaAutowiringInspection")
-  //@Autowired
-  //private NutDao nutDao;
 
   /**
    * 配置视图解析器
@@ -154,9 +141,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     converters.add(converter);
   }
 
+  /**
+   * 添加自定义权限拦截器
+   * @param registry
+   */
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    //super.addInterceptors(registry);
     registry.addInterceptor(new PermissionInterceptor())
         .addPathPatterns("/**")  // 需指定拦截路径，才会创建MappedInterceptor，下面的exclude的路径才会放行
         .excludePathPatterns("/**/public/**");
