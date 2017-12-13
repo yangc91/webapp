@@ -23,6 +23,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
   /**
    * Always returns a 403 error code to the client.
    */
+  @Override
   public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException arg2) throws IOException,
       ServletException {
     if (logger.isDebugEnabled()) {

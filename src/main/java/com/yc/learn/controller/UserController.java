@@ -75,7 +75,7 @@ public class UserController extends BaseController {
   }
 
   @RequestMapping("list")
-  @PreAuthorize("hasAuthority('user:list')")
+  //@PreAuthorize("hasAuthority('user:list')")
   public Object list(@RequestBody PageBean pageBean) {
     logger.info("调用查询用户列表接口");
     LitePaging<UserInfo> pagination =
@@ -84,7 +84,7 @@ public class UserController extends BaseController {
   }
 
   @RequestMapping("resetPassword")
-  @PreAuthorize("hasAuthority('user:resetPassword')")
+  //@PreAuthorize("hasAuthority('user:resetPassword')")
   public Object resetPassword(String userId) {
     logger.info("调用重置用户密码接口，输入参数：{}", userId);
     try {
@@ -100,7 +100,7 @@ public class UserController extends BaseController {
    * 修改密码
    */
   @RequestMapping("updatePassword")
-  @PreAuthorize("hasAuthority('user:updatePassword')")
+  //@PreAuthorize("hasAuthority('user:updatePassword')")
   public Object updatePassword(String oldPwd, String newPwd) {
     logger.info("调用修改用户密码接口，输入参数：oldPwd :{}, newPwd: {}", oldPwd, newPwd);
     if (StringUtils.isBlank(oldPwd) || StringUtils.isBlank(newPwd)) {

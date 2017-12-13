@@ -33,7 +33,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   /**
    * 将AuthenticationManager注册为spring bean
-   * 需全局注入，@EnableGlobalMethodSecurity才可使用
    * @throws Exception
    */
   @Bean
@@ -53,8 +52,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     http
         .csrf().disable()
         .authorizeRequests()
-        //管理员放行
-        .antMatchers("/**").access(" hasRole('admin')")
         // 放行带public的路径
         .antMatchers("/public/**").permitAll()
         .antMatchers("/auth/**").authenticated()
