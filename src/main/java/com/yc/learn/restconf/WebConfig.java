@@ -1,11 +1,15 @@
 package com.yc.learn.restconf;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.yc.learn.activiti.EventListener.MyEventListener;
 import com.yc.learn.activiti.entitymanager.CustomUserEntityManager;
 import com.yc.learn.interceptor.PermissionInterceptor;
 import com.yc.learn.service.IUserService;
 import com.yc.learn.utils.JsonMapperProvide;
+import com.yc.learn.xss.DefaultJsonDeserializer;
+import com.yc.learn.xss.DefaultJsonSerializer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -137,7 +141,15 @@ public class WebConfig extends WebMvcConfigurerAdapter {
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
     MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-    converter.setObjectMapper(JsonMapperProvide.nonEmptyMapper());
+
+    SimpleModule module = new SimpleModule();
+    module.addDeserializer(String.class, new DefaultJsonDeserializer());
+    module.addSerializer(String.class, new DefaultJsonSerializer());
+
+    ObjectMapper mapper = JsonMapperProvide.nonEmptyMapper();
+    mapper.registerModule(module);
+
+    converter.setObjectMapper(mapper);
     converters.add(converter);
   }
 
