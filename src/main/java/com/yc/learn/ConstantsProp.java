@@ -15,6 +15,6 @@ public class ConstantsProp {
   /**
    * 默认密码
    */
-  public static String DEFAULT_PASSWORD = "000000";
+  public static String DEFAULT_PASSWORD = "111111";
 
 }

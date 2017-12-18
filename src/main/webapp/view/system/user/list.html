@@ -12,10 +12,13 @@
 
 <!--右侧-->
 <div class="admin-list userList" ng-show="tableParams.total() > 0 && totalRecords > 0">
-	<div class="handle-div">
-        <button type="button" class="btn btn-blue" ng-click="openUserDialog()">添加管理员</button>
-	 	<button type="button" ng-class="{ true : 'btn btn-disable', false : 'btn btn-red' }[checkedItem == 0]" ng-click="deleteUser()">删除管理员</button>
-	</div>
+  <div class="handle-div">
+    <button type="button" class="btn btn-blue" ng-click="openUserDialog()">添加</button>
+    <button type="button"
+            ng-class="{ true : 'btn btn-disable', false : 'btn btn-red' }[checkedItem == 0]"
+            ng-click="deleteUser()">删除
+    </button>
+  </div>
     <table ng-table="tableParams" show-filter="false" class="table vtable-hover">
 
         <!--自定义表头-->
@@ -45,7 +48,7 @@
             </td>
             <td data-title="'姓名'" style="width: 13%;min-width: 100px;">
                 <div class="td default">
-                    <span ng-bind="user.fullName"></span>
+                    <span ng-bind="user.realName"></span>
                     <div class="vline right-vline"></div>
                 </div>
             </td>
@@ -57,8 +60,9 @@
             <!--</td>-->
             <td data-title="'操作'">
                 <div class="td right-border default"  style="min-width: 150px;">
-                    <span class="desc-text" ng-click="openEditUserDialog(user)">编辑管理员</span>
-                    <span class="desc-text" ng-click="deleteOneUser(user)" style="padding-left: 10px">删除管理员</span>
+                    <span class="desc-text" ng-click="openEditUserDialog(user)">编辑</span>
+                    <span class="desc-text" ng-click="openEditUserDialog(user)" style="padding-left: 10px">冻结</span>
+                    <span class="desc-text" ng-click="deleteOneUser(user)" style="padding-left: 10px">删除</span>
                     <span class="desc-text" ng-click="confirmPwd(user)" style="padding-left: 10px">重置密码</span>
                 </div>
             </td>
@@ -104,10 +108,10 @@
 	<div class="infoImg">
 		<img src="../themes/default/images/people.png" />
 	</div>
-	<p class="personName">
-		{{prevItem.userName}}
-	</p>
-	<p class="fcb" style="padding-bottom:10px">{{prevItem.name}}</p>
+	<!--<p class="personName">-->
+		<!--{{prevItem.loginName}}-->
+	<!--</p>-->
+	<p class="fcb" style="padding-bottom:10px">{{prevItem.realName}}</p>
 	<p class="deviceInfo">
 		<span class="deviceInfoName">手机号码:</span>
 		{{prevItem.mobile}}

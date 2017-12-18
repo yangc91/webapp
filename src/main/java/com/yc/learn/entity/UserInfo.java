@@ -35,13 +35,21 @@ public class UserInfo extends BaseEntity {
   private String email;
 
   /**
+   * 手机
+   */
+  @Column("c_mobile")
+  private String mobile;
+
+  /**
    * 状态： 0-删除，1-正常, 2-未激活，3-冻结
    */
+  @Column("n_state")
   private Integer state;
 
   /**
    * 排序号， n_order
    */
+  @Column("n_sort_order")
   private Integer order;
 
   private String deptId;
@@ -78,5 +86,29 @@ public class UserInfo extends BaseEntity {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  public Integer getOrder() {
+    return order;
+  }
+
+  public void setOrder(Integer order) {
+    this.order = order;
+  }
+
+  public Integer getState() {
+    return state;
+  }
+
+  public void setState(Integer state) {
+    this.state = state;
+  }
+
+  public String getMobile() {
+    return mobile;
+  }
+
+  public void setMobile(String mobile) {
+    this.mobile = mobile;
   }
 }

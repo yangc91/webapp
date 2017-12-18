@@ -67,9 +67,9 @@ app.config(function ($httpProvider) {
   delete headers.common['X-Requested-With'];
 
   // 头信息配置,缺少X-Requested-With时解析错误
-  headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
-  headers.post['Accept'] = 'application/json, text/javascript, */*; q=0.01';
-  headers.post['X-Requested-With'] = 'XMLHttpRequest';
+  // headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+  // headers.post['Accept'] = 'application/json, text/javascript, */*; q=0.01';
+  // headers.post['X-Requested-With'] = 'XMLHttpRequest';
 
   /**
    * The workhorse; converts an object to x-www-form-urlencoded serialization.
@@ -113,9 +113,9 @@ app.config(function ($httpProvider) {
   };
 
   // 覆盖默认 transformRequest
-  $httpProvider.defaults.transformRequest = [function (data) {
-    return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
-  }];
+  // $httpProvider.defaults.transformRequest = [function (data) {
+  //   return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
+  // }];
 
   //对所有请求统一拦截
   $httpProvider.interceptors.push(['$rootScope', '$q', function ($rootScope, $q) {

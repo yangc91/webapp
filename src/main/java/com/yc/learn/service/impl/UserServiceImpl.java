@@ -8,6 +8,7 @@ import com.yc.learn.service.IUserService;
 import com.yc.learn.utils.page.LitePaging;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Resource;
 import org.springframework.http.HttpStatus;
@@ -52,6 +53,11 @@ public class UserServiceImpl implements IUserService {
   @Override
   public LitePaging<UserInfo> list(Integer pageNumber, Integer pageSize) {
     return userDao.list(pageNumber, pageSize);
+  }
+
+  @Override
+  public Map<String, Object> count() {
+    return userDao.count();
   }
 
   @Override

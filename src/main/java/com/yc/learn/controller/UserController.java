@@ -76,24 +76,33 @@ public class UserController extends BaseController {
 
   @RequestMapping("list")
   //@PreAuthorize("hasAuthority('user:list')")
-  public Object list(@RequestBody PageBean pageBean) {
-    logger.info("调用查询用户列表接口");
+  public Object list(@RequestBody PageBean pageBean) throws JsonProcessingException {
+    logger.info("调用查询用户列表接口, 参数：{}",JsonMapperProvide.alwaysMapper().writeValueAsString(pageBean));
     LitePaging<UserInfo> pagination =
         userService.list(pageBean.getPageNumber(), pageBean.getPageSize());
     return pagination;
+  }
+
+  @RequestMapping("count")
+  //@PreAuthorize("hasAuthority('user:count')")
+  public Object count() throws JsonProcessingException {
+    logger.info("调用统计用户接口");
+    return userService.count();
   }
 
   @RequestMapping("resetPassword")
   //@PreAuthorize("hasAuthority('user:resetPassword')")
   public Object resetPassword(String userId) {
     logger.info("调用重置用户密码接口，输入参数：{}", userId);
+    Map<String, Object> result = new HashMap<>(2);
     try {
       userService.updatePassword(userId, passwordEncoder.encode(ConstantsProp.DEFAULT_PASSWORD));
+      result.put("success", true);
     } catch (Exception e) {
       logger.error("重置密码错误！", e);
       throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, "0x999", "重置密码出现错误");
     }
-    return true;
+    return result;
   }
 
   /**

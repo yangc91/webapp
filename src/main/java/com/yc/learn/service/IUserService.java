@@ -4,6 +4,7 @@ import com.yc.learn.bean.UserGrantedAuthority;
 import com.yc.learn.entity.UserInfo;
 import com.yc.learn.utils.page.LitePaging;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -26,11 +27,14 @@ public interface IUserService {
 
   /**
    * 根据name(登录名)查询用户
+   * @param name
+   * @return
    */
   UserInfo getUserByName(String name);
 
   /**
    * 更新用户信息
+   * @param userInfo
    */
   void update(UserInfo userInfo);
 
@@ -41,8 +45,17 @@ public interface IUserService {
 
   /**
    * 分页查询用户列表
+   * @param pageNo
+   * @param pageSize
+   * @return
    */
   LitePaging<UserInfo> list(Integer pageNo, Integer pageSize);
+
+  /**
+   * 统计用户信息
+   * @return
+   */
+  Map<String, Object> count();
 
   /**
    * 修改密码

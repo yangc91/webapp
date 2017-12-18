@@ -2,8 +2,10 @@ package com.yc.learn.dao;
 
 import com.yc.learn.entity.UserInfo;
 import com.yc.learn.utils.page.LitePaging;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Resource;
 import org.nutz.dao.Cnd;
@@ -64,6 +66,13 @@ public class UserDao {
     litePaging.setTotalCount(count);
 
     return litePaging;
+  }
+
+  public Map<String, Object> count() {
+    Map<String, Object> result = new HashMap<>(1);
+    int count = nutDao.count(UserInfo.class, Cnd.NEW());
+    result.put("totalRecords", count);
+    return result;
   }
 
   /**
