@@ -6,6 +6,50 @@ app.add.controller('userListCtr', ['$scope', '$state', '$sce', 'ngTableParams', 
 
   $scope.$emit('menuChange', $state.current.url);
 
+  var checkboxes = {
+    checked: false,
+    items: {}
+  };
+
+  //复选框数据
+  $scope.checkboxes = checkboxes;
+  /*成功失败提示的弹框*/
+  $scope.closeable = true;
+
+  //切换复选框
+  $scope.checkedItem = 0;
+  $scope.toggleCheck = function () {
+    var _id = this.person.id;
+    if (this.person.selected) {
+      checkboxes.items[_id] = _id;
+
+      if (Object.keys(checkboxes.items).length == $scope.tableParams.data.length) {
+        checkboxes.checked = true;
+      }
+    } else {
+      delete checkboxes.items[_id];
+      checkboxes.checked = false;
+    }
+    $scope.checkedItem = Object.keys(checkboxes.items).length;
+  };
+
+  //选择全部
+  $scope.checkAll = function () {
+    checkboxes.items = {}; //先清空已选择
+    var data = $scope.tableParams.data;
+
+    for (var i = 0; i < data.length; i++) {
+      //checkboxes.checked为true代表全选按钮被选中
+      //checkboxes.checked为false代表全选按钮没选中
+      if (checkboxes.checked) {//全选选中
+        checkboxes.items[data[i].id] = data[i].id;
+      }
+
+      data[i].selected = checkboxes.checked;
+    }
+    $scope.checkedItem = Object.keys(checkboxes.items).length;
+  };
+
   /**
    * alert警告框
    * @type {{toString: Function, close: Function, show: Function}}
@@ -256,45 +300,34 @@ app.add.controller('userListCtr', ['$scope', '$state', '$sce', 'ngTableParams', 
         responseType: "json"
       })
         .success(function (result) {
-            //var data = result.data;
-            //$scope.totalRecords = result.persionTotalNum;
+          $scope.totalCount = result.totalCount;
+          var dataList = result.dataList;
+          if (dataList.length > 0) {
+            $scope.prevItem = dataList[0];
+            dataList[0].visited = true;
+          } else {
+            $scope.prevItem = {};
+          }
 
-            var totalCount = result.totalCount;
-            var dataList = result.dataList;
-            $scope.totalCount = totalCount;
+          $scope.noResultContent = "false";
+          if ($scope.totalRecords > 0 && $scope.resultRecords == 0) {
+            $scope.noResultContent = "true";
+            $scope.faceImg = "littleTrouble";
+            $scope.noContent = "啊呀,没有检索到任何内容…";
+            $scope.chooseList = [{"prevLink": "请更改条件后再次搜索或筛选"}]
+          }
 
-            if (dataList.length > 0) {
-              $scope.prevItem = dataList[0];
-              dataList[0].visited = true;
-            } else {
-              $scope.prevItem = {};
-            }
+          if ($scope.totalRecords == 0 && $scope.resultRecords == 0) {
+            $scope.noResultContent = "true";
+            $scope.faceImg = "noData";
+            $scope.noContent = "终于等到你，来添加用户吧";
+            $scope.chooseList = [{"prevLink": '可以为不同的用户添加专属账号'}, {
+              "content": "添加用户", "textLink": true, "prevLink": "点击", "nextLink": "来增加用户"
+            }]
+          }
 
-            // $scope.noResultContent = "false";
-            // if (totalCount == 0) {
-            //   $scope.noResultContent = "true";
-            // }
-            //$scope.faceImg = "littleTrouble";
-
-            $scope.noResultContent = "false";
-            if ($scope.totalRecords > 0 && $scope.resultRecords == 0) {
-              $scope.noResultContent = "true";
-              $scope.faceImg = "littleTrouble";
-              $scope.noContent = "啊呀,没有检索到任何内容…";
-              $scope.chooseList = [{"prevLink": "请更改条件后再次搜索或筛选"}]
-            }
-
-            if ($scope.totalRecords == 0 && $scope.resultRecords == 0) {
-              $scope.noResultContent = "true";
-              $scope.faceImg = "noData";
-              $scope.noContent = "终于等到你，来添加用户吧";
-              $scope.chooseList = [{"prevLink": '可以为不同的用户添加专属账号'}, {
-                "content": "添加用户", "textLink": true, "prevLink": "点击", "nextLink": "来增加用户"
-              }]
-            }
-
-            params.total(totalCount);
-            $defer.resolve(dataList);
+          params.total($scope.totalCount);
+          $defer.resolve(dataList);
         })
         .error(function (data) {
           console.info(error);
@@ -342,7 +375,47 @@ app.add.controller('userListCtr', ['$scope', '$state', '$sce', 'ngTableParams', 
     } else {
       return;
     }
-  }
+  };
+
+  //冻结
+  $scope.confirmLock = function (user) {
+    var _scope = $scope;
+    var id = user.id;
+    dialog.openDialog({
+      title: "冻结用户", icon: 'secondConfirm', content: '<p class="confirmTip">确定要冻结该用户吗？</p>\
+            		<p class="w300 fs14 mt10">\
+            			冻结后用户无法登陆~\
+            		</p>', buttons: [{
+        name: "取消", className: "btn-gray", callback: function ($scope, dia, button, config) {
+
+        }
+      }, {
+        name: "冻结", className: "btn-red", callback: function ($scope, dia, button, config) {
+          $http({
+            method: 'POST',
+            url: base + '/system/user/lock.do',
+            params: {
+                id: id,
+                type: "3"
+            },
+            responseType: "json"
+          }).success(function (result) {
+            if (result.success && result.success == true) {
+              var length = _scope.alerts.push({
+                type: 'success', msg: "恭喜,冻结用户成功!"
+              });
+
+              $timeout(function () {
+                _scope.alerts.splice(length - 1, 1);
+              }, 2000);
+              tableReload();
+            }
+          });
+        }
+      }]
+    })
+  };
+
   //确认重置密码提示
   $scope.confirmPwd = function (user) {
     var _scope = $scope;
@@ -363,10 +436,9 @@ app.add.controller('userListCtr', ['$scope', '$state', '$sce', 'ngTableParams', 
           $http({
             method: 'POST',
             url: base + '/system/user/resetPassword.do',
-            params: {userId: id},
+            params: {id: id},
             responseType: "json"
           }).success(function (result) {
-            debugger;
             if (result.success && result.success == true) {
               var length = _scope.alerts.push({
                 type: 'success', msg: "恭喜,重置密码成功!"
@@ -382,12 +454,12 @@ app.add.controller('userListCtr', ['$scope', '$state', '$sce', 'ngTableParams', 
     })
   };
 
-  //删除单个管理员
+  //删除单个用户
   $scope.deleteOneUser = function (user) {
     var _scope = $scope;
     var ids = user.id;
     dialog.openDialog({
-      title: "删除管理员", icon: 'secondConfirm', contentClass: "w350", content: '<p class="secondConfirm">确定要删除该管理员吗？</p>\
+      title: "删除用户", icon: 'secondConfirm', contentClass: "w350", content: '<p class="secondConfirm">确定要删除该用户吗？</p>\
 		        		<p class="w300 fs14">\
 		        			删除后不可恢复\
 		        		</p>', buttons: [{
@@ -397,7 +469,7 @@ app.add.controller('userListCtr', ['$scope', '$state', '$sce', 'ngTableParams', 
       }, {
         name: "删除", className: "btn-red", callback: function ($scope, dia, button, config) {
           $http({
-            method: 'POST', url: 'system/user/remove.do', params: {ids: ids}, responseType: "json"
+            method: 'POST', url: 'system/user/delete.do', params: {ids: ids}, responseType: "json"
           }).success(function (result) {
             _scope.alerts.push({
               type: 'success', msg: "恭喜,删除成功!"

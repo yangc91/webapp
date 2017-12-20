@@ -2,6 +2,7 @@ package com.yc.learn.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yc.learn.ConstantsProp;
+import com.yc.learn.bean.LockUserRequest;
 import com.yc.learn.bean.PageBean;
 import com.yc.learn.bean.UserLoginInfo;
 import com.yc.learn.entity.UserInfo;
@@ -44,34 +45,78 @@ public class UserController extends BaseController {
     logger.info("调用添加用户接口，输入参数：{}",
         JsonMapperProvide.alwaysMapper().writeValueAsString(userInfo));
     Map<String, Object> result = new HashMap<>();
-    result.put("success", "false");
+    result.put("success", false);
     userService.add(userInfo);
-    result.put("success", "true");
+    result.put("success", true);
     // 记录日志
     logger.info("添加用户加成功");
     return result;
   }
 
+  /**
+   * 删除用户
+   * @param ids
+   * @return
+   * @throws JsonProcessingException
+   */
+  @RequestMapping("delete")
+  public Object delete(String... ids) throws JsonProcessingException {
+    logger.info("调用删除用户接口，输入参数：ids:{}", ids);
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("success", false);
+    try {
+      userService.delete(ids);
+      result.put("success", true);
+    }catch (Exception e) {
+      logger.error("删除用户出现异常, 参数：{}",ids,  e);
+    }
+
+    return result;
+  }
+
+  /**
+   * 冻结/解冻用户
+   * @param lockUser
+   * @return
+   * @throws JsonProcessingException
+   */
+  @RequestMapping("lock")
+  public Object lock(LockUserRequest lockUser) throws JsonProcessingException {
+    logger.info("调用用户冻结/解冻接口，输入参数：{}",
+        JsonMapperProvide.alwaysMapper().writeValueAsString(lockUser));
+    Map<String, Object> result = new HashMap<>();
+    result.put("success", false);
+    try {
+      userService.changeState(lockUser.getId(), lockUser.getType());
+      result.put("success", true);
+    }catch (Exception e) {
+      logger.error("冻结用户出现异常, 参数：{}",JsonMapperProvide.alwaysMapper().writeValueAsString(lockUser),  e);
+    }
+
+    return result;
+  }
+
   @RequestMapping("update")
-  public Object add(@RequestBody UserInfo userInfo) throws JsonProcessingException {
+  public Object update(@RequestBody UserInfo userInfo) throws JsonProcessingException {
     logger.info("调用编辑用户接口，输入参数：{}",
         JsonMapperProvide.alwaysMapper().writeValueAsString(userInfo));
 
     Map<String, Object> result = new HashMap<>();
-    result.put("success", "false");
+    result.put("success", false);
 
     userService.update(userInfo);
 
     logger.info("编辑用户加成功");
-    result.put("success", "true");
+    result.put("success", true);
 
     return result;
   }
 
   @RequestMapping("get")
-  public Object add(String userId) {
-    logger.info("调用查询指定用户接口，输入参数：{}", userId);
-    return userService.getUserById(userId);
+  public Object get(String id) {
+    logger.info("调用查询指定用户接口，输入参数：id:{}", id);
+    return userService.getUserById(id);
   }
 
   @RequestMapping("list")
@@ -92,11 +137,11 @@ public class UserController extends BaseController {
 
   @RequestMapping("resetPassword")
   //@PreAuthorize("hasAuthority('user:resetPassword')")
-  public Object resetPassword(String userId) {
-    logger.info("调用重置用户密码接口，输入参数：{}", userId);
+  public Object resetPassword(String id) {
+    logger.info("调用重置用户密码接口，输入参数：{}", id);
     Map<String, Object> result = new HashMap<>(2);
     try {
-      userService.updatePassword(userId, passwordEncoder.encode(ConstantsProp.DEFAULT_PASSWORD));
+      userService.updatePassword(id, passwordEncoder.encode(ConstantsProp.DEFAULT_PASSWORD));
       result.put("success", true);
     } catch (Exception e) {
       logger.error("重置密码错误！", e);
@@ -126,14 +171,14 @@ public class UserController extends BaseController {
       }
     } catch (Exception e) {
       logger.error("重置密码错误！", e);
-      throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, "0x999", "重置密码出现错误");
+      throw new RestException(HttpStatus.INTERNAL_SERVER_ERROR, "0x999", "修改密码出现错误");
     }
     return true;
   }
 
   //TODO 检查用户名是否重复
   @RequestMapping("check")
-  public Object add() {
+  public Object check() {
     return "";
   }
 }

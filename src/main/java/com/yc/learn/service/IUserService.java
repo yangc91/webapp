@@ -39,6 +39,13 @@ public interface IUserService {
   void update(UserInfo userInfo);
 
   /**
+   *  变更用户状态
+   * @param id
+   * @param state 1-正常, 2-未激活，3-冻结
+   */
+  void changeState(String id, String state);
+
+  /**
    * 查询用户列表(全部)
    */
   List<UserInfo> list();
@@ -60,7 +67,13 @@ public interface IUserService {
   /**
    * 修改密码
    */
-  Boolean updatePassword(String userId, String newPwd);
+  void updatePassword(String userId, String newPwd);
+
+  /**
+   * 批量删除用户
+   * @param ids
+   */
+  void delete(String... ids);
 
   /**
    * 获取用户的所有权限（个人及所有role角色）

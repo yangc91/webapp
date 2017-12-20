@@ -46,6 +46,11 @@ public class UserServiceImpl implements IUserService {
   }
 
   @Override
+  public void changeState(String id, String state) {
+    userDao.changeState(id, state);
+  }
+
+  @Override
   public List<UserInfo> list() {
     return userDao.list();
   }
@@ -61,8 +66,13 @@ public class UserServiceImpl implements IUserService {
   }
 
   @Override
-  public Boolean updatePassword(String userId, String newPwd) {
-    return userDao.updatePassword(userId, newPwd);
+  public void updatePassword(String userId, String newPwd) {
+    userDao.updatePassword(userId, newPwd);
+  }
+
+  @Override
+  public void delete(String... ids) {
+    userDao.delete(ids);
   }
 
   @Override

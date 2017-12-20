@@ -46,6 +46,14 @@ public class UserDao {
     nutDao.update(userInfo);
   }
 
+  public void changeState(String id, String state) {
+    StringBuffer sqlBuffer =
+        new StringBuffer(" UPDATE t_sys_user SET n_state = @state WHERE C_ID = @id");
+    Sql sql = Sqls.create(sqlBuffer.toString());
+    sql.params().set("state", state).set("id", id);
+    nutDao.execute(sql);
+  }
+
   public List<UserInfo> list() {
     Criteria cri = Cnd.cri();
     List<UserInfo> list = nutDao.query(UserInfo.class, cri);
@@ -78,14 +86,23 @@ public class UserDao {
   /**
    * 修改密码
    */
-  public Boolean updatePassword(String userId, String newPwd) {
+  public void updatePassword(String userId, String newPwd) {
     StringBuffer sqlBuffer =
         new StringBuffer(" UPDATE t_sys_user SET c_password = @password WHERE C_ID = @id");
     Sql sql = Sqls.create(sqlBuffer.toString());
     sql.params().set("password", newPwd).set("id", userId);
     nutDao.execute(sql);
+  }
 
-    return true;
+  public void delete(String... ids) {
+    StringBuffer sqlBuffer =
+        new StringBuffer(" delete t_sys_user WHERE C_ID = @id");
+    Sql sql = Sqls.create(sqlBuffer.toString());
+    for (String id : ids) {
+      sql.params().set("id", id);
+      sql.addBatch();
+    }
+    nutDao.execute(sql);
   }
 
   public Set<String> listAuthroty(String userId) {
