@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -40,8 +41,14 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
@@ -62,6 +69,9 @@ import redis.clients.jedis.JedisPoolConfig;
  * @ComponentScan == < context:component-scan base-package= "org.rest" />
  * @EnableAspectJAutoProxy == <aop:aspectj-autoproxy>
  * @ImportResource == <import resource=”classpath*:/rest_config.xml” />
+ *
+ * < context:property-placeholder location= "classpath:persistence.properties,
+ * classpath:web.properties" ignore-unresolvable=
  */
 @Configuration
 @EnableWebMvc
@@ -69,6 +79,13 @@ import redis.clients.jedis.JedisPoolConfig;
 @ComponentScan(basePackages = "com.yc.learn")
 @PropertySource({"classpath:system.properties"})
 @ImportResource({"classpath*:/rest_config.xml"})
+//@ComponentScan(basePackages = {"com.yc.learn"},excludeFilters = {@ComponentScan.Filter(type= FilterType.ANNOTATION, value = {EnableWebMvc.class,
+//org.springframework.stereotype.Controller.class
+//    })
+//,@ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, value = FooController.class)
+//    ,@ComponentScan.Filter(type= FilterType.REGEX, pattern = {"com.yc.learn.controller.*", "com.yc.learn.restconf.*"})
+//, "com.yc.learn.restconf.*"
+//})
 public class WebConfig extends WebMvcConfigurerAdapter {
 
   public Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -81,8 +98,8 @@ public class WebConfig extends WebMvcConfigurerAdapter {
   @Autowired
   private Environment environment;
 
-  @Autowired
-  private DataSourceTransactionManager transactionManager;
+  //@Autowired
+  //private DataSourceTransactionManager transactionManager;
 
   @Bean
   public NutDao nutDao(DataSource dataSource) {
@@ -119,37 +136,28 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     return resolver;
   }
 
-  //@Bean
-  //public ContentNegotiatingViewResolver contentViewResolver() throws Exception {
-  //  ContentNegotiatingViewResolver contentViewResolver = new ContentNegotiatingViewResolver();
-  //  ContentNegotiationManagerFactoryBean contentNegotiationManager = new ContentNegotiationManagerFactoryBean();
-  //  contentNegotiationManager.addMediaType("json", MediaType.APPLICATION_JSON);
-  //  contentViewResolver.setContentNegotiationManager(contentNegotiationManager.getObject());
-  //  contentViewResolver.setDefaultViews(Arrays.<View> asList(new MappingJackson2JsonView()));
-  //  return contentViewResolver;
-  //}
-
   /**
    * 静态资源处理
    */
   @Override
   public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
     configurer.enable();
-    //super.configureDefaultServletHandling(configurer);
   }
 
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+  }
 
+  @Override
+  public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+    //...额外添加转换器....
     SimpleModule module = new SimpleModule();
     module.addDeserializer(String.class, new DefaultJsonDeserializer());
     module.addSerializer(String.class, new DefaultJsonSerializer());
-
-    ObjectMapper mapper = JsonMapperProvide.nonEmptyMapper();
+    ObjectMapper mapper = Jackson2ObjectMapperBuilder.json().build();
     mapper.registerModule(module);
+    MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(mapper);
 
-    converter.setObjectMapper(mapper);
     converters.add(converter);
   }
 
@@ -256,4 +264,39 @@ public class WebConfig extends WebMvcConfigurerAdapter {
   //  return processEngine().getIdentityService();
   //}
 
+
+  //@Autowired
+  //private RedisTemplate<String, String> template;
+  //
+  //// inject the template as ListOperations
+  //@Resource(name="redisTemplate")
+  //private ListOperations<String, String> listOps;
+
+  ///**
+  // * jedis
+  // */
+  //@Bean
+  //public RedisConnectionFactory jedisConnectionFactory() {
+  //  RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
+  //      .master("mymaster")
+  //      .sentinel("127.0.0.1", 26379)
+  //      .sentinel("127.0.0.1", 26380);
+  //  JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
+  //  return jedisConnectionFactory;
+  //}
+  //
+  //@Bean
+  //public RedisTemplate<String, String> redisTemplate() {
+  //  RedisTemplate<String, String> template = new RedisTemplate<String, String>();
+  //  template.setConnectionFactory(jedisConnectionFactory());
+  //  return template;
+  //}
+  //
+  //@Resource(name="redisTemplate")
+  //@Bean
+  //public String test() {
+  //  listOps.leftPush("aaa", "xxxxxxxxx");
+  //  listOps.leftPush("11", "2222");
+  //  return "";
+  //}
 }

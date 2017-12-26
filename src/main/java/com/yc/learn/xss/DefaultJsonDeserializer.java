@@ -21,7 +21,8 @@ public class DefaultJsonDeserializer extends StdDeserializer<String> {
     super(t);
   }
 
-  @Override public String deserialize(JsonParser p, DeserializationContext ctxt)
+  @Override
+  public String deserialize(JsonParser p, DeserializationContext ctxt)
       throws IOException {
     String value = p.getValueAsString();
     if (StringUtils.isEmpty(value)) {

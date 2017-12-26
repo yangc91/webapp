@@ -23,6 +23,7 @@ public class DefaultJsonSerializer extends StdSerializer<String> {
   @Override
   public void serialize(String value, JsonGenerator gen, SerializerProvider serializers)
       throws IOException {
+    // xss策略再此执行
     String safe = HtmlUtils.htmlEscape(value, "utf-8");
     gen.writeString(safe);
   }

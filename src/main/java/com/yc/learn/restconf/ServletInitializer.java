@@ -1,9 +1,11 @@
 package com.yc.learn.restconf;
 
+import javax.servlet.Filter;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
- * @Auther: yangchun
+ * @author yangchun
  * @Date: 2017-8-17 19:37
  */
 public class ServletInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
@@ -23,21 +25,11 @@ public class ServletInitializer extends AbstractAnnotationConfigDispatcherServle
     return new String[] {"/*"};
   }
 
-  //@Override
-  //protected Filter[] getServletFilters() {
-  //  return super.getServletFilters();
-  //}
-
-  //@Override
-  //public void onStartup(ServletContext servletContext) throws ServletException {
-  //  super.onStartup(servletContext);
-  //  registerProxyFilter(servletContext, "springSecurityFilterChain");
-  //  registerProxyFilter(servletContext, "oauth2ClientContextFilter");
-  //}
-
-  //private void registerProxyFilter(ServletContext servletContext, String name) {
-  //  DelegatingFilterProxy filter = new DelegatingFilterProxy(name);
-  //  filter.setContextAttribute("org.springframework.web.servlet.FrameworkServlet.CONTEXT.dispatcher");
-  //  servletContext.addFilter(name, filter).addMappingForUrlPatterns(null, false, "/*");
-  //}
+  @Override
+  protected Filter[] getServletFilters() {
+    CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+    characterEncodingFilter.setEncoding("UTF-8");
+    characterEncodingFilter.setForceEncoding(true);
+    return new Filter[] {characterEncodingFilter};
+  }
 }

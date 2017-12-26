@@ -25,6 +25,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -32,7 +33,7 @@ import redis.clients.jedis.JedisPool;
 import static com.yc.learn.ConstantsProp.REDIS_LONGIN_PREFIX;
 
 /**
- * @Auther: yangchun
+ * @author yangchun
  * @Date: 2017-7-29 10:55
  */
 @RestController
